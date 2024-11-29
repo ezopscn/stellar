@@ -1,0 +1,362 @@
+@import "AdminVars";
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+/*全局滚动条*/
+::-webkit-scrollbar-track-piece {
+  background-color: #f8f8f8;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #dddddd;
+  background-clip: padding-box;
+  min-height: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #bbb;
+}
+
+// 不可选择
+.admin-unselect {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
+  touch-action: none;
+  cursor: default;
+}
+
+// Header
+.admin-header {
+  height: @HEADER-HEIGHT;
+  line-height: @HEADER-HEIGHT;
+  border-bottom: 1px solid @BOX-COLOR;
+  box-shadow: @BOTTOM-SHADOW;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 0 15px;
+  background-color: #ffffff;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+
+  .admin-left {
+    display: flex;
+
+    .admin-logo {
+      height: @HEADER-HEIGHT;
+      line-height: @HEADER-HEIGHT;
+      width: calc(@MENU-WIDTH - 15px);
+
+      img {
+        height: @HEADER-HEIGHT;
+        line-height: @HEADER-HEIGHT;
+        padding: 10px 0;
+      }
+    }
+  }
+
+  .admin-right {
+    .ant-avatar:hover {
+      cursor: pointer;
+    }
+
+    .ant-badge .ant-badge-count,
+    .ant-badge .ant-badge-dot, .ant-badge .ant-scroll-number-custom-component {
+      top: 4px;
+    }
+
+    .ant-badge .ant-badge-count-sm {
+      min-width: 12px;
+      height: 12px;
+      font-size: 10px;
+      line-height: 12px;
+    }
+  }
+}
+
+// 主体
+.admin-main {
+  margin-top: @HEADER-HEIGHT;
+}
+
+// Sider
+.admin-sider {
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  user-select: none;
+  border-right: 1px solid @BOX-COLOR;
+  box-shadow: @RIGHT-SHADOW;
+  max-height: calc(100vh - @HEADER-HEIGHT);
+  height: calc(100vh - @HEADER-HEIGHT);
+  background: @MENU-BG-COLOR !important;
+}
+
+// menu
+.admin-menu {
+  padding: 10px 0 calc(@HEADER-HEIGHT + 10px) 0;
+  background: @MENU-BG-COLOR !important;
+}
+
+.admin-body {
+  max-height: calc(100vh - @HEADER-HEIGHT);
+  height: calc(100vh - @HEADER-HEIGHT);
+  // background-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.admin-footer {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  padding: 15px 30px;
+}
+
+.ant-dropdown-menu-title-content .ant-badge {
+  top: -1px;
+  margin-left: 5px;
+}
+
+.admin-page-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(9, 30, 66, 0.1);
+  background-image: url(../image/background/banner1.png);
+  background-repeat: no-repeat;
+  background-size: 100%;
+
+  .admin-page-title {
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    line-height: 1;
+    font-weight: bolder;
+    font-size: clamp(15px, 25vw, 15px);
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #00084d, #1d63ed);
+  }
+
+  .admin-page-desc {
+    color: #666666;
+    padding-left: 5px;
+  }
+
+  * {
+    letter-spacing: 1px;
+    line-height: 25px;
+  }
+
+  ul {
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-inline-start: 30px;
+  }
+}
+
+// error
+.admin-error {
+  .admin-error-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 0 10%;
+
+    img {
+      height: 25px;
+      padding: 20px 0;
+    }
+  }
+
+  .admin-error-body {
+    padding: 0 10%;
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    text-align: center;
+
+    img {
+      position: absolute;
+      top: calc(50vh - 300px);
+      height: 400px;
+    }
+
+    .admin-error-code {
+      position: absolute;
+      top: calc(50vh - 100px);
+      line-height: 0;
+      font-size: 500px;
+      font-weight: bolder;
+      opacity: 0.03;
+    }
+
+    button {
+      width: 200px;
+      font-weight: bold;
+      position: absolute;
+      top: calc(50vh + 150px);
+      letter-spacing: 5px;
+    }
+  }
+
+  .admin-error-footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+  }
+}
+
+// 登录
+.admin-login-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url(../image/background/rbg.png);
+  background-size: cover;
+}
+
+.admin-login-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url(../image/background/cncf.webp);
+  background-repeat: no-repeat;
+  background-size: auto 500px;
+  background-position: center;
+  background-position-y: calc(100% + 120px);
+  overflow: hidden;
+}
+
+.admin-login-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 0 30px;
+
+  img {
+    height: 25px;
+    padding: 20px 0;
+  }
+}
+
+.admin-login-body {
+  border: 1px solid rgba(9, 30, 66, 0.1);
+  box-shadow: rgba(9, 30, 66, 0.1) 0 0 10px;
+  width: 320px;
+  padding: 50px 40px;
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff;
+
+  .ant-form-item {
+    margin-bottom: 25px;
+  }
+
+  .admin-login-title {
+    font-weight: bolder;
+    font-size: 25px;
+    color: #000000;
+    margin-bottom: 20px;
+    text-align: center;
+    letter-spacing: 2px;
+    user-select: none;
+  }
+
+  .admin-welcome {
+    letter-spacing: 3px;
+    margin: 15px 0;
+    color: #d9d9d9 !important;
+    font-size: 15px;
+  }
+
+  .admin-login-change {
+    margin: 15px 0;
+    color: #d9d9d9 !important;
+    font-size: 13px;
+  }
+
+  .admin-login-input {
+    height: 32px;
+    line-height: 32px;
+
+    .ant-input-prefix {
+      font-size: 17px;
+      margin-right: 15px;
+      color: #d9d9d9;
+    }
+  }
+
+  .admin-login-code-button {
+    height: 32px;
+    line-height: 32px;
+    width: 112px;
+    letter-spacing: 1px;
+  }
+
+  .admin-login-form-button {
+    height: 32px;
+    line-height: 32px;
+    margin: 0;
+  }
+
+  .admin-login-remember-item {
+    margin-bottom: 15px;
+  }
+}
+
+.admin-login-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+}
+
+.admin-page-search,
+.admin-page-list {
+  margin: 10px;
+  border: 1px solid rgba(9, 30, 66, 0.1);
+  padding: 15px;
+  background-color: #ffffff;
+
+  .ant-form-item {
+    margin: 10px 0;
+  }
+}
+
+.admin-page-btn-group {
+  margin-bottom: 10px;
+}
+
+// 加载中
+.admin-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
