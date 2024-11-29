@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"stellar/common"
 	"stellar/initialize"
-	"stellar/pkg/gedis"
+	"stellar/service"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -44,68 +44,50 @@ var startCmd = &cobra.Command{
 		initialize.Redis()        // 初始化 Redis
 		initialize.ClientId()     // 初始化客户端 ID
 
-		// 心跳上报
 		go func() {
-			cache := gedis.NewRedisConnection()
-			key := fmt.Sprintf("%s:%s", common.RKP.HeartbeatId, *common.ClientId)
-			for {
-				common.SystemLog.Debugf("Start heartbeat check, client id: %s", *common.ClientId)
-				cache.Set(key, time.Now().Unix(), gedis.WithExpire(time.Second*15))
-				time.Sleep(10 * time.Second)
-			}
+			// 心跳上报
+			service.ReportHeartbeatTask()
 		}()
 
-		// 竞选 Leader
 		if common.Config.System.LeaderElection {
 			go func() {
-				cache := gedis.NewRedisConnection()
-				for {
-					// 没有 Leader，则设置自己为 Leader，自己是 Leader，则延长过期时间并加锁
-					leaderId := cache.GetString(common.RKP.LeaderId).Unwrap()
-					if leaderId == "" {
-						common.SystemLog.Debugf("No leader, set leader id: %s", *common.ClientId)
-						cache.Set(common.RKP.LeaderId, *common.ClientId, gedis.WithExpire(time.Second*15))
-					} else if leaderId == *common.ClientId {
-						common.SystemLog.Debugf("I am leader, extend expiration time and lock")
-						cache.Set(common.RKP.LeaderId, *common.ClientId, gedis.WithExpire(time.Second*15), gedis.WithXX())
-					}
-					time.Sleep(10 * time.Second)
-				}
+				// 竞选 Leader
+				service.ElectionLeaderTask()
+			}()
+
+			go func() {
+				// Leader 读取并发布任务
+				service.PublishTaskToChannelTask()
 			}()
 		}
 
-		// 注册 Worker
 		if common.Config.System.Worker {
 			go func() {
-				common.SystemLog.Debugf("Start register worker, client id: %s", *common.ClientId)
-				cache := gedis.NewRedisConnection()
-				key := fmt.Sprintf("%s:%s", common.RKP.WorkerId, *common.ClientId)
-				for {
-					cache.Set(key, time.Now().Unix(), gedis.WithExpire(time.Second*15))
-					time.Sleep(10 * time.Second)
-				}
+				// 注册 Worker
+				service.RegisterWorkerTask()
+			}()
+
+			go func() {
+				// Worker 订阅任务
+				service.SubscribeTaskFromChannelTask()
 			}()
 		}
 
 		// Web 后端服务
 		if common.Config.System.WebServer {
-			r := initialize.Router() // 初始化路由
-			// 启动服务
+			// 初始化路由
+			r := initialize.Router()
 			server := http.Server{
 				Addr:    fmt.Sprintf("%s:%s", common.Config.System.Host, common.Config.System.Port),
 				Handler: r,
 			}
 
+			// 注册 Web 服务
 			go func() {
-				common.SystemLog.Debugf("Start register web server, client id: %s", *common.ClientId)
-				cache := gedis.NewRedisConnection()
-				key := fmt.Sprintf("%s:%s", common.RKP.WebServerId, *common.ClientId)
-				for {
-					cache.Set(key, time.Now().Unix(), gedis.WithExpire(time.Second*15))
-					time.Sleep(10 * time.Second)
-				}
+				service.RegisterWebServerTask()
 			}()
 
+			// 启动服务
 			go func() {
 				err := server.ListenAndServe()
 				if err != nil && err != http.ErrServerClosed {
@@ -125,10 +107,9 @@ var startCmd = &cobra.Command{
 			if err != nil {
 				panic("Failed to shutdown the server: " + err.Error())
 			}
-			fmt.Println("Server shutdown gracefully")
+			fmt.Println("Server shutdown successfully")
 		} else {
-			// 设置一个保活的主进程
-			select {}
+			select {} // 设置一个保活的主进程
 		}
 
 		// 如果当前节点竞选成功 Leader，则启动任务调度
