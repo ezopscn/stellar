@@ -60,7 +60,7 @@ func RegisterWebServerTask() {
 }
 
 // 检测并发布任务
-func PublishTaskToChannelTask() {
+func PublishTaskToRedisListTask() {
 	cache := gedis.NewRedisConnection()
 	for {
 		leaderId := cache.GetString(common.RKP.LeaderId).Unwrap()
@@ -71,15 +71,20 @@ func PublishTaskToChannelTask() {
 			now := time.Now()
 			err := common.MySQLDB.Where("nextRunTime <= ? AND status = ?", now, 1).Find(&metricTasks).Error
 			if err != nil {
-				common.SystemLog.Error("查询指标任务失败: ", err.Error())
+				common.SystemLog.Error("Get metric tasks failed: ", err.Error())
 				return
 			}
 
 			for _, metricTask := range metricTasks {
-				common.SystemLog.Debug("检测到指标任务: ", metricTask.Name, ": ", metricTask.MetricName+metricTask.MetricLabel)
+				// 发布到消息队列，确保只有一个订阅者能收到消息
+				name := metricTask.MetricName + metricTask.MetricLabel
+				common.SystemLog.Debugf("Detect metric task: %s", name)
+				err := common.RedisCache.LPush(context.Background(), common.RKP.MetricTask, metricTask.Id).Err()
+				if err != nil {
+					common.SystemLog.Error("Publish metric task failed: ", name, ": ", err.Error())
+					continue
+				}
 
-				// 发布到消息队列
-				common.RedisCache.Publish(context.Background(), "METRIC_TASK", metricTask)
 				// 更新任务下次执行时间
 			}
 		}
@@ -88,10 +93,14 @@ func PublishTaskToChannelTask() {
 }
 
 // Worker 订阅任务
-func SubscribeTaskFromChannelTask() {
+func SubscribeTaskFromRedisListTask() {
 	common.SystemLog.Debugf("Start subscribe task, client id: %s", *common.ClientId)
 	for {
 		common.SystemLog.Debugf("I am worker, subscribe task, client id: %s", *common.ClientId)
+		taskId, err := common.RedisCache.BRPop(context.Background(), 0, common.RKP.MetricTask).Result()
+		if err == nil {
+			common.SystemLog.Debugf("Get metric task: %s", taskId[1])
+		}
 		time.Sleep(1 * time.Second)
 	}
 }

@@ -56,8 +56,8 @@ var startCmd = &cobra.Command{
 			}()
 
 			go func() {
-				// Leader 读取并发布任务
-				service.PublishTaskToChannelTask()
+				// Leader 读取并发布任务到 Redis 列表中
+				service.PublishTaskToRedisListTask()
 			}()
 		}
 
@@ -68,8 +68,8 @@ var startCmd = &cobra.Command{
 			}()
 
 			go func() {
-				// Worker 订阅任务
-				service.SubscribeTaskFromChannelTask()
+				// Worker Redis 列表中获取任务
+				service.SubscribeTaskFromRedisListTask()
 			}()
 		}
 
