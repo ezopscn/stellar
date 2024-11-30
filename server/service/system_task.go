@@ -76,31 +76,53 @@ func PublishTaskToRedisListTask() {
 			}
 
 			for _, metricTask := range metricTasks {
-				// 发布到消息队列，确保只有一个订阅者能收到消息
+				// 发布到消息列表，这样才能确保只有一个消费者能收到消息
 				name := metricTask.MetricName + metricTask.MetricLabel
-				common.SystemLog.Debugf("Detect metric task: %s", name)
+				common.SystemLog.Debugf("Publish metric task: %s", name)
 				err := common.RedisCache.LPush(context.Background(), common.RKP.MetricTask, metricTask.Id).Err()
 				if err != nil {
 					common.SystemLog.Error("Publish metric task failed: ", name, ": ", err.Error())
 					continue
 				}
 
-				// 更新任务下次执行时间
+				// 更新任务下次执行时间，解析 Cron 表达式
+				// parser := cron.NewParser(cron.Second | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow)
+				// nextRunTime, err := parser.Parse(metricTask.CronExpression)
+				// if err != nil {
+				// 	common.SystemLog.Error("Parse cron expression failed: ", err.Error())
+				// 	continue
+				// }
+				// metricTask.NextRunTime = nextRunTime.Next(now)
+				// err = common.MySQLDB.Save(&metricTask).Error
+				// if err != nil {
+				// 	common.SystemLog.Error("Update metric task next run time failed: ", err.Error())
+				// 	continue
+				// }
 			}
 		}
 		time.Sleep(1 * time.Second)
 	}
 }
 
-// Worker 订阅任务
-func SubscribeTaskFromRedisListTask() {
-	common.SystemLog.Debugf("Start subscribe task, client id: %s", *common.ClientId)
+// Worker 消费任务
+func ConsumeTaskFromRedisListTask() {
+	common.SystemLog.Debugf("Start consume task, client id: %s", *common.ClientId)
 	for {
-		common.SystemLog.Debugf("I am worker, subscribe task, client id: %s", *common.ClientId)
+		common.SystemLog.Debugf("I am worker, consume task, client id: %s", *common.ClientId)
 		taskId, err := common.RedisCache.BRPop(context.Background(), 0, common.RKP.MetricTask).Result()
 		if err == nil {
-			common.SystemLog.Debugf("Get metric task: %s", taskId[1])
+			// 查询任务详情
+			var metricTask model.MetricTask
+			err := common.MySQLDB.Where("id = ?", taskId[1]).First(&metricTask).Error
+			if err != nil {
+				common.SystemLog.Error("Get metric task detail failed: ", err.Error())
+				continue
+			}
+
+			// 开始执行任务
+			common.SystemLog.Debugf("Start execute metric task: %s", metricTask.Name)
+
+			// 异步执行任务，如果任务没有在规定实际执行完成，则终止任务，并保存执行记录
 		}
-		time.Sleep(1 * time.Second)
 	}
 }

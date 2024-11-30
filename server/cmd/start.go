@@ -69,7 +69,7 @@ var startCmd = &cobra.Command{
 
 			go func() {
 				// Worker Redis 列表中获取任务
-				service.SubscribeTaskFromRedisListTask()
+				service.ConsumeTaskFromRedisListTask()
 			}()
 		}
 
@@ -111,12 +111,5 @@ var startCmd = &cobra.Command{
 		} else {
 			select {} // 设置一个保活的主进程
 		}
-
-		// 如果当前节点竞选成功 Leader，则启动任务调度
-		// TODO: 启动任务调度
-		// service.CheckAndPublishMetricTask()
-
-		// time.Sleep(10 * time.Second)
-		// service.SubscribeMetricTask()
 	},
 }
