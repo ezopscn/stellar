@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { TitleSuffix } from '@/common/Text.jsx';
 
-const Usercenter = () => {
+const Me = () => {
   const title = '个人中心' + TitleSuffix;
   return (
     <>
@@ -14,4 +14,4 @@ const Usercenter = () => {
   );
 };
 
-export default Usercenter;
+export default Me;

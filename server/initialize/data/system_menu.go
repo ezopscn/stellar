@@ -51,7 +51,7 @@ var systemMenus = []model.SystemMenu{
 		Children: []model.SystemMenu{
 			{
 				Id:       1910,
-				Label:    "用户中心",
+				Label:    "用户管理",
 				Key:      "/system/users",
 				Sort:     1910,
 				ParentId: 1900,
@@ -110,7 +110,7 @@ var systemMenus = []model.SystemMenu{
 		Id:          2000,
 		Label:       "个人中心",
 		Icon:        "UserOutlined",
-		Key:         "/usercenter",
+		Key:         "/me",
 		Sort:        2000,
 		ParentId:    0,
 		SystemRoles: systemRoles,

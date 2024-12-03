@@ -24,9 +24,9 @@ const siderMenus = [
   getItem('工作空间', '/dashboard', <DynamicIcon iconName={'DesktopOutlined'} />),
   getItem('指标配置', '/metrics', <DynamicIcon iconName={'ConsoleSqlOutlined'} />),
   getItem('数据源', '/datasources', <DynamicIcon iconName={'ApiOutlined'} />),
-  getItem('个人中心', '/usercenter', <DynamicIcon iconName={'UserOutlined'} />),
+  getItem('个人中心', '/me', <DynamicIcon iconName={'UserOutlined'} />),
   getItem('系统设置', '/system', <DynamicIcon iconName={'ClusterOutlined'} />, [
-    getItem('用户中心', '/system/users'),
+    getItem('用户管理', '/system/users'),
     getItem('用户角色', '/system/roles'),
     getItem('系统菜单', '/system/menus'),
     getItem('系统接口', '/system/apis'),

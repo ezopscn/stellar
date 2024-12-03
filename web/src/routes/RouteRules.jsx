@@ -34,10 +34,10 @@ export const RouteRules = [
         element: RouteLazyLoad(React.lazy(() => import('../pages/datasources/Datasources.jsx')))
       },
       {
-        path: '/usercenter',
+        path: '/me',
         name: '个人中心',
         auth: true,
-        element: RouteLazyLoad(React.lazy(() => import('../pages/usercenter/Usercenter.jsx')))
+        element: RouteLazyLoad(React.lazy(() => import('../pages/me/Me.jsx')))
       },
       {
         path: '/system',
@@ -46,7 +46,7 @@ export const RouteRules = [
         children: [
           {
             path: '/system/users',
-            name: '用户中心',
+            name: '用户管理',
             auth: true,
             element: RouteLazyLoad(React.lazy(() => import('../pages/system/user/User.jsx')))
           },
