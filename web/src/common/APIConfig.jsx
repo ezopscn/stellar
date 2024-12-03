@@ -6,6 +6,7 @@ const Apis = {
   RunEnv: window.CONFIG.env, // 运行环境
   BackendURL: BackendURL, // 后端基础接口
   Public: {
+    Version: BackendURL + '/version', // 版本信息
     Login: BackendURL + '/login', // 用户登录
     Logout: BackendURL + '/logout' // 注销登录
   },
