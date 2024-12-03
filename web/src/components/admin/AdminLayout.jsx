@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Avatar, Badge, Dropdown, Layout, Menu, Select } from 'antd';
+import { Avatar, Badge, Dropdown, Layout, Menu, Select, App } from 'antd';
 import { DefaultAvatar, Logo } from '@/common/Image.jsx';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { FooterText } from '@/common/Text.jsx';
 import { TreeFindPath } from '@/utils/Path.jsx';
 import { RouteRules } from '@/routes/RouteRules.jsx';
 import { DynamicIcon } from '@/utils/IconLoad.jsx';
+import { AxiosGet } from '@/utils/Request.jsx';
+import { Apis } from '@/common/APIConfig.jsx';
 
 const { Header, Content, Sider } = Layout;
 
@@ -38,39 +40,11 @@ const siderMenus = [
   ])
 ];
 
-// 下拉菜单
-const dropdownMenus = [
-  {
-    label: 'DK / 吴彦祖',
-    key: '0',
-    disabled: true
-  },
-  {
-    label: (
-      <a target="_blank">
-        消息中心<Badge size="small" count={5}></Badge>
-      </a>
-    ),
-    key: '1'
-  },
-  {
-    label: (
-      <a target="_blank">
-        个人资料
-      </a>
-    ),
-    key: '2'
-  },
-  {
-    type: 'divider'
-  },
-  {
-    label: '注销登录',
-    key: '3'
-  }
-];
+
 
 const AdminLayout = () => {
+  // 消息提示
+  const { message } = App.useApp();
   // 菜单跳转
   const navigate = useNavigate();
   // 菜单展开收起状态
@@ -87,6 +61,46 @@ const AdminLayout = () => {
     setOpenKeys(TreeFindPath(RouteRules, data => data.path === pathname));
     setSelectedKeys(pathname);
   }, [pathname]);
+
+  // 用户注销
+  const logoutHandler = async () => {
+    const res = await AxiosGet(Apis.Public.Logout);
+    if (res.code === 200) {
+      localStorage.clear();
+      message.success('注销成功');
+      navigate('/login');
+    } else {
+      message.error('注销异常，' + res.message);
+    }
+  };
+
+  // 下拉菜单
+  const dropdownMenus = [
+    {
+      label: 'DK / 吴彦祖',
+      key: '0',
+      disabled: true
+    },
+    {
+      label: (
+        <a target="_blank">
+          个人资料
+        </a>
+      ),
+      key: '1',
+      onClick: () => {
+        navigate('/me');
+      }
+    },
+    {
+      type: 'divider'
+    },
+    {
+      label: '注销登录',
+      key: '2',
+      onClick: logoutHandler
+    }
+  ];
 
   return (
     <Layout>
