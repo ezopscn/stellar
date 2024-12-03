@@ -7,7 +7,7 @@ system:
   # 监听端口，推荐使用 3000-65535 之间的端口，服务启动时可以使用 --port 参数覆盖该值
   port: 12345
   # 是否是 Web 后端服务角色，集群中至少有一个节点设置为 true
-  web-server: false
+  web-server: true
   # 是否允许竞选 Leader，集群中至少有一个节点设置为 true
   leader-election: true
   # 是否允许成为 Worker，集群中至少有一个节点设置为 true
