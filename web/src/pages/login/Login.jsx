@@ -3,6 +3,7 @@ import { DingtalkOutlined, InsuranceOutlined, LockOutlined, UserOutlined } from 
 import { AxiosPost } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
 import { useNavigate } from 'react-router';
+import { SetToken } from '@/utils/Token.jsx';
 
 const Login = () => {
   // 消息提示
@@ -14,6 +15,8 @@ const Login = () => {
     try {
       const res = await AxiosPost(Apis.Public.Login, data);
       if (res.code === 200) {
+        const { token, expire } = res.data;
+        SetToken(token, expire);
         message.success('登录成功');
         navigate('/dashboard');
       } else {

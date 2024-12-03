@@ -8,7 +8,8 @@ const Apis = {
   Public: {
     Version: BackendURL + '/version', // 版本信息
     Login: BackendURL + '/login', // 用户登录
-    Logout: BackendURL + '/logout' // 注销登录
+    Logout: BackendURL + '/logout', // 注销登录
+    TokenVerification: BackendURL + '/token/verification' // Token 校验
   },
   Current: {
     User: {

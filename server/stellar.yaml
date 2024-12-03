@@ -9,9 +9,9 @@ system:
   # 是否是 Web 后端服务角色，集群中至少有一个节点设置为 true
   web-server: true
   # 是否允许竞选 Leader，集群中至少有一个节点设置为 true
-  leader-election: true
+  leader-election: false
   # 是否允许成为 Worker，集群中至少有一个节点设置为 true
-  worker: true
+  worker: false
 
 ####################################################################################
 # 日志配置

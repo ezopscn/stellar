@@ -10,6 +10,7 @@ export const GetToken = () => {
       return localStorage.getItem('token');
     }
   }
+
   // Token 过期或者没有 Token，直接清空 localStorage
   localStorage.clear();
   return null;

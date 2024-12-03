@@ -32,3 +32,8 @@ func VersionHandler(ctx *gin.Context) {
 		"systemGoVersion": common.SystemGoVersion,
 	})
 }
+
+// Token 校验
+func TokenVerificationHandler(ctx *gin.Context) {
+	response.Success()
+}
