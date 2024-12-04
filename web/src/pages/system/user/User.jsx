@@ -84,13 +84,13 @@ const User = () => {
       dataIndex: ['systemRole', 'name'],
       render: (name) => {
         if (name === '超级管理员') {
-          return <Tag color="magenta">{name}</Tag>;
+          return <Tag bordered={false} color="magenta">{name}</Tag>;
         } else if (name === '管理员') {
-          return <Tag color="volcano">{name}</Tag>;
+          return <Tag bordered={false} color="volcano">{name}</Tag>;
         } else if (name === '运维') {
-          return <Tag color='green'>{name}</Tag>;
+          return <Tag bordered={false} color='green'>{name}</Tag>;
         } else {
-          return <Tag>{name}</Tag>;
+          return <Tag bordered={false}>{name}</Tag>;
         }
       }
     },
@@ -99,13 +99,13 @@ const User = () => {
       dataIndex: ['systemRole', 'keyword'],
       render: (keyword) => {
         if (keyword === 'SuperAdministrator') {
-          return <Tag color="magenta">{keyword}</Tag>;
+          return <Tag bordered={false} color="magenta">{keyword}</Tag>;
         } else if (keyword === 'Administrator') {
-          return <Tag color="volcano">{keyword}</Tag>;
+          return <Tag bordered={false} color="volcano">{keyword}</Tag>;
         } else if (keyword === 'DevOps') {
-          return <Tag color='green'>{keyword}</Tag>;
+          return <Tag bordered={false} color='green'>{keyword}</Tag>;
         } else {
-          return <Tag>{keyword}</Tag>;
+          return <Tag bordered={false}>{keyword}</Tag>;
         }
       }
     },
@@ -114,9 +114,9 @@ const User = () => {
       dataIndex: 'status',
       render: (status) => {
         if (status === 1) {
-          return <Tag color="green">启用</Tag>;
+          return <Tag bordered={false} color="green">启用</Tag>;
         } else {
-          return <Tag color="red">禁用</Tag>;
+          return <Tag bordered={false} color="red">禁用</Tag>;
         }
       }
     },
