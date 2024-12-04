@@ -8,12 +8,13 @@ import (
 type SystemUser struct {
 	BaseModel
 	Username               string        `gorm:"column:username;uniqueIndex:uidx_username;comment:用户名" json:"username"`
-	Password               string        `gorm:"column:password;comment:密码" json:"password"`
+	Password               string        `gorm:"column:password;comment:密码" json:"-"`
 	CNName                 string        `gorm:"column:cnName;comment:中文名" json:"cnName"`
 	ENName                 string        `gorm:"column:enName;comment:英文名" json:"enName"`
 	Email                  string        `gorm:"column:email;uniqueIndex:uidx_email;comment:邮箱" json:"email"`
 	Phone                  string        `gorm:"column:phone;uniqueIndex:uidx_phone;comment:手机号" json:"phone"`
 	HidePhone              *uint         `gorm:"column:hidePhone;default:1;comment:是否隐藏手机号(0=不隐藏,1=隐藏)" json:"hidePhone"`
+	Gender                 *uint         `gorm:"column:gender;default:0;comment:性别(0=未知,1=男,2=女)" json:"gender"`
 	Avatar                 string        `gorm:"column:avatar;comment:头像" json:"avatar"`
 	Department             string        `gorm:"column:department;not null;comment:部门" json:"department"`
 	JobPosition            string        `gorm:"column:jobPosition;not null;comment:工作岗位" json:"jobPosition"`

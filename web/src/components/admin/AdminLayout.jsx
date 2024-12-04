@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Avatar, Badge, Dropdown, Layout, Menu, Select, App } from 'antd';
-import { DefaultAvatar, Logo } from '@/common/Image.jsx';
+import { Logo } from '@/common/Image.jsx';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { FooterText } from '@/common/Text.jsx';
 import { TreeFindPath } from '@/utils/Path.jsx';
@@ -8,6 +8,8 @@ import { RouteRules } from '@/routes/RouteRules.jsx';
 import { DynamicIcon } from '@/utils/IconLoad.jsx';
 import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
+import { jwtDecode } from "jwt-decode";
+import { ManOutlined, WomanOutlined, QuestionOutlined } from '@ant-design/icons';
 
 const { Header, Content, Sider } = Layout;
 
@@ -39,7 +41,6 @@ const siderMenus = [
     getItem('操作日志', '/securityaudit/operation'),
   ])
 ];
-
 
 
 const AdminLayout = () => {
@@ -74,17 +75,21 @@ const AdminLayout = () => {
     }
   };
 
+  // 从 Token 中解析出用户相关信息
+  const token = localStorage.getItem('token');
+  const userInfo = jwtDecode(token);
+
   // 下拉菜单
   const dropdownMenus = [
     {
-      label: 'DK / 吴彦祖',
+      label: `${userInfo?.cnName} / ${userInfo?.enName}`,
       key: '0',
       disabled: true
     },
     {
       label: (
         <a target="_blank">
-          个人资料
+          修改资料
         </a>
       ),
       key: '1',
@@ -111,14 +116,15 @@ const AdminLayout = () => {
           </div>
         </div>
         <div className="admin-right">
-          <Badge size="small" count={5}>
+          <Badge count={userInfo?.gender === 1 ? <ManOutlined style={{ backgroundColor: '#165dff' }} /> :
+            userInfo?.gender === 2 ? <WomanOutlined style={{ backgroundColor: '#ff4d4f' }} /> :
+              <QuestionOutlined style={{ backgroundColor: '#999' }} />}>
             <Dropdown menu={{
               items: dropdownMenus
             }}>
-              <Avatar shape="circle" size={30}
-                      src={DefaultAvatar} />
+              <Avatar shape="circle" size={30} src={userInfo?.avatar} />
             </Dropdown>
-          </Badge>
+        </Badge>
         </div>
       </Header>
       <Layout className="admin-main">

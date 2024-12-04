@@ -1,66 +1,117 @@
-import { Button, Col, Form, Input, Row, Select, Space, Table } from 'antd';
-import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ArrowRightOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { Button, Col, Form, Input, Row, Select, Space, Table, App } from 'antd';
+import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ManOutlined, WomanOutlined, QuestionOutlined } from '@ant-design/icons';
+import { useState, useEffect } from 'react';
 import { TitleSuffix } from '@/common/Text.jsx';
 import { Helmet } from 'react-helmet';
+import { AxiosGet } from '@/utils/Request';
+import { Apis } from '@/common/APIConfig';
+import { Avatar, Tag } from 'antd';
 
 const { Option } = Select;
 
 const User = () => {
+  // 消息提示
+  const { message } = App.useApp();
   const title = '用户中心' + TitleSuffix;
 
+  // 每页数据量
+  const [pageSize, setPageSize] = useState(1);
+
+  // 获取用户列表
+  const [userList, setUserList] = useState([]);
+  useEffect(() => {
+    const getUserList = async () => {
+      const res = await AxiosGet(Apis.System.User.List);
+      if (res.code === 200) {
+        setUserList(res.data);
+      } else {
+        message.error(res.message);
+      }
+    };
+    getUserList();
+  }, []);
+
+  // 表格列
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name'
+      title: '头像',
+      dataIndex: 'avatar',
+      render: (avatar) => <Avatar src={avatar} />
     },
     {
-      title: 'Age',
-      dataIndex: 'age',
-      key: 'age'
+      title: '中文名',
+      dataIndex: 'cnName',
     },
     {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address'
+      title: '英文名',
+      dataIndex: 'enName',
     },
     {
-      title: 'Action',
-      dataIndex: '',
-      key: 'x',
-      render: () => <a>Delete</a>
-    }
-  ];
-
-  const data = [
-    {
-      key: 1,
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      description: 'My name is John Brown, I am 32 years old, living in New York No. 1 Lake Park.'
+      title: '性别',
+      dataIndex: 'gender',
+      render: (gender) => {
+        if (gender === 1) {
+          return <ManOutlined style={{ color: '#165dff' }} />;
+        } else if (gender === 2) {
+          return <WomanOutlined style={{ color: '#ff4d4f' }} />;
+        } else {
+          return <QuestionOutlined style={{ color: '#999' }} />;
+        }
+      }
     },
     {
-      key: 2,
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      description: 'My name is Jim Green, I am 42 years old, living in London No. 1 Lake Park.'
+      title: '用户名',
+      dataIndex: 'username',
     },
     {
-      key: 3,
-      name: 'Not Expandable',
-      age: 29,
-      address: 'Jiangsu No. 1 Lake Park',
-      description: 'This not expandable'
+      title: '邮箱',
+      dataIndex: 'email',
     },
     {
-      key: 4,
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sydney No. 1 Lake Park',
-      description: 'My name is Joe Black, I am 32 years old, living in Sydney No. 1 Lake Park.'
+      title: '手机号',
+      dataIndex: 'phone',
+    },
+    {
+      title: '部门',
+      dataIndex: 'department',
+    },
+    {
+      title: '岗位',
+      dataIndex: 'jobPosition',
+    },
+    {
+      title: '角色名称',
+      dataIndex: ['systemRole', 'name'],
+      render: (name) => {
+        if (name === '超级管理员') {
+          return <Tag color="magenta">{name}</Tag>;
+        } else if (name === '管理员') {
+          return <Tag color="volcano">{name}</Tag>;
+        } else if (name === '运维') {
+          return <Tag color='green'>{name}</Tag>;
+        } else {
+          return <Tag>{name}</Tag>;
+        }
+      }
+    },
+    {
+      title: '角色关键字',
+      dataIndex: ['systemRole', 'keyword'],
+      render: (keyword) => {
+        if (keyword === 'SuperAdministrator') {
+          return <Tag color="magenta">{keyword}</Tag>;
+        } else if (keyword === 'Administrator') {
+          return <Tag color="volcano">{keyword}</Tag>;
+        } else if (keyword === 'DevOps') {
+          return <Tag color='green'>{keyword}</Tag>;
+        } else {
+          return <Tag>{keyword}</Tag>;
+        }
+      }
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
     }
   ];
 
@@ -186,7 +237,16 @@ const User = () => {
               ),
               rowExpandable: (record) => record.name !== 'Not Expandable'
             }}
-            dataSource={data}
+            dataSource={userList}
+            rowKey='id'
+            pagination={{
+              pageSize: pageSize,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              onChange: (page, pageSize) => {
+                setPageSize(pageSize);
+              }
+            }}
           />
         </div>
       </div>

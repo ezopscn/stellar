@@ -9,7 +9,7 @@ const Metrics = () => {
         <title>{title}</title>
         <meta name="description" content={title} />
       </Helmet>
-      <h1>Hello</h1>
+      <h1>Metrics</h1>
     </>
   );
 };

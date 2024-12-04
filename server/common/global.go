@@ -10,16 +10,17 @@ import (
 
 // 全局变量，build 或者 run 的时候会通过参数替换
 var (
-	SystemVersion               = "unknown"      // 系统版本
-	SystemGoVersion             = "unknown"      // 系统 Go 版本
-	SystemConfigType            = "yaml"         // 配置文件类型
-	SystemConfigDefaultFilename = "stellar.yaml" // 默认配置文件名
-	SystemConfigFilename        = ""             // 配置文件名，可以通过参数替换
-	SystemConfigHost            = ""             // 配置文件主机，可以通过参数替换
-	SystemConfigPort            = ""             // 配置文件端口，可以通过参数替换
-	SystemRoleWebServer         = ""             // 是否是 Web 后端服务角色，可选值：1、0
-	SystemRoleLeaderElection    = ""             // 是否是领导者竞选角色，可选值：1、0
-	SystemRoleWorker            = ""             // 是否是工作者角色，可选值：1、0
+	SystemVersion               = "unknown"                                       // 系统版本
+	SystemGoVersion             = "unknown"                                       // 系统 Go 版本
+	SystemConfigType            = "yaml"                                          // 配置文件类型
+	SystemConfigDefaultFilename = "stellar.yaml"                                  // 默认配置文件名
+	SystemConfigFilename        = ""                                              // 配置文件名，可以通过参数替换
+	SystemConfigHost            = ""                                              // 配置文件主机，可以通过参数替换
+	SystemConfigPort            = ""                                              // 配置文件端口，可以通过参数替换
+	SystemRoleWebServer         = ""                                              // 是否是 Web 后端服务角色，可选值：1、0
+	SystemRoleLeaderElection    = ""                                              // 是否是领导者竞选角色，可选值：1、0
+	SystemRoleWorker            = ""                                              // 是否是工作者角色，可选值：1、0
+	SystemRoleAdminList         = []string{"Administrator", "SuperAdministrator"} // 管理员角色关键字列表
 )
 
 // 全局状态
