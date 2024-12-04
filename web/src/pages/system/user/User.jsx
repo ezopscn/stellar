@@ -112,7 +112,24 @@ const User = () => {
     {
       title: '状态',
       dataIndex: 'status',
-    }
+      render: (status) => {
+        if (status === 1) {
+          return <Tag color="green">启用</Tag>;
+        } else {
+          return <Tag color="red">禁用</Tag>;
+        }
+      }
+    },
+    {
+      title: '操作',
+      key: 'action',
+      render: (_, record) => (
+        <Space size="middle">
+          <a>编辑</a>
+          {record.status === 1 ? <a style={{ color: '#ff4d4f' }}>禁用</a> : <a>启用</a>}
+        </Space>
+      ),
+    },
   ];
 
   const rowSelection = {
