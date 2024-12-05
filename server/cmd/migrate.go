@@ -18,7 +18,7 @@ func init() {
 // 迁移命令
 var migrateCmd = &cobra.Command{
 	Use:   "migrate",
-	Short: "Migrate the database",
+	Short: "Migrate the database, only first time initialize system data",
 }
 
 // 迁移表命令
@@ -35,7 +35,7 @@ var migrateTableCmd = &cobra.Command{
 // 迁移数据命令
 var migrateDataCmd = &cobra.Command{
 	Use:   "data",
-	Short: "Migrate the database data",
+	Short: "Dangerous! Migrate the database data, will delete all data and insert new data",
 	Run: func(cmd *cobra.Command, args []string) {
 		initialize.Config()
 		initialize.MySQL()

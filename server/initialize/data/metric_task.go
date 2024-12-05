@@ -51,8 +51,6 @@ var metricTasks = []model.MetricTask{
 
 // 指标任务初始化
 func InitMetricTaskData() {
-	for _, metricTask := range metricTasks {
-		common.MySQLDB.Exec("DELETE FROM metric_task WHERE id = ?", metricTask.Id)
-		common.MySQLDB.Create(&metricTask)
-	}
+	common.MySQLDB.Exec("TRUNCATE TABLE metric_task")
+	common.MySQLDB.Create(&metricTasks)
 }

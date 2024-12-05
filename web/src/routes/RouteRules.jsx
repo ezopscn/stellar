@@ -45,6 +45,18 @@ export const RouteRules = [
         auth: true,
         children: [
           {
+            path: '/system/departments',
+            name: '组织架构',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/department/Department.jsx')))
+          },
+          {
+            path: '/system/jobpositions',
+            name: '职位管理',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/jobposition/JobPosition.jsx')))
+          },
+          {
             path: '/system/users',
             name: '用户管理',
             auth: true,

@@ -11,19 +11,23 @@ import (
 // 迁移数据表
 func MigrateTable() {
 	fmt.Println(time.Now().Format(common.TimeMillisecondFormat), "Start migrate table")
-	common.MySQLDB.AutoMigrate(new(model.SystemUser))
-	common.MySQLDB.AutoMigrate(new(model.SystemRole))
-	common.MySQLDB.AutoMigrate(new(model.SystemMenu))
-	common.MySQLDB.AutoMigrate(new(model.DatasourceType))
-	common.MySQLDB.AutoMigrate(new(model.Datasource))
-	common.MySQLDB.AutoMigrate(new(model.MetricTask))
-	common.MySQLDB.AutoMigrate(new(model.MetricTaskLog))
+	common.MySQLDB.AutoMigrate(new(model.SystemDepartment))  // 部门
+	common.MySQLDB.AutoMigrate(new(model.SystemJobPosition)) // 岗位
+	common.MySQLDB.AutoMigrate(new(model.SystemUser))        // 用户
+	common.MySQLDB.AutoMigrate(new(model.SystemRole))        // 角色
+	common.MySQLDB.AutoMigrate(new(model.SystemMenu))        // 菜单
+	common.MySQLDB.AutoMigrate(new(model.DatasourceType))    // 数据源类型
+	common.MySQLDB.AutoMigrate(new(model.Datasource))        // 数据源
+	common.MySQLDB.AutoMigrate(new(model.MetricTask))        // 指标任务
+	common.MySQLDB.AutoMigrate(new(model.MetricTaskLog))     // 指标任务日志
 	fmt.Println(time.Now().Format(common.TimeMillisecondFormat), "Table migrate completed")
 }
 
 // 迁移数据
 func MigrateData() {
 	fmt.Println(time.Now().Format(common.TimeMillisecondFormat), "Start migrate data")
+	data.InitDepartmentData()
+	data.InitJobPositionData()
 	data.InitUserData()
 	data.InitRoleData()
 	data.InitMenuData()

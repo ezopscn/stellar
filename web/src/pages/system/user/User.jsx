@@ -78,13 +78,19 @@ const User = () => {
     },
     {
       title: '部门',
-      dataIndex: 'department',
+      dataIndex: 'systemDepartments',
       minWidth: 100,
+      render: (systemDepartments) => {
+        return systemDepartments.map(department => department.name).join(',');
+      }
     },
     {
       title: '岗位',
-      dataIndex: 'jobPosition',
+      dataIndex: 'systemJobPositions',
       minWidth: 120,
+      render: (systemJobPositions) => {
+        return systemJobPositions.map(jobPosition => jobPosition.name).join(',');
+      }
     },
     {
       title: '角色名称',
@@ -137,35 +143,6 @@ const User = () => {
           {record.status === 1 ? <a style={{ color: '#ff4d4f' }}>禁用</a> : <a>启用</a>}
         </Space>
       ),
-    },
-  ];
-
-  // 用户详情展开
-  const userDetail = [
-    {
-      key: '1',
-      label: 'UserName',
-      children: 'Zhou Maomao',
-    },
-    {
-      key: '2',
-      label: 'Telephone',
-      children: '1810000000',
-    },
-    {
-      key: '3',
-      label: 'Live',
-      children: 'Hangzhou, Zhejiang',
-    },
-    {
-      key: '4',
-      label: 'Remark',
-      children: 'empty',
-    },
-    {
-      key: '5',
-      label: 'Address',
-      children: 'No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China',
     },
   ];
 
@@ -274,21 +251,46 @@ const User = () => {
             <Button icon={<UserAddOutlined />}>添加用户</Button>
           </div>
           <Table
+            // 表格布局大小
             size='small'
+            // 表格布局方式，支持 fixed、auto
             tableLayout='auto'
+            // 表格行选择
             rowSelection={{
               type: 'checkbox',
               ...rowSelection
             }}
+            // 表格列
             columns={columns}
+            // 表格展开信息
             expandable={{
-              expandedRowRender: (record) => (
-                <Descriptions column={1} items={userDetail} />
-              ),
+              expandedRowRender: (record) => {
+                const items = [
+                  {
+                    label: '用户创建者',
+                    children: record.creator.split(',')[0] + ' / ' + record.creator.split(',')[1],
+                  },
+                  {
+                    label: '个人介绍',
+                    children: record.description,
+                  },
+                  {
+                    label: '最后登录 IP',
+                    children: record.lastLoginIP,
+                  },
+                  {
+                    label: '最后登录时间',
+                    children: record.lastLoginTime,
+                  },
+                ]
+                return <Descriptions column={1} items={items} />
+              },
               rowExpandable: (record) => record.name !== 'Not Expandable'
             }}
             dataSource={userList}
+            // 行唯一标识
             rowKey='id'
+            // 表格分页
             pagination={{
               pageSize: pageSize,
               showSizeChanger: true,
@@ -297,6 +299,7 @@ const User = () => {
                 setPageSize(pageSize);
               }
             }}
+            // 表格滚动，目的是为了最后一列固定
             scroll={{
               x: 'max-content',
             }}

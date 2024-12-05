@@ -7,13 +7,6 @@ import (
 	"stellar/pkg/utils"
 )
 
-const (
-	defaultPassword     = "p@ssw0rd"                                                            // 默认密码
-	defaultAvatar       = "https://gw.alipayobjects.com/zos/rmsportal/jZUIxmJycoymBprLOUbT.png" // 默认头像
-	defaultMaleAvatar   = "https://gw.alipayobjects.com/zos/rmsportal/ubnKSIfAJTxIgXOKlciN.png" // 默认头像(男)
-	defaultFemaleAvatar = "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png" // 默认头像(女)
-)
-
 // 用户初始化数据
 var systemUsers = []model.SystemUser{
 	{
@@ -29,11 +22,9 @@ var systemUsers = []model.SystemUser{
 		HidePhone:    trans.Uint(1),
 		Gender:       trans.Uint(1),
 		Avatar:       defaultMaleAvatar,
-		Department:   "系统工程部",
-		JobPosition:  "高级运维工程师",
 		Description:  "系统超级管理员",
 		Status:       trans.Uint(1),
-		CreatorId:    1,
+		Creator:      defaultCreator,
 		SystemRoleId: 1,
 	},
 	{
@@ -49,11 +40,9 @@ var systemUsers = []model.SystemUser{
 		HidePhone:    trans.Uint(1),
 		Gender:       trans.Uint(1),
 		Avatar:       defaultMaleAvatar,
-		Department:   "系统工程部",
-		JobPosition:  "高级运维工程师",
-		Description:  "系统超级管理员",
+		Description:  "系统管理员",
 		Status:       trans.Uint(1),
-		CreatorId:    1,
+		Creator:      defaultCreator,
 		SystemRoleId: 2,
 	},
 	{
@@ -69,11 +58,9 @@ var systemUsers = []model.SystemUser{
 		HidePhone:    trans.Uint(0),
 		Gender:       trans.Uint(2),
 		Avatar:       defaultFemaleAvatar,
-		Department:   "系统工程部",
-		JobPosition:  "高级运维工程师",
-		Description:  "系统高级运维工程师",
+		Description:  "系统运维工程师",
 		Status:       trans.Uint(0),
-		CreatorId:    1,
+		Creator:      defaultCreator,
 		SystemRoleId: 3,
 	},
 	{
@@ -89,19 +76,15 @@ var systemUsers = []model.SystemUser{
 		HidePhone:    trans.Uint(0),
 		Gender:       trans.Uint(0),
 		Avatar:       defaultAvatar,
-		Department:   "系统工程部",
-		JobPosition:  "访客",
-		Description:  "系统访客",
+		Description:  "系统访客，只读用户",
 		Status:       trans.Uint(0),
-		CreatorId:    1,
+		Creator:      defaultCreator,
 		SystemRoleId: 4,
 	},
 }
 
 // 用户初始化
 func InitUserData() {
-	for _, user := range systemUsers {
-		common.MySQLDB.Exec("DELETE FROM system_user WHERE id = ?", user.Id)
-		common.MySQLDB.Create(&user)
-	}
+	common.MySQLDB.Exec("TRUNCATE TABLE system_user")
+	common.MySQLDB.Create(&systemUsers)
 }
