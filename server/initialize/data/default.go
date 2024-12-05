@@ -1,9 +1,24 @@
 package data
 
-var (
-	defaultPassword     = "p@ssw0rd"                                                            // 默认密码
-	defaultAvatar       = "https://gw.alipayobjects.com/zos/rmsportal/jZUIxmJycoymBprLOUbT.png" // 默认头像
-	defaultMaleAvatar   = "https://gw.alipayobjects.com/zos/rmsportal/ubnKSIfAJTxIgXOKlciN.png" // 默认头像(男)
-	defaultFemaleAvatar = "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png" // 默认头像(女)
-	defaultCreator      = "系统默认创建,System,0"
+import (
+	"fmt"
+	"stellar/pkg/utils"
 )
+
+var (
+	defaultPassword = "p@ssw0rd"                   // 默认密码
+	defaultAvatar   = "/images/avatar/default.png" // 默认头像
+	defaultCreator  = "系统默认创建,System,0"
+)
+
+// 随机生成男头像
+func RandomMaleAvatar() string {
+	idStr := utils.RandString(1, "123456")
+	return fmt.Sprintf("/images/avatar/male_%s.svg", idStr)
+}
+
+// 随机生成女头像
+func RandomFemaleAvatar() string {
+	idStr := utils.RandString(1, "123456")
+	return fmt.Sprintf("/images/avatar/female_%s.svg", idStr)
+}

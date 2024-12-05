@@ -22,11 +22,15 @@ const User = () => {
   const [userList, setUserList] = useState([]);
   useEffect(() => {
     const getUserList = async () => {
-      const res = await AxiosGet(Apis.System.User.List);
-      if (res.code === 200) {
-        setUserList(res.data);
-      } else {
-        message.error(res.message);
+      try {
+        const res = await AxiosGet(Apis.System.User.List);
+        if (res.code === 200) {
+          setUserList(res.data);
+        } else {
+          message.error(res.message);
+        }
+      } catch (error) {
+        message.error('后端服务异常，获取用户列表失败');
       }
     };
     getUserList();
@@ -104,21 +108,6 @@ const User = () => {
           return <Tag bordered={false} color='green'>{name}</Tag>;
         } else {
           return <Tag bordered={false}>{name}</Tag>;
-        }
-      }
-    },
-    {
-      title: '角色关键字',
-      dataIndex: ['systemRole', 'keyword'],
-      render: (keyword) => {
-        if (keyword === 'SuperAdministrator') {
-          return <Tag bordered={false} color="magenta">{keyword}</Tag>;
-        } else if (keyword === 'Administrator') {
-          return <Tag bordered={false} color="volcano">{keyword}</Tag>;
-        } else if (keyword === 'DevOps') {
-          return <Tag bordered={false} color='green'>{keyword}</Tag>;
-        } else {
-          return <Tag bordered={false}>{keyword}</Tag>;
         }
       }
     },
