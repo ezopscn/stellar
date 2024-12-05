@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet';
 import { AxiosGet } from '@/utils/Request';
 import { Apis } from '@/common/APIConfig';
 import { Avatar, Tag } from 'antd';
+import { Descriptions } from 'antd';
 
 const { Option } = Select;
 
@@ -41,14 +42,17 @@ const User = () => {
     {
       title: '中文名',
       dataIndex: 'cnName',
+      minWidth: 80,
     },
     {
       title: '英文名',
       dataIndex: 'enName',
+      minWidth: 80,
     },
     {
       title: '性别',
       dataIndex: 'gender',
+      minWidth: 50,
       render: (gender) => {
         if (gender === 1) {
           return <ManOutlined style={{ color: '#165dff' }} />;
@@ -62,6 +66,7 @@ const User = () => {
     {
       title: '用户名',
       dataIndex: 'username',
+      minWidth: 80,
     },
     {
       title: '邮箱',
@@ -74,10 +79,12 @@ const User = () => {
     {
       title: '部门',
       dataIndex: 'department',
+      minWidth: 100,
     },
     {
       title: '岗位',
       dataIndex: 'jobPosition',
+      minWidth: 120,
     },
     {
       title: '角色名称',
@@ -123,6 +130,7 @@ const User = () => {
     {
       title: '操作',
       key: 'action',
+      fixed: 'right',
       render: (_, record) => (
         <Space size="middle">
           <a>编辑</a>
@@ -132,6 +140,36 @@ const User = () => {
     },
   ];
 
+  // 用户详情展开
+  const userDetail = [
+    {
+      key: '1',
+      label: 'UserName',
+      children: 'Zhou Maomao',
+    },
+    {
+      key: '2',
+      label: 'Telephone',
+      children: '1810000000',
+    },
+    {
+      key: '3',
+      label: 'Live',
+      children: 'Hangzhou, Zhejiang',
+    },
+    {
+      key: '4',
+      label: 'Remark',
+      children: 'empty',
+    },
+    {
+      key: '5',
+      label: 'Address',
+      children: 'No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China',
+    },
+  ];
+
+  // 表格行选择
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
       console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
@@ -237,6 +275,7 @@ const User = () => {
           </div>
           <Table
             size='small'
+            tableLayout='auto'
             rowSelection={{
               type: 'checkbox',
               ...rowSelection
@@ -244,13 +283,7 @@ const User = () => {
             columns={columns}
             expandable={{
               expandedRowRender: (record) => (
-                <p
-                  style={{
-                    margin: 0
-                  }}
-                >
-                  {record.description}
-                </p>
+                <Descriptions column={1} items={userDetail} />
               ),
               rowExpandable: (record) => record.name !== 'Not Expandable'
             }}
@@ -263,6 +296,9 @@ const User = () => {
               onChange: (page, pageSize) => {
                 setPageSize(pageSize);
               }
+            }}
+            scroll={{
+              x: 'max-content',
             }}
           />
         </div>

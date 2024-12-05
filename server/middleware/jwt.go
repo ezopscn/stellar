@@ -8,7 +8,6 @@ import (
 	"stellar/model"
 	"stellar/pkg/gedis"
 	"stellar/pkg/response"
-	"stellar/pkg/trans"
 	"stellar/pkg/utils"
 	"time"
 
@@ -76,7 +75,7 @@ func authenticator(ctx *gin.Context) (interface{}, error) {
 	}
 
 	// 5.验证用户状态是否正常
-	if systemUser.Status == trans.Uint(0) {
+	if *systemUser.Status == 0 {
 		return nil, errors.New("用户已禁用，请联系管理员")
 	}
 
