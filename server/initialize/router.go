@@ -25,9 +25,11 @@ func Router() *gin.Engine {
 		router.CurrentUserAuthRoutes(r.Group(common.SystemApiPrefix+"/current/user"), auth) // 当前用户路由（需要认证）
 		// 系统路由组
 		{
-			router.SystemUserAuthRoutes(r.Group(common.SystemApiPrefix+"/system/user"), auth) // 用户路由（需要认证）
-			router.SystemRoleAuthRoutes(r.Group(common.SystemApiPrefix+"/system/role"), auth) // 角色路由（需要认证）
-			router.SystemMenuAuthRoutes(r.Group(common.SystemApiPrefix+"/system/menu"), auth) // 菜单路由（需要认证）
+			router.SystemUserAuthRoutes(r.Group(common.SystemApiPrefix+"/system/user"), auth)                // 用户路由（需要认证）
+			router.SystemRoleAuthRoutes(r.Group(common.SystemApiPrefix+"/system/role"), auth)                // 角色路由（需要认证）
+			router.SystemMenuAuthRoutes(r.Group(common.SystemApiPrefix+"/system/menu"), auth)                // 菜单路由（需要认证）
+			router.SystemJobPositionAuthRoutes(r.Group(common.SystemApiPrefix+"/system/job/position"), auth) // 岗位路由（需要认证）
+			router.SystemDepartmentAuthRoutes(r.Group(common.SystemApiPrefix+"/system/department"), auth)    // 部门路由（需要认证）
 		}
 	}
 	return r

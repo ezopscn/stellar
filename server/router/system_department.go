@@ -7,9 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 角色路由
-func SystemRoleAuthRoutes(rg *gin.RouterGroup, auth *jwt.GinJWTMiddleware) gin.IRoutes {
+// 系统部门路由
+func SystemDepartmentAuthRoutes(rg *gin.RouterGroup, auth *jwt.GinJWTMiddleware) gin.IRoutes {
 	authRG := rg.Use(auth.MiddlewareFunc())
-	authRG.GET("/list", v1.RoleListHandler)
+	authRG.GET("/list", v1.DepartmentListHandler)
 	return authRG
 }

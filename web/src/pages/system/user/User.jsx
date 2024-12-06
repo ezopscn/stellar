@@ -8,34 +8,208 @@ import { Apis } from '@/common/APIConfig';
 import { Avatar, Tag } from 'antd';
 import { Descriptions } from 'antd';
 
-const { Option } = Select;
-
 const User = () => {
   // 消息提示
   const { message } = App.useApp();
+  // 表单
+  const [form] = Form.useForm();
+
+  /////////////////////////////////////////////////////
+  // Page Header 信息
+  /////////////////////////////////////////////////////
   const title = '用户中心' + TitleSuffix;
 
-  // 每页数据量
-  const [pageSize, setPageSize] = useState(1);
+  /////////////////////////////////////////////////////
+  // 搜索栏
+  /////////////////////////////////////////////////////
+  // 更多搜索
+  const [expand, setExpand] = useState(false);
 
-  // 获取用户列表
-  const [userList, setUserList] = useState([]);
+  // 性别列表
+  const genderList = [
+    {
+      label: '未知',
+      value: 0,
+    },
+    {
+      label: '男',
+      value: 1,
+    },
+    {
+      label: '女',
+      value: 2,
+    },
+  ]
+
+  // 状态列表
+  const statusList = [
+    {
+      label: '启用',
+      value: 1,
+    },
+    {
+      label: '禁用',
+      value: 0,
+    },
+  ]
+
+  // 获取角色列表
+  const [roleList, setRoleList] = useState([]);
   useEffect(() => {
-    const getUserList = async () => {
+    const getRoleList = async () => {
+      const res = await AxiosGet(Apis.System.Role.List);
       try {
-        const res = await AxiosGet(Apis.System.User.List);
         if (res.code === 200) {
-          setUserList(res.data);
+          setRoleList(res.data.map(role => ({
+            label: role.name,
+            value: role.id,
+          })));
         } else {
           message.error(res.message);
         }
       } catch (error) {
-        message.error('后端服务异常，获取用户列表失败');
+        console.log('后端服务异常，获取角色列表失败');
       }
-    };
-    getUserList();
+    }
+    getRoleList();
   }, []);
 
+  // 获取岗位列表
+  const [jobPositionList, setJobPositionList] = useState([]);
+  useEffect(() => {
+    const getJobPositionList = async () => {
+      const res = await AxiosGet(Apis.System.JobPosition.List);
+      try {
+        if (res.code === 200) {
+          setJobPositionList(res.data.map(jobPosition => ({
+            label: jobPosition.name,
+            value: jobPosition.id,
+          })));
+        } else {
+          message.error(res.message);
+        }
+      } catch (error) {
+        console.log('后端服务异常，获取岗位列表失败');
+      }
+    }
+    getJobPositionList();
+  }, []);
+
+  // 获取部门列表
+  const [departmentList, setDepartmentList] = useState([]);
+  useEffect(() => {
+    const getDepartmentList = async () => {
+      const res = await AxiosGet(Apis.System.Department.List);
+      try {
+        if (res.code === 200) {
+          setDepartmentList(res.data.map(department => ({
+            label: department.name,
+            value: department.id,
+          })));
+        } else {
+          message.error(res.message);
+        }
+      } catch (error) {
+        console.log('后端服务异常，获取部门列表失败');
+      }
+    }
+    getDepartmentList();
+  }, []);
+
+  // 获取搜索栏字段
+  const getFilterFields = () => {
+    const expandWidth = 7; // 展开宽度
+    const children = [];   // 子元素
+    const filterFields = [ // 过滤字段
+      {
+        label: '用户名',
+        name: 'username',
+        placeholder: '使用用户名进行搜索',
+        type: 'input',
+      },
+      {
+        label: '姓名',
+        name: 'name',
+        placeholder: '使用中文名，英文名进行搜索',
+        type: 'input',
+      },
+      {
+        label: '邮箱',
+        name: 'email',
+        placeholder: '使用邮箱地址进行搜索',
+        type: 'input',
+      },
+      {
+        label: '手机号',
+        name: 'phone',
+        placeholder: '使用手机号码进行搜索',
+        type: 'input',
+      },
+      {
+        label: '状态',
+        name: 'status',
+        placeholder: '选择用户状态进行搜索',
+        type: 'select',
+        data: statusList,
+      },
+      {
+        label: '性别',
+        name: 'gender',
+        placeholder: '选择性别进行搜索',
+        type: 'select',
+        data: genderList,
+      },
+      {
+        label: '部门',
+        name: 'department',
+        placeholder: '选择部门进行搜索',
+        type: 'select',
+        search: true,
+        data: departmentList,
+      },
+      {
+        label: '岗位',
+        name: 'jobPosition',
+        placeholder: '选择岗位进行搜索',
+        type: 'select',
+        search: true,
+        data: jobPositionList,
+      },
+      {
+        label: '角色',
+        name: 'role',
+        placeholder: '选择角色进行搜索',
+        type: 'select',
+        search: true,
+        data: roleList,
+      },
+    ];
+
+    // 生成搜索表单
+    filterFields.slice(0, expand ? filterFields.length : expandWidth).forEach((field, index) => {
+      children.push(
+        <Col span={6} key={field.label}>
+          <Form.Item
+            name={field.name}
+            label={field.label}
+          >
+            {field.type === "input" ? <Input placeholder={field.placeholder} /> :
+              <Select placeholder={field.placeholder} options={field.data} showSearch={field.search} optionFilterProp='label' />}
+          </Form.Item>
+        </Col>
+      );
+    });
+    return children;
+  };
+
+  // 搜索
+  const filterUserList = (values) => {
+    console.log('Received values of form: ', values);
+  };
+
+  /////////////////////////////////////////////////////
+  // 表格数据
+  /////////////////////////////////////////////////////
   // 表格列
   const columns = [
     {
@@ -142,59 +316,30 @@ const User = () => {
     },
     getCheckboxProps: (record) => ({
       disabled: record.name === 'Disabled User',
-      // Column configuration not to be checked
       name: record.name
     })
   };
 
-  const [form] = Form.useForm();
-  const [expand, setExpand] = useState(false);
+  // 获取用户列表
+  const [userList, setUserList] = useState([]);
+  useEffect(() => {
+    const getUserList = async () => {
+      try {
+        const res = await AxiosGet(Apis.System.User.List);
+        if (res.code === 200) {
+          setUserList(res.data);
+        } else {
+          message.error(res.message);
+        }
+      } catch (error) {
+        message.error('后端服务异常，获取用户列表失败');
+      }
+    };
+    getUserList();
+  }, []);
 
-  const getFields = () => {
-    const count = expand ? 10 : 7;
-    const children = [];
-    for (let i = 0; i < count; i++) {
-      children.push(
-        <Col span={6} key={i}>
-          {i % 3 !== 1 ? (
-            <Form.Item
-              name={`field-${i}`}
-              label={`Field ${i}`}
-              rules={[
-                {
-                  required: true,
-                  message: 'Input something!'
-                }
-              ]}
-            >
-              <Input placeholder='placeholder' />
-            </Form.Item>
-          ) : (
-            <Form.Item
-              name={`field-${i}`}
-              label={`Field ${i}`}
-              rules={[
-                {
-                  required: true,
-                  message: 'Select something!'
-                }
-              ]}
-              initialValue='1'
-            >
-              <Select>
-                <Option value='1'>111</Option>
-                <Option value='2'>222</Option>
-              </Select>
-            </Form.Item>
-          )}
-        </Col>
-      );
-    }
-    return children;
-  };
-  const onFinish = (values) => {
-    console.log('Received values of form: ', values);
-  };
+  // 每页数据量
+  const [pageSize, setPageSize] = useState(1);
 
   return (
     <>
@@ -214,10 +359,10 @@ const User = () => {
       </div>
       <div className='admin-page-main'>
         <div className='admin-page-search'>
-          <Form form={form} name='advanced_search' onFinish={onFinish}>
+          <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name='userFilterForm' onFinish={filterUserList}>
             <Row gutter={24}>
-              {getFields()}
-              <Col span={6} key='x' style={{ marginTop: '10px' }}>
+              {getFilterFields()}
+              <Col span={6} key='x' style={{ marginTop: '10px', textAlign: 'right' }}>
                 <Space>
                   <Button icon={<SearchOutlined />} htmlType='submit'>搜索用户</Button>
                   <Button icon={<ClearOutlined />} onClick={() => {
