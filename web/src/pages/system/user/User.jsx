@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, Row, Select, Space, Table, App } from 'antd';
+import { Button, Col, Form, Input, Row, Space, Table, App } from 'antd';
 import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ManOutlined, WomanOutlined, QuestionOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { TitleSuffix } from '@/common/Text.jsx';
@@ -7,6 +7,8 @@ import { AxiosGet } from '@/utils/Request';
 import { Apis } from '@/common/APIConfig';
 import { Avatar, Tag } from 'antd';
 import { Descriptions } from 'antd';
+import { GenerateSelectTree } from '@/common/GenerateTree';
+import { TreeSelect, Select } from 'antd';
 
 const User = () => {
   // 消息提示
@@ -56,9 +58,9 @@ const User = () => {
   // 获取角色列表
   const [roleList, setRoleList] = useState([]);
   useEffect(() => {
-    const getRoleList = async () => {
-      const res = await AxiosGet(Apis.System.Role.List);
+    const fetchRoleList = async () => {
       try {
+        const res = await AxiosGet(Apis.System.Role.List);
         if (res.code === 200) {
           setRoleList(res.data.map(role => ({
             label: role.name,
@@ -68,18 +70,18 @@ const User = () => {
           message.error(res.message);
         }
       } catch (error) {
-        console.log('后端服务异常，获取角色列表失败');
+        console.log('后端服务异常，获取角色列表失败', error);
       }
-    }
-    getRoleList();
+    };
+    fetchRoleList();
   }, []);
 
   // 获取岗位列表
   const [jobPositionList, setJobPositionList] = useState([]);
   useEffect(() => {
-    const getJobPositionList = async () => {
-      const res = await AxiosGet(Apis.System.JobPosition.List);
+    const fetchJobPositionList = async () => {
       try {
+        const res = await AxiosGet(Apis.System.JobPosition.List);
         if (res.code === 200) {
           setJobPositionList(res.data.map(jobPosition => ({
             label: jobPosition.name,
@@ -89,31 +91,30 @@ const User = () => {
           message.error(res.message);
         }
       } catch (error) {
-        console.log('后端服务异常，获取岗位列表失败');
+        console.log('后端服务异常，获取岗位列表失败', error);
       }
-    }
-    getJobPositionList();
+    };
+    fetchJobPositionList();
   }, []);
 
   // 获取部门列表
   const [departmentList, setDepartmentList] = useState([]);
   useEffect(() => {
-    const getDepartmentList = async () => {
-      const res = await AxiosGet(Apis.System.Department.List);
+    const fetchDepartmentList = async () => {
       try {
+        const res = await AxiosGet(Apis.System.Department.List);
         if (res.code === 200) {
-          setDepartmentList(res.data.map(department => ({
-            label: department.name,
-            value: department.id,
-          })));
+          const departments = res.data;
+          const treeData = GenerateSelectTree(departments, 0);
+          setDepartmentList(treeData);
         } else {
           message.error(res.message);
         }
       } catch (error) {
-        console.log('后端服务异常，获取部门列表失败');
+        console.log('后端服务异常，获取部门列表失败', error);
       }
-    }
-    getDepartmentList();
+    };
+    fetchDepartmentList();
   }, []);
 
   // 获取搜索栏字段
@@ -165,6 +166,7 @@ const User = () => {
         placeholder: '选择部门进行搜索',
         type: 'select',
         search: true,
+        tree: true,
         data: departmentList,
       },
       {
@@ -193,7 +195,8 @@ const User = () => {
             name={field.name}
             label={field.label}
           >
-            {field.type === "input" ? <Input placeholder={field.placeholder} /> :
+            {field.type === "input" ? <Input placeholder={field.placeholder} /> : field.tree ?
+              <TreeSelect placeholder={field.placeholder} treeData={field.data} showSearch={field.search} treeNodeFilterProp='label' treeDefaultExpandAll /> :
               <Select placeholder={field.placeholder} options={field.data} showSearch={field.search} optionFilterProp='label' />}
           </Form.Item>
         </Col>
@@ -332,7 +335,7 @@ const User = () => {
           message.error(res.message);
         }
       } catch (error) {
-        message.error('后端服务异常，获取用户列表失败');
+        console.log('后端服务异常，获取用户列表失败', error);
       }
     };
     getUserList();
