@@ -28,7 +28,7 @@ instance.interceptors.response.use(
 );
 
 // GET 请求
-export const AxiosGet = (url, params) => instance.get(url, params).then((res) => res.data);
+export const AxiosGet = (url, data) => instance.get(url, { params: data }).then((res) => res.data);
 
 // POST 请求
 export const AxiosPost = (url, data) => instance.post(url, data).then((res) => res.data);

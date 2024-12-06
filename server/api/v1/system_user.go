@@ -19,7 +19,7 @@ func UserListHandler(ctx *gin.Context) {
 	}
 
 	// 获取用户列表
-	users, err := service.GetUserListService()
+	users, err := service.GetUserListService(ctx)
 	if err != nil {
 		response.FailedWithMessage("获取用户列表失败")
 		return

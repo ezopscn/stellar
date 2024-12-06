@@ -62,24 +62,40 @@ const User = () => {
       name: 'username',
       placeholder: '使用用户名进行搜索',
       type: 'input',
+      rules: [{
+        message: '用户名长度不能超过30个字符',
+        max: 30,
+      }],
     },
     {
       label: '姓名',
       name: 'name',
       placeholder: '使用中文名，英文名进行搜索',
       type: 'input',
+      rules: [{
+        message: '姓名长度不能超过30个字符',
+        max: 30,
+      }],
     },
     {
       label: '邮箱',
       name: 'email',
       placeholder: '使用邮箱地址进行搜索',
       type: 'input',
+      rules: [{
+        message: '邮箱长度不能超过30个字符',
+        max: 50,
+      }],
     },
     {
       label: '手机号',
       name: 'phone',
       placeholder: '使用手机号码进行搜索',
       type: 'input',
+      rules: [{
+        message: '手机号长度不能超过15个字符',
+        max: 15,
+      }],
     },
     {
       label: '状态',
@@ -96,6 +112,7 @@ const User = () => {
           value: 0,
         },
       ],
+      rules: []
     },
     {
       label: '性别',
@@ -116,6 +133,7 @@ const User = () => {
           value: 3,
         },
       ],
+      rules: []
     },
     {
       label: '部门',
@@ -125,6 +143,7 @@ const User = () => {
       search: true,
       tree: true,
       data: departmentList,
+      rules: []
     },
     {
       label: '岗位',
@@ -133,6 +152,7 @@ const User = () => {
       type: 'select',
       search: true,
       data: jobPositionList,
+      rules: []
     },
     {
       label: '角色',
@@ -141,6 +161,7 @@ const User = () => {
       type: 'select',
       search: true,
       data: roleList,
+      rules: []
     },
   ];
 
@@ -156,8 +177,9 @@ const User = () => {
           <Form.Item
             name={field.name}
             label={field.label}
+            rules={field.rules}
           >
-            {field.type === "input" ? <Input placeholder={field.placeholder} /> : field.tree ?
+            {field.type === "input" ? <Input placeholder={field.placeholder} autoComplete='off' /> : field.tree ?
               <TreeSelect placeholder={field.placeholder} treeData={field.data} showSearch={field.search} treeNodeFilterProp='label' treeDefaultExpandAll /> :
               <Select placeholder={field.placeholder} options={field.data} showSearch={field.search} optionFilterProp='label' />}
           </Form.Item>
@@ -165,11 +187,6 @@ const User = () => {
       );
     });
     return children;
-  };
-
-  // 搜索
-  const filterUserList = (values) => {
-    console.log('Received values of form: ', values);
   };
 
   /////////////////////////////////////////////////////
@@ -224,7 +241,7 @@ const User = () => {
       dataIndex: 'systemDepartments',
       minWidth: 100,
       render: (systemDepartments) => {
-        return systemDepartments.map(department => department.name).join(',');
+        return systemDepartments?.map(department => department.name).join(',');
       }
     },
     {
@@ -232,7 +249,7 @@ const User = () => {
       dataIndex: 'systemJobPositions',
       minWidth: 120,
       render: (systemJobPositions) => {
-        return systemJobPositions.map(jobPosition => jobPosition.name).join(',');
+        return systemJobPositions?.map(jobPosition => jobPosition.name).join(',');
       }
     },
     {
@@ -302,6 +319,21 @@ const User = () => {
     };
     getUserList();
   }, []);
+
+  // 条件搜索用户
+  const filterUserList = async (userFilterParams) => {
+    console.log('查询条件: ', userFilterParams);
+    try {
+      const res = await AxiosGet(Apis.System.User.List, userFilterParams);
+      if (res.code === 200) {
+        setUserList(res.data);
+      } else {
+        message.error(res.message);
+      }
+    } catch (error) {
+      console.log('后端服务异常，获取用户列表失败', error);
+    }
+  };
 
   // 每页数据量
   const [pageSize, setPageSize] = useState(2);
