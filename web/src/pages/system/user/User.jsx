@@ -1,14 +1,11 @@
-import { Button, Col, Form, Input, Row, Space, Table, App } from 'antd';
-import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ManOutlined, WomanOutlined, QuestionOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
-import { TitleSuffix } from '@/common/Text.jsx';
 import { Helmet } from 'react-helmet';
+import { Button, Col, Form, Input, Row, Space, Table, App, Avatar, Tag, Descriptions, TreeSelect, Select } from 'antd';
+import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ManOutlined, WomanOutlined, QuestionOutlined } from '@ant-design/icons';
+import { TitleSuffix } from '@/common/Text.jsx';
 import { AxiosGet } from '@/utils/Request';
 import { Apis } from '@/common/APIConfig';
-import { Avatar, Tag } from 'antd';
-import { Descriptions } from 'antd';
 import { GenerateSelectTree } from '@/common/GenerateTree';
-import { TreeSelect, Select } from 'antd';
 
 const User = () => {
   // 消息提示
@@ -27,165 +24,130 @@ const User = () => {
   // 更多搜索
   const [expand, setExpand] = useState(false);
 
-  // 性别列表
-  const genderList = [
-    {
-      label: '未知',
-      value: 0,
-    },
-    {
-      label: '男',
-      value: 1,
-    },
-    {
-      label: '女',
-      value: 2,
-    },
-  ]
-
-  // 状态列表
-  const statusList = [
-    {
-      label: '启用',
-      value: 1,
-    },
-    {
-      label: '禁用',
-      value: 0,
-    },
-  ]
-
-  // 获取角色列表
+  // 获取角色、岗位、部门列表
   const [roleList, setRoleList] = useState([]);
-  useEffect(() => {
-    const fetchRoleList = async () => {
-      try {
-        const res = await AxiosGet(Apis.System.Role.List);
-        if (res.code === 200) {
-          setRoleList(res.data.map(role => ({
-            label: role.name,
-            value: role.id,
-          })));
-        } else {
-          message.error(res.message);
-        }
-      } catch (error) {
-        console.log('后端服务异常，获取角色列表失败', error);
-      }
-    };
-    fetchRoleList();
-  }, []);
-
-  // 获取岗位列表
   const [jobPositionList, setJobPositionList] = useState([]);
-  useEffect(() => {
-    const fetchJobPositionList = async () => {
-      try {
-        const res = await AxiosGet(Apis.System.JobPosition.List);
-        if (res.code === 200) {
-          setJobPositionList(res.data.map(jobPosition => ({
-            label: jobPosition.name,
-            value: jobPosition.id,
-          })));
-        } else {
-          message.error(res.message);
-        }
-      } catch (error) {
-        console.log('后端服务异常，获取岗位列表失败', error);
-      }
-    };
-    fetchJobPositionList();
-  }, []);
-
-  // 获取部门列表
   const [departmentList, setDepartmentList] = useState([]);
   useEffect(() => {
-    const fetchDepartmentList = async () => {
+    const fetchList = async (api, setter) => {
       try {
-        const res = await AxiosGet(Apis.System.Department.List);
+        const res = await AxiosGet(api);
         if (res.code === 200) {
-          const departments = res.data;
-          const treeData = GenerateSelectTree(departments, 0);
-          setDepartmentList(treeData);
+          // 部门树结构需要单独处理
+          if (api === Apis.System.Department.List) {
+            const treeData = GenerateSelectTree(res.data, 0);
+            setter(treeData);
+          } else {
+            setter(res.data.map(item => ({
+              label: item.name,
+              value: item.id,
+            })));
+          }
         } else {
           message.error(res.message);
         }
       } catch (error) {
-        console.log('后端服务异常，获取部门列表失败', error);
+        console.log(`后端服务异常，获取接口：${api} 列表失败`, error);
       }
     };
-    fetchDepartmentList();
+    fetchList(Apis.System.Role.List, setRoleList);
+    fetchList(Apis.System.JobPosition.List, setJobPositionList);
+    fetchList(Apis.System.Department.List, setDepartmentList);
   }, []);
+
+  // 列表数据
+  const filterFields = [
+    {
+      label: '用户名',
+      name: 'username',
+      placeholder: '使用用户名进行搜索',
+      type: 'input',
+    },
+    {
+      label: '姓名',
+      name: 'name',
+      placeholder: '使用中文名，英文名进行搜索',
+      type: 'input',
+    },
+    {
+      label: '邮箱',
+      name: 'email',
+      placeholder: '使用邮箱地址进行搜索',
+      type: 'input',
+    },
+    {
+      label: '手机号',
+      name: 'phone',
+      placeholder: '使用手机号码进行搜索',
+      type: 'input',
+    },
+    {
+      label: '状态',
+      name: 'status',
+      placeholder: '选择用户状态进行搜索',
+      type: 'select',
+      data: [
+        {
+          label: '启用',
+          value: 1,
+        },
+        {
+          label: '禁用',
+          value: 0,
+        },
+      ],
+    },
+    {
+      label: '性别',
+      name: 'gender',
+      placeholder: '选择性别进行搜索',
+      type: 'select',
+      data: [
+        {
+          label: '未知',
+          value: 0,
+        },
+        {
+          label: '男',
+          value: 1,
+        },
+        {
+          label: '女',
+          value: 2,
+        },
+      ],
+    },
+    {
+      label: '部门',
+      name: 'department',
+      placeholder: '选择部门进行搜索',
+      type: 'select',
+      search: true,
+      tree: true,
+      data: departmentList,
+    },
+    {
+      label: '岗位',
+      name: 'jobPosition',
+      placeholder: '选择岗位进行搜索',
+      type: 'select',
+      search: true,
+      data: jobPositionList,
+    },
+    {
+      label: '角色',
+      name: 'role',
+      placeholder: '选择角色进行搜索',
+      type: 'select',
+      search: true,
+      data: roleList,
+    },
+  ];
 
   // 获取搜索栏字段
   const getFilterFields = () => {
     const expandWidth = 7; // 展开宽度
     const children = [];   // 子元素
-    const filterFields = [ // 过滤字段
-      {
-        label: '用户名',
-        name: 'username',
-        placeholder: '使用用户名进行搜索',
-        type: 'input',
-      },
-      {
-        label: '姓名',
-        name: 'name',
-        placeholder: '使用中文名，英文名进行搜索',
-        type: 'input',
-      },
-      {
-        label: '邮箱',
-        name: 'email',
-        placeholder: '使用邮箱地址进行搜索',
-        type: 'input',
-      },
-      {
-        label: '手机号',
-        name: 'phone',
-        placeholder: '使用手机号码进行搜索',
-        type: 'input',
-      },
-      {
-        label: '状态',
-        name: 'status',
-        placeholder: '选择用户状态进行搜索',
-        type: 'select',
-        data: statusList,
-      },
-      {
-        label: '性别',
-        name: 'gender',
-        placeholder: '选择性别进行搜索',
-        type: 'select',
-        data: genderList,
-      },
-      {
-        label: '部门',
-        name: 'department',
-        placeholder: '选择部门进行搜索',
-        type: 'select',
-        search: true,
-        tree: true,
-        data: departmentList,
-      },
-      {
-        label: '岗位',
-        name: 'jobPosition',
-        placeholder: '选择岗位进行搜索',
-        type: 'select',
-        search: true,
-        data: jobPositionList,
-      },
-      {
-        label: '角色',
-        name: 'role',
-        placeholder: '选择角色进行搜索',
-        type: 'select',
-        search: true,
-        data: roleList,
-      },
-    ];
 
     // 生成搜索表单
     filterFields.slice(0, expand ? filterFields.length : expandWidth).forEach((field, index) => {
@@ -342,7 +304,7 @@ const User = () => {
   }, []);
 
   // 每页数据量
-  const [pageSize, setPageSize] = useState(1);
+  const [pageSize, setPageSize] = useState(2);
 
   return (
     <>
