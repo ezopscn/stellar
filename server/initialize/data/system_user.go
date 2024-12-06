@@ -74,7 +74,7 @@ var systemUsers = []model.SystemUser{
 		Email:        "guest@ezops.cn",
 		Phone:        "16666666666",
 		HidePhone:    trans.Uint(0),
-		Gender:       trans.Uint(0),
+		Gender:       trans.Uint(3),
 		Avatar:       defaultAvatar,
 		Description:  "系统访客，只读用户",
 		Status:       trans.Uint(0),

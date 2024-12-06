@@ -14,7 +14,7 @@ type SystemUser struct {
 	Email                  string              `gorm:"column:email;uniqueIndex:uidx_email;comment:邮箱" json:"email"`
 	Phone                  string              `gorm:"column:phone;uniqueIndex:uidx_phone;comment:手机号" json:"phone"`
 	HidePhone              *uint               `gorm:"column:hidePhone;default:1;comment:是否隐藏手机号(0=不隐藏,1=隐藏)" json:"hidePhone"`
-	Gender                 *uint               `gorm:"column:gender;default:0;comment:性别(0=未知,1=男,2=女)" json:"gender"`
+	Gender                 *uint               `gorm:"column:gender;default:3;comment:性别(1=男,2=女,3=未知)" json:"gender"`
 	Avatar                 string              `gorm:"column:avatar;comment:头像" json:"avatar"`
 	SystemDepartments      []SystemDepartment  `gorm:"many2many:system_user_department_relation" json:"systemDepartments,omitempty"`
 	SystemJobPositions     []SystemJobPosition `gorm:"many2many:system_user_job_position_relation" json:"systemJobPositions,omitempty"`
