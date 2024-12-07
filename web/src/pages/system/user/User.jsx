@@ -165,13 +165,15 @@ const User = () => {
     },
   ];
 
+  // 默认展开的搜索项数量
+  const defaultExpandItemCount = 8;
+
   // 获取搜索栏字段
   const getFilterFields = () => {
-    const expandWidth = 7; // 展开宽度
     const children = [];   // 子元素
 
     // 生成搜索表单
-    filterFields.slice(0, expand ? filterFields.length : expandWidth).forEach((field, index) => {
+    filterFields.slice(0, expand ? filterFields.length : defaultExpandItemCount).forEach((field, index) => {
       children.push(
         <Col span={6} key={field.label}>
           <Form.Item
@@ -179,9 +181,9 @@ const User = () => {
             label={field.label}
             rules={field.rules}
           >
-            {field.type === "input" ? <Input placeholder={field.placeholder} autoComplete='off' /> : field.tree ?
-              <TreeSelect placeholder={field.placeholder} treeData={field.data} showSearch={field.search} treeNodeFilterProp='label' treeDefaultExpandAll /> :
-              <Select placeholder={field.placeholder} options={field.data} showSearch={field.search} optionFilterProp='label' />}
+            {field.type === "input" ? <Input placeholder={field.placeholder} allowClear={true} autoComplete='off' /> : field.tree ?
+              <TreeSelect placeholder={field.placeholder} treeData={field.data} showSearch={field.search} treeNodeFilterProp='label' allowClear={true} treeDefaultExpandAll /> :
+              <Select placeholder={field.placeholder} options={field.data} showSearch={field.search} optionFilterProp='label' allowClear={true} />}
           </Form.Item>
         </Col>
       );
@@ -359,7 +361,7 @@ const User = () => {
           <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name='userFilterForm' onFinish={filterUserList}>
             <Row gutter={24}>
               {getFilterFields()}
-              <Col span={6} key='x' style={{ marginTop: '10px', textAlign: 'right' }}>
+              <Col span={24} key='x' style={{ marginTop: '10px', textAlign: 'right' }}>
                 <Space>
                   <Button icon={<SearchOutlined />} htmlType='submit'>搜索用户</Button>
                   <Button icon={<ClearOutlined />} onClick={() => {

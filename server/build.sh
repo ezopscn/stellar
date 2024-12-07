@@ -18,3 +18,4 @@ go build -ldflags "-X stellar/common.SystemVersion=${commit_id} -X stellar/commo
 # 镜像运行
 # docker run -p 13306:3306 --name mysql-dev -e MYSQL_ROOT_PASSWORD=123456 -d mysql
 # docker run -p 16379:6379 --name redis-dev -e REDIS_PASSWORD=123456 -d redis
+# go run -ldflags "-X stellar/common.SystemVersion=1.0 -X stellar/common.SystemGoVersion=1.23" -o stellar main.go
