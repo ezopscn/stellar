@@ -310,8 +310,8 @@ const User = () => {
   const defaultPageSize = 1;
   // 默认页码
   const defaultPageNumber = 1;
-  // 是否分页
-  const defaultIsPagination = true;
+  // 是否需要分页
+  const isPagination = true;
   // 默认数据总数
   const defaultTotal = 0;
   // 每页显示的条数
@@ -320,22 +320,21 @@ const User = () => {
   const [pageNumber, setPageNumber] = useState(defaultPageNumber); 
   // 数据总数
   const [total, setTotal] = useState(defaultTotal);
-  // 是否分页
-  const [isPagination, setIsPagination] = useState(defaultIsPagination);
   // 条件搜索用户
   const [userFilterParams, setUserFilterParams] = useState({});
   // 默认用户列表加载和监听所有页码变化事件（包括搜索）
   useEffect(() => {
     const params = { ...userFilterParams, pageSize, pageNumber, isPagination };
     filterUserList(params);
-  }, [pageSize, pageNumber, isPagination]);
+  }, [pageSize, pageNumber]);
 
   // 条件搜索用户方法
   const filterUserListHandle = (data) => {
     // 初始化页码，避免在搜索结果溢出搜索数据的页码的时候，导致请求参数中带了页码，无法请求到数据
-    const params = { ...data, pageSize: defaultPageSize, pageNumber: defaultPageNumber, isPagination: defaultIsPagination };
-    setUserFilterParams(params);
-    filterUserList(params);
+    setPageNumber(defaultPageNumber);
+    setPageSize(defaultPageSize);
+    setTotal(defaultTotal);
+    setUserFilterParams(data);
   };
 
   // 条件搜索用户
@@ -347,7 +346,6 @@ const User = () => {
         setUserList(res.data.list);
         setPageSize(res.data.pagination.pageSize);
         setPageNumber(res.data.pagination.pageNumber);
-        setIsPagination(res.data.pagination.isPagination);
         setTotal(res.data.pagination.total);
       } else {
         message.error(res.message);
