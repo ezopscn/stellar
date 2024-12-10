@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"stellar/common"
 	"stellar/dto"
 	"stellar/model"
@@ -10,11 +11,11 @@ import (
 )
 
 // 获取用户列表
-func GetUserListService(ctx *gin.Context) (users []model.SystemUser, err error) {
+func GetUserListService(ctx *gin.Context) (users []model.SystemUser, pagination dto.Pagination, err error) {
 	// 获取筛选条件
 	filter := dto.SystemUserFilterRequest{}
 	if err := ctx.ShouldBindQuery(&filter); err != nil {
-		return nil, errors.New("获取用户筛选条件失败")
+		return nil, pagination, errors.New("获取用户筛选条件失败")
 	}
 
 	// 初始化查询条件
@@ -65,6 +66,25 @@ func GetUserListService(ctx *gin.Context) (users []model.SystemUser, err error) 
 	// 角色
 	if filter.Role != nil {
 		query = query.Where("systemRoleId = ?", *filter.Role)
+	}
+
+	// 统计记录数量
+	var total int64
+	query.Count(&total)
+	pagination.Total = total
+
+	// 不传递分页，则默认要分页
+	if filter.IsPagination != nil && *filter.IsPagination {
+		pagination.IsPagination = true
+		if filter.PageNumber != nil {
+			pagination.PageNumber = *filter.PageNumber
+		}
+		if filter.PageSize != nil {
+			pagination.PageSize = *filter.PageSize
+		}
+		fmt.Println("pagination: ", pagination)
+		limit, offset := pagination.GetPaginationLimitAndOffset()
+		query = query.Limit(limit).Offset(offset)
 	}
 
 	// 加入查询条件

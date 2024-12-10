@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { Button, Col, Form, Input, Row, Space, Table, App, Avatar, Tag, Descriptions, TreeSelect, Select } from 'antd';
+import { Button, Col, Form, Input, Row, Space, Table, App, Avatar, Tag, Descriptions, TreeSelect, Select, Modal } from 'antd';
 import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ManOutlined, WomanOutlined, QuestionOutlined } from '@ant-design/icons';
 import { TitleSuffix } from '@/common/Text.jsx';
 import { AxiosGet } from '@/utils/Request';
@@ -306,39 +306,66 @@ const User = () => {
 
   // 获取用户列表
   const [userList, setUserList] = useState([]);
+  // 默认每页显示的数据量
+  const defaultPageSize = 1;
+  // 默认页码
+  const defaultPageNumber = 1;
+  // 是否分页
+  const defaultIsPagination = true;
+  // 默认数据总数
+  const defaultTotal = 0;
+  // 每页显示的条数
+  const [pageSize, setPageSize] = useState(defaultPageSize); 
+  // 当前页码
+  const [pageNumber, setPageNumber] = useState(defaultPageNumber); 
+  // 数据总数
+  const [total, setTotal] = useState(defaultTotal);
+  // 是否分页
+  const [isPagination, setIsPagination] = useState(defaultIsPagination);
+  // 条件搜索用户
+  const [userFilterParams, setUserFilterParams] = useState({});
+  // 默认用户列表加载和监听所有页码变化事件（包括搜索）
   useEffect(() => {
-    const getUserList = async () => {
-      try {
-        const res = await AxiosGet(Apis.System.User.List);
-        if (res.code === 200) {
-          setUserList(res.data);
-        } else {
-          message.error(res.message);
-        }
-      } catch (error) {
-        console.log('后端服务异常，获取用户列表失败', error);
-      }
-    };
-    getUserList();
-  }, []);
+    const params = { ...userFilterParams, pageSize, pageNumber, isPagination };
+    filterUserList(params);
+  }, [pageSize, pageNumber, isPagination]);
+
+  // 条件搜索用户方法
+  const filterUserListHandle = (data) => {
+    // 初始化页码，避免在搜索结果溢出搜索数据的页码的时候，导致请求参数中带了页码，无法请求到数据
+    const params = { ...data, pageSize: defaultPageSize, pageNumber: defaultPageNumber, isPagination: defaultIsPagination };
+    setUserFilterParams(params);
+    filterUserList(params);
+  };
 
   // 条件搜索用户
-  const filterUserList = async (userFilterParams) => {
-    console.log('查询条件: ', userFilterParams);
+  const filterUserList = async (params) => {
+    console.log('查询条件: ', params);
     try {
-      const res = await AxiosGet(Apis.System.User.List, userFilterParams);
+      const res = await AxiosGet(Apis.System.User.List, params);
       if (res.code === 200) {
-        setUserList(res.data);
+        setUserList(res.data.list);
+        setPageSize(res.data.pagination.pageSize);
+        setPageNumber(res.data.pagination.pageNumber);
+        setIsPagination(res.data.pagination.isPagination);
+        setTotal(res.data.pagination.total);
       } else {
         message.error(res.message);
       }
     } catch (error) {
-      console.log('后端服务异常，获取用户列表失败', error);
+      console.error('后端服务异常，获取用户列表失败', error);
     }
   };
 
-  // 每页数据量
-  const [pageSize, setPageSize] = useState(2);
+  /////////////////////////////////////////////////////
+  // 用户添加弹窗
+  /////////////////////////////////////////////////////
+  const [userModalVisible, setUserModalVisible] = useState(false);
+
+  // 添加用户
+  const addUserHandle = () => {
+    console.log('添加用户');
+  };
 
   return (
     <>
@@ -346,6 +373,7 @@ const User = () => {
         <title>{title}</title>
         <meta name='description' content={title} />
       </Helmet>
+      {/* 页面头部介绍 */}
       <div className='admin-page-header'>
         <div className='admin-page-title'>用户中心 / USER MANAGEMENT.</div>
         <div className='admin-page-desc'>
@@ -356,9 +384,11 @@ const User = () => {
           </ul>
         </div>
       </div>
+      {/* 页面主体 */}
       <div className='admin-page-main'>
+        {/* 搜索栏 */}
         <div className='admin-page-search'>
-          <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name='userFilterForm' onFinish={filterUserList}>
+          <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name='userFilterForm' onFinish={filterUserListHandle}>
             <Row gutter={24}>
               {getFilterFields()}
               <Col span={24} key='x' style={{ marginTop: '10px', textAlign: 'right' }}>
@@ -379,9 +409,12 @@ const User = () => {
             </Row>
           </Form>
         </div>
+        {/* 表格 */}
         <div className='admin-page-list'>
           <div className='admin-page-btn-group'>
-            <Button icon={<UserAddOutlined />}>添加用户</Button>
+            <Button icon={<UserAddOutlined />} onClick={() => {
+              setUserModalVisible(true);
+            }}>添加用户</Button>
           </div>
           <Table
             // 表格布局大小
@@ -426,9 +459,14 @@ const User = () => {
             // 表格分页
             pagination={{
               pageSize: pageSize,
+              current: pageNumber,
+              total: total,
+              showTotal: (total) => `总共 ${total} 条记录`,
+              // hideOnSinglePage: true,
               showSizeChanger: true,
               showQuickJumper: true,
               onChange: (page, pageSize) => {
+                setPageNumber(page);
                 setPageSize(pageSize);
               }
             }}
@@ -439,6 +477,15 @@ const User = () => {
           />
         </div>
       </div>
+
+      {/* 用户添加弹窗 */}
+      <Modal title="添加用户" open={userModalVisible} onOk={addUserHandle} onCancel={() => {
+        setUserModalVisible(false);
+      }}>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </Modal>
     </>
   );
 };

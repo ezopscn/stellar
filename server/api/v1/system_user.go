@@ -2,6 +2,7 @@ package v1
 
 import (
 	"stellar/common"
+	"stellar/dto"
 	"stellar/pkg/response"
 	"stellar/pkg/utils"
 	"stellar/service"
@@ -19,7 +20,7 @@ func UserListHandler(ctx *gin.Context) {
 	}
 
 	// 获取用户列表
-	users, err := service.GetUserListService(ctx)
+	users, pagination, err := service.GetUserListService(ctx)
 	if err != nil {
 		response.FailedWithMessage("获取用户列表失败")
 		return
@@ -34,5 +35,8 @@ func UserListHandler(ctx *gin.Context) {
 		}
 	}
 
-	response.SuccessWithData(users)
+	response.SuccessWithData(dto.PaginationResponse{
+		List:       users,
+		Pagination: pagination,
+	})
 }
