@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { Button, Col, Form, Input, Row, Space, Table, App, Avatar, Tag, Descriptions, TreeSelect, Select, Modal } from 'antd';
+import { Button, Col, Form, Input, Row, Space, Table, App, Avatar, Tag, Descriptions, TreeSelect, Select, Modal, Radio } from 'antd';
 import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ManOutlined, WomanOutlined, QuestionOutlined } from '@ant-design/icons';
 import { TitleSuffix } from '@/common/Text.jsx';
 import { AxiosGet } from '@/utils/Request';
@@ -307,7 +307,7 @@ const User = () => {
   // 获取用户列表
   const [userList, setUserList] = useState([]);
   // 默认每页显示的数据量
-  const defaultPageSize = 1;
+  const defaultPageSize = 2;
   // 默认页码
   const defaultPageNumber = 1;
   // 是否需要分页
@@ -315,9 +315,9 @@ const User = () => {
   // 默认数据总数
   const defaultTotal = 0;
   // 每页显示的条数
-  const [pageSize, setPageSize] = useState(defaultPageSize); 
+  const [pageSize, setPageSize] = useState(defaultPageSize);
   // 当前页码
-  const [pageNumber, setPageNumber] = useState(defaultPageNumber); 
+  const [pageNumber, setPageNumber] = useState(defaultPageNumber);
   // 数据总数
   const [total, setTotal] = useState(defaultTotal);
   // 条件搜索用户
@@ -326,7 +326,7 @@ const User = () => {
   useEffect(() => {
     const params = { ...userFilterParams, pageSize, pageNumber, isPagination };
     filterUserList(params);
-  }, [pageSize, pageNumber]);
+  }, [pageSize, pageNumber, userFilterParams]);
 
   // 条件搜索用户方法
   const filterUserListHandle = (data) => {
@@ -479,10 +479,194 @@ const User = () => {
       {/* 用户添加弹窗 */}
       <Modal title="添加用户" open={userModalVisible} onOk={addUserHandle} onCancel={() => {
         setUserModalVisible(false);
-      }}>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+      }}
+        width={400}
+        maskClosable={false}
+        footer={[
+          <Button key="submit" block type="primary" onClick={addUserHandle}>
+            添加
+          </Button>
+        ]}
+      >
+        <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name='userAddForm' onFinish={addUserHandle}>
+          <Form.Item
+            name="username"
+            label="用户名"
+            rules={[
+              {
+                required: true,
+                message: '用户名不能为空',
+              },
+              {
+                pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,
+                message: '用户名只能以字母开头，且只能包含字母、数字和下划线',
+              },
+              {
+                max: 30,
+                message: '用户名长度不能超过30个字符',
+              },
+              {
+                min: 3,
+                message: '用户名长度不能小于3个字符',
+              }
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            label="密码"
+            rules={[
+              {
+                required: true,
+                message: '密码不能为空',
+              },
+              {
+                max: 30,
+                message: '长度不能超过30个字符',
+              },
+              {
+                min: 8,
+                message: '长度不能小于8个字符',
+              },
+              {
+                pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
+                message: '必须包含至少一个字母、数字和特殊字符',
+              }
+            ]}
+          >
+            <Input type="password" />
+          </Form.Item>
+          <Form.Item
+            name="repassword"
+            label="确认密码"
+            dependencies={['password']}
+            rules={[
+              {
+                required: true,
+                message: '确认密码不能为空',
+              },
+              {
+                max: 30,
+                message: '长度不能超过30个字符',
+              },
+              {
+                min: 8,
+                message: '长度不能小于8个字符',
+              },
+              {
+                pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
+                message: '必须包含至少一个字母、数字和特殊字符',
+              }
+            ]}
+          >
+            <Input type="password" />
+          </Form.Item>
+          <Form.Item
+            name="cnName"
+            label="中文名"
+            rules={[
+              {
+                required: true,
+                message: '中文名不能为空',
+              },
+              {
+                pattern: /^[^\d\W]+$/,
+                message: '中文名只能包含汉字',
+              },
+              {
+                max: 30,
+                message: '中文名长度不能超过30个字符',
+              },
+              {
+                min: 2,
+                message: '中文名长度不能小于2个字符',
+              }
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="enName"
+            label="英文名"
+            rules={[
+              {
+                required: true,
+                message: '英文名不能为空',
+              },
+              {
+                pattern: /^[a-zA-Z]+$/,
+                message: '英文名只能包含字母',
+              },
+              {
+                max: 30,
+                message: '英文名长度不能超过30个字符',
+              },
+              {
+                min: 2,
+                message: '英文名长度不能小于2个字符',
+              }
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            label="邮箱"
+            rules={[
+              {
+                type: 'email',
+                message: '邮箱格式不正确',
+              },
+              {
+                required: true,
+                message: '邮箱不能为空',
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="gender"
+            label="性别"
+            rules={[
+              {
+                required: true,
+                message: '性别不能为空',
+              },
+            ]}
+          >
+            <Select>
+              <Select.Option value={1}>男</Select.Option>
+              <Select.Option value={2}>女</Select.Option>
+              <Select.Option value={3}>未知</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="department"
+            label="部门"
+            rules={[
+              {
+                required: true,
+                message: '部门不能为空',
+              },
+            ]}
+          >
+            <TreeSelect multiple placeholder="选择部门" treeData={departmentList} showSearch treeNodeFilterProp='label' allowClear={true} treeDefaultExpandAll />
+          </Form.Item>
+          <Form.Item
+            name="jobPosition"
+            label="岗位"
+            rules={[
+              {
+                required: true,
+                message: '岗位不能为空',
+              },
+            ]}
+          >
+            <Select mode="multiple" placeholder="选择岗位" options={jobPositionList} showSearch optionFilterProp='label' allowClear={true} />
+          </Form.Item>
+        </Form>
       </Modal>
     </>
   );
