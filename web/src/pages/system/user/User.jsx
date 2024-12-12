@@ -10,10 +10,10 @@ import APIRequest from '@/common/APIRequest';
 const User = () => {
   const { message } = App.useApp(); // 消息提示
   const [form] = Form.useForm(); // 表单
-  const pageKeyword = '用户'; // 页面关键词
+
+  // 页面信息
   const title = '用户管理' + TitleSuffix; // 页面标题
-  const pageTitle = '用户管理 / USER MANAGEMENT.'; // 页面标题
-  const pageDesc = '用户是系统的核心资产之一，也是许多其它资源的强制依赖，所以对于用户的管理，我提供了以下的要求和建议，请知悉：'; // 页面描述
+  const pageKeyword = '用户'; // 页面关键词
 
   /////////////////////////////////////////////////////
   // 搜索栏
@@ -280,9 +280,9 @@ const User = () => {
       dataIndex: ['systemRole', 'name'],
       render: (name) => {
         const roleColors = {
-          '超级管理员': 'magenta',
-          '管理员': 'volcano',
-          '运维': 'green'
+          超级管理员: 'magenta',
+          管理员: 'volcano',
+          运维: 'green'
         };
         const color = roleColors[name] || '';
         return (
@@ -379,9 +379,9 @@ const User = () => {
       </Helmet>
       {/* 页面头部介绍 */}
       <div className="admin-page-header">
-        <div className="admin-page-title">{pageTitle}</div>
+        <div className="admin-page-title">用户管理 / USER MANAGEMENT.</div>
         <div className="admin-page-desc">
-          <div>{pageDesc}</div>
+          <div>用户是系统的核心资产之一，也是许多其它资源的强制依赖，所以对于用户的管理，我提供了以下的要求和建议，请知悉：</div>
           <ul>
             <li>出于数据安全考虑，系统将强制使用禁用用户来替代删除用户，以此保证数据的可靠性和稳定性。</li>
             <li>针对某些特殊的用户，例如老板、高管等，我们建议隐藏其联系方式，保护个人隐私。</li>
@@ -397,24 +397,13 @@ const User = () => {
               {getFilterFields()}
               <Col span={24} key="x" style={{ marginTop: '10px', textAlign: 'right' }}>
                 <Space>
-                  <Button icon={<SearchOutlined />} htmlType="submit">
-                    条件搜索
-                  </Button>
-                  <Button
-                    icon={<ClearOutlined />}
-                    onClick={() => {
-                      form.resetFields();
-                    }}
-                  >
-                    清理条件
-                  </Button>
-                  <a
-                    onClick={() => {
-                      setExpand(!expand);
-                    }}
-                  >
-                    <DownOutlined rotate={expand ? 180 : 0} /> {expand ? '收起条件' : '展开更多'}
-                  </a>
+                  <Button icon={<SearchOutlined />} htmlType="submit">条件搜索</Button>
+                  <Button icon={<ClearOutlined />} onClick={() => form.resetFields()}>清理条件</Button>
+                  {filterFields.length > defaultExpandItemCount && (
+                    <a onClick={() => setExpand(!expand)}>
+                      <DownOutlined rotate={expand ? 180 : 0} /> {expand ? '收起条件' : '展开更多'}
+                    </a>
+                  )}
                 </Space>
               </Col>
             </Row>
@@ -423,12 +412,7 @@ const User = () => {
         {/* 表格 */}
         <div className="admin-page-list">
           <div className="admin-page-btn-group">
-            <Button
-              icon={<UserAddOutlined />}
-              onClick={() => {
-                setAddModalVisible(true);
-              }}
-            >
+            <Button icon={<UserAddOutlined />} onClick={() => setAddModalVisible(true)}>
               添加{pageKeyword}
             </Button>
           </div>
@@ -487,9 +471,7 @@ const User = () => {
               }
             }}
             // 表格滚动，目的是为了最后一列固定
-            scroll={{
-              x: 'max-content'
-            }}
+            scroll={{ x: 'max-content' }}
           />
         </div>
       </div>

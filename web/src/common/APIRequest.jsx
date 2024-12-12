@@ -4,9 +4,9 @@ import { AxiosGet } from '@/utils/Request';
 // API 请求方法
 const APIRequest = {
   // 获取普通的列表数据
-  GetDataList: async (api, setter, tree = false) => {
+  GetDataList: async (api, setter, tree = false, params = {}) => {
     try {
-      const res = await AxiosGet(api);
+      const res = await AxiosGet(api, params);
       if (res.code === 200) {
         if (tree) {
           const treeData = GenerateTreeNode(res.data, 0);
@@ -23,9 +23,9 @@ const APIRequest = {
     }
   },
   // 获取用于填充 Select 的数据
-  GetSelectDataList: async (api, setter, tree = false) => {
+  GetSelectDataList: async (api, setter, tree = false, params = {}) => {
     try {
-      const res = await AxiosGet(api);
+      const res = await AxiosGet(api, params);
       if (res.code === 200) {
         if (tree) {
           const treeData = GenerateSelectTree(res.data, 0);
