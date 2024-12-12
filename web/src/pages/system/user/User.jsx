@@ -3,9 +3,9 @@ import { Helmet } from 'react-helmet';
 import { Button, Col, Form, Input, Row, Space, Table, Avatar, Tag, Descriptions, TreeSelect, Select, Modal, App } from 'antd';
 import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ManOutlined, WomanOutlined, QuestionOutlined } from '@ant-design/icons';
 import { TitleSuffix } from '@/common/Text.jsx';
-import { AxiosGet } from '@/utils/Request';
-import { Apis } from '@/common/APIConfig';
-import APIRequest from '@/common/APIRequest';
+import { AxiosGet } from '@/utils/Request.jsx';
+import { Apis } from '@/common/APIConfig.jsx';
+import APIRequest from '@/common/APIRequest.jsx';
 
 const User = () => {
   const { message } = App.useApp(); // 消息提示
@@ -31,7 +31,7 @@ const User = () => {
     APIRequest.GetSelectDataList(Apis.System.Department.List, setDepartmentList, true);
   }, []);
 
-  // 定义筛选列表和数据限制，支持类型：input、select、checkbox
+  // 定义筛选列表和数据限制，支持类型：input、select、treeSelect
   const filterFields = [
     {
       label: '用户名',
@@ -129,7 +129,7 @@ const User = () => {
       label: '部门',
       name: 'department',
       placeholder: '选择部门进行搜索',
-      type: 'select',
+      type: 'treeSelect',
       search: true,
       tree: true,
       multiple: false,
@@ -165,28 +165,16 @@ const User = () => {
     const children = []; // 子元素
 
     // 生成搜索表单
-    filterFields.slice(0, expand ? filterFields.length : defaultExpandItemCount).forEach((field, index) => {
+    filterFields.slice(0, expand ? filterFields.length : defaultExpandItemCount).forEach((item, index) => {
       children.push(
-        <Col span={6} key={field.label}>
-          <Form.Item name={field.name} label={field.label} rules={field.rules}>
-            {field.type === 'input' ? (
-              <Input placeholder={field.placeholder} allowClear={true} autoComplete="off" />
-            ) : field.type === 'select' ? (
-              field.tree ? (
-                <TreeSelect
-                  multiple={field.multiple}
-                  placeholder={field.placeholder}
-                  treeData={field.data}
-                  showSearch={field.search}
-                  treeNodeFilterProp="label"
-                  allowClear={true}
-                  treeDefaultExpandAll
-                />
-              ) : (
-                <Select mode={field.multiple ? 'multiple' : 'default'} placeholder={field.placeholder} options={field.data} showSearch={field.search} optionFilterProp="label" allowClear={true} />
-              )
-            ) : field.type === 'checkbox' ? (
-              <Checkbox.Group options={field.data} />
+        <Col span={6} key={item.label}>
+          <Form.Item name={item.name} label={item.label} rules={item.rules}>
+            {item.type === 'input' ? (
+              <Input placeholder={item.placeholder} allowClear={true} />
+            ) : item.type === 'treeSelect' ? (
+              <TreeSelect multiple={item.multiple} placeholder={item.placeholder} treeData={item.data} showSearch={item.search} treeNodeFilterProp="label" allowClear={true} treeDefaultExpandAll />
+            ) : item.type === 'select' ? (
+              <Select mode={item.multiple ? 'multiple' : 'default'} placeholder={item.placeholder} options={item.data} showSearch={item.search} optionFilterProp="label" allowClear={true} />
             ) : null}
           </Form.Item>
         </Col>
@@ -366,13 +354,241 @@ const User = () => {
   /////////////////////////////////////////////////////
   const [addModalVisible, setAddModalVisible] = useState(false);
 
+  // 定义添加数据的字段 
+  const addRecordFields = [
+    {
+      label: '用户名',
+      name: 'username',
+      placeholder: '请输入用户名',
+      type: 'input',
+      rules: [
+        {
+          required: true,
+          message: '用户名不能为空'
+        },
+        {
+          pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,
+          message: '用户名只能以字母开头，且只能包含字母、数字和下划线'
+        },
+        {
+          max: 30,
+          message: '用户名长度不能超过30个字符'
+        },
+        {
+          min: 3,
+          message: '用户名长度不能小于3个字符'
+        }
+      ]
+    },
+    {
+      label: '密码',
+      name: 'password',
+      placeholder: '请输入密码',
+      type: 'inputPassword',
+      rules: [
+        {
+          required: true,
+          message: '密码不能为空'
+        },
+        {
+          max: 30,
+          message: '密码长度不能超过30个字符'
+        },
+        {
+          min: 8,
+          message: '密码长度不能小于8个字符'
+        }
+      ]
+    },
+    {
+      label: '中文名',
+      name: 'cnName',
+      placeholder: '请输入中文名',
+      type: 'input',
+      rules: [
+        {
+          required: true,
+          message: '中文名不能为空'
+        },
+        {
+          max: 30,
+          message: '中文名长度不能超过30个字符'
+        },
+        {
+          min: 2,
+          message: '中文名长度不能小于2个字符'
+        }
+      ]
+    },
+    {
+      label: '英文名',
+      name: 'enName',
+      placeholder: '请输入英文名',
+      type: 'input',
+      rules: [
+        {
+          required: true,
+          message: '英文名不能为空'
+        },
+        {
+          pattern: /^[a-zA-Z]+$/,
+          message: '英文名只能包含字母'
+        },
+        {
+          max: 30,
+          message: '英文名长度不能超过30个字符'
+        },
+        {
+          min: 2,
+          message: '英文名长度不能小于2个字符'
+        }
+      ]
+    },
+    {
+      label: '邮箱',
+      name: 'email',
+      placeholder: '请输入邮箱',
+      type: 'input',
+      rules: [
+        {
+          required: true,
+          message: '邮箱不能为空'
+        },
+        {
+          type: 'email',
+          message: '邮箱格式不正确'
+        }
+      ] 
+    },
+    {
+      label: '手机号',
+      name: 'phone',
+      placeholder: '请输入手机号',
+      type: 'input',
+      rules: [
+        {
+          required: true,
+          message: '手机号不能为空'
+        },
+        {
+          pattern: /^1[3-9]\d{9}$/,
+          message: '手机号格式不正确'
+        }
+      ]
+    },
+    {
+      label: '隐藏手机号',
+      name: 'hidePhone',
+      type: 'select',
+      search: false,
+      tree: false,
+      multiple: false,
+      data: [{ label: '是', value: 1 }, { label: '否', value: 0 }],
+      rules: [
+        {
+          required: true,
+          message: '隐藏手机号不能为空'
+        }
+      ]
+    },
+    {
+      label: '性别',
+      name: 'gender',
+      type: 'select',
+      search: false,
+      tree: false,
+      multiple: false,
+      data: [
+        { label: '男', value: 1 },
+        { label: '女', value: 2 },
+        { label: '未知', value: 3 }
+      ],
+      rules: [
+        {
+          required: true,
+          message: '性别不能为空'
+        }
+      ]
+    },
+    {
+      label: '部门',
+      name: 'departments',
+      type: 'treeSelect',
+      search: true,
+      tree: true,
+      multiple: true,
+      data: departmentList,
+      rules: [
+        {
+          required: true,
+          message: '部门不能为空'
+        }
+      ]
+    },
+    {
+      label: '岗位',
+      name: 'jobPositions',
+      type: 'select',
+      search: true,
+      tree: false,
+      multiple: true,
+      data: jobPositionList,
+      rules: [
+        {
+          required: true,
+          message: '岗位不能为空'
+        }
+      ]
+    },
+    {
+      label: '角色',
+      name: 'role',
+      type: 'select',
+      search: true,
+      tree: false,
+      multiple: false,
+      data: roleList,
+      rules: [
+        {
+          required: true,
+          message: '角色不能为空'
+        }
+      ]
+    },
+    {
+      label: '描述',
+      name: 'description',
+      placeholder: '请输入描述信息',
+      type: 'textarea',
+      rules: []
+    }
+  ];
+
+  // 获取添加数据字段
+  const getAddRecordFields = () => {
+    const children = [];
+    addRecordFields.forEach((item) => {
+      children.push(
+        <Form.Item key={item.name} label={item.label} name={item.name} rules={item.rules}>
+          {item.type === 'input' ? <Input placeholder={item.placeholder} allowClear={true} /> 
+            : item.type === 'inputPassword' ? <Input.Password placeholder={item.placeholder} allowClear={true} /> 
+            : item.type === 'select' ? <Select mode={item.multiple ? 'multiple' : 'default'} options={item.data} showSearch={item.search} optionFilterProp="label" placeholder={item.placeholder} allowClear={true} />
+            : item.type === 'treeSelect' ? <TreeSelect multiple={item.multiple} placeholder={item.placeholder} treeData={item.data} showSearch={item.search} treeNodeFilterProp="label" allowClear={true} treeDefaultExpandAll />
+            : item.type === 'textarea' ? <Input.TextArea placeholder={item.placeholder} allowClear={true} /> : null}
+        </Form.Item>
+      );
+    });
+    return children;
+  };
+
   // 添加数据方法
-  const addRecordHandle = () => {
-    console.log('添加数据');
+  const addRecordHandle = (data) => {
+    console.log('添加数据：', data);
   };
 
   return (
     <>
+      {/* 页面 header */}
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={title} />
@@ -392,7 +608,7 @@ const User = () => {
       <div className="admin-page-main">
         {/* 搜索栏 */}
         <div className="admin-page-search">
-          <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="filterForm" onFinish={filterDataListHandle}>
+          <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="filterForm" onFinish={filterDataListHandle} autoComplete="off">
             <Row gutter={24}>
               {getFilterFields()}
               <Col span={24} key="x" style={{ marginTop: '10px', textAlign: 'right' }}>
@@ -481,194 +697,17 @@ const User = () => {
         title={'添加' + pageKeyword}
         open={addModalVisible}
         onOk={addRecordHandle}
-        onCancel={() => {
-          setAddModalVisible(false);
-        }}
+        onCancel={() => setAddModalVisible(false)}
         width={400}
         maskClosable={false}
-        footer={[
-          <Button key="submit" block type="primary" onClick={addRecordHandle}>
-            添加{pageKeyword}
-          </Button>
-        ]}
+        footer={null}
       >
-        <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="addForm" onFinish={addRecordHandle}>
-          <Form.Item
-            name="username"
-            label="用户名"
-            rules={[
-              {
-                required: true,
-                message: '用户名不能为空'
-              },
-              {
-                pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,
-                message: '用户名只能以字母开头，且只能包含字母、数字和下划线'
-              },
-              {
-                max: 30,
-                message: '用户名长度不能超过30个字符'
-              },
-              {
-                min: 3,
-                message: '用户名长度不能小于3个字符'
-              }
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            label="密码"
-            rules={[
-              {
-                required: true,
-                message: '密码不能为空'
-              },
-              {
-                max: 30,
-                message: '长度不能超过30个字符'
-              },
-              {
-                min: 8,
-                message: '长度不能小于8个字符'
-              },
-              {
-                pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-                message: '必须包含至少一个字母、数字和特殊字符'
-              }
-            ]}
-          >
-            <Input type="password" />
-          </Form.Item>
-          <Form.Item
-            name="repassword"
-            label="确认密码"
-            dependencies={['password']}
-            rules={[
-              {
-                required: true,
-                message: '确认密码不能为空'
-              },
-              {
-                max: 30,
-                message: '长度不能超过30个字符'
-              },
-              {
-                min: 8,
-                message: '长度不能小于8个字符'
-              },
-              {
-                pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-                message: '必须包含至少一个字母、数字和特殊字符'
-              }
-            ]}
-          >
-            <Input type="password" />
-          </Form.Item>
-          <Form.Item
-            name="cnName"
-            label="中文名"
-            rules={[
-              {
-                required: true,
-                message: '中文名不能为空'
-              },
-              {
-                pattern: /^[^\d\W]+$/,
-                message: '中文名只能包含汉字'
-              },
-              {
-                max: 30,
-                message: '中文名长度不能超过30个字符'
-              },
-              {
-                min: 2,
-                message: '中文名长度不能小于2个字符'
-              }
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="enName"
-            label="英文名"
-            rules={[
-              {
-                required: true,
-                message: '英文名不能为空'
-              },
-              {
-                pattern: /^[a-zA-Z]+$/,
-                message: '英文名只能包含字母'
-              },
-              {
-                max: 30,
-                message: '英文名长度不能超过30个字符'
-              },
-              {
-                min: 2,
-                message: '英文名长度不能小于2个字符'
-              }
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="email"
-            label="邮箱"
-            rules={[
-              {
-                type: 'email',
-                message: '邮箱格式不正确'
-              },
-              {
-                required: true,
-                message: '邮箱不能为空'
-              }
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="gender"
-            label="性别"
-            rules={[
-              {
-                required: true,
-                message: '性别不能为空'
-              }
-            ]}
-          >
-            <Select>
-              <Select.Option value={1}>男</Select.Option>
-              <Select.Option value={2}>女</Select.Option>
-              <Select.Option value={3}>未知</Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            name="department"
-            label="部门"
-            rules={[
-              {
-                required: true,
-                message: '部门不能为空'
-              }
-            ]}
-          >
-            <TreeSelect multiple placeholder="选择部门" treeData={departmentList} showSearch treeNodeFilterProp="label" allowClear={true} treeDefaultExpandAll />
-          </Form.Item>
-          <Form.Item
-            name="jobPosition"
-            label="岗位"
-            rules={[
-              {
-                required: true,
-                message: '岗位不能为空'
-              }
-            ]}
-          >
-            <Select mode="multiple" placeholder="选择岗位" options={jobPositionList} showSearch optionFilterProp="label" allowClear={true} />
+        <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="addRecordForm" onFinish={addRecordHandle} autoComplete="off">
+          {getAddRecordFields()}
+          <Form.Item wrapperCol={{ span: 24 }}>
+            <Button type="primary" htmlType="submit" block>
+              添加{pageKeyword}
+            </Button>
           </Form.Item>
         </Form>
       </Modal>
