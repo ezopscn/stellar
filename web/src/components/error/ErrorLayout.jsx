@@ -14,7 +14,9 @@ const ErrorLayout = () => {
         </div>
         <div className="admin-error-body">
           <Outlet />
-          <Button type="primary" icon={<ArrowLeftOutlined />} onClick={() => navigate('/')}>回到首页</Button>
+          <Button type="primary" icon={<ArrowLeftOutlined />} onClick={() => navigate('/')}>
+            回到首页
+          </Button>
         </div>
         <div className="admin-error-footer admin-unselect">
           <FooterText />

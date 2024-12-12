@@ -15,15 +15,18 @@ import '@/assets/css/Admin.less';
 createRoot(document.getElementById('root')).render(
   // autoInsertSpaceInButton：解决按钮的文本为两个汉字时中间自动补充空格的问题，新版本已经废弃
   // theme：修改默认主题，参考文档：https://ant-design.antgroup.com/docs/react/customize-theme-cn
-  <ConfigProvider locale={zhCN} theme={{
-    hashed: false, // 禁用 css hash
-    token: {
-      borderRadius: 0, // 圆角
-      fontFamily: 'MiSans, serif', // 文字字体
-      fontSize: 13, // 默认字号
-      controlHeight: 28 // 按钮和输入框等基础控件的高度
-    }
-  }}>
+  <ConfigProvider
+    locale={zhCN}
+    theme={{
+      hashed: false, // 禁用 css hash
+      token: {
+        borderRadius: 0, // 圆角
+        fontFamily: 'MiSans, serif', // 文字字体
+        fontSize: 13, // 默认字号
+        controlHeight: 28 // 按钮和输入框等基础控件的高度
+      }
+    }}
+  >
     <MainApp />
   </ConfigProvider>
 );

@@ -8,21 +8,21 @@ const instance = axios.create({
 
 // 请求拦截器
 instance.interceptors.request.use(
-  function(config) {
+  function (config) {
     config.headers.Authorization = 'Bearer ' + GetToken(); // 在请求中添加 Token
     return config;
   },
-  function(error) {
+  function (error) {
     return Promise.reject(error);
   }
 );
 
 // 响应拦截器
 instance.interceptors.response.use(
-  function(response) {
+  function (response) {
     return response;
   },
-  function(error) {
+  function (error) {
     return Promise.reject(error);
   }
 );

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Avatar, Badge, Dropdown, Layout, Menu, Select, App } from 'antd';
+import { Avatar, Badge, Dropdown, Layout, Menu, App } from 'antd';
 import { Logo } from '@/common/Image.jsx';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { FooterText } from '@/common/Text.jsx';
@@ -8,7 +8,7 @@ import { RouteRules } from '@/routes/RouteRules.jsx';
 import { DynamicIcon } from '@/utils/IconLoad.jsx';
 import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from 'jwt-decode';
 import { ManOutlined, WomanOutlined, QuestionOutlined } from '@ant-design/icons';
 
 const { Header, Content, Sider } = Layout;
@@ -36,14 +36,10 @@ const siderMenus = [
     getItem('用户角色', '/system/roles'),
     getItem('系统菜单', '/system/menus'),
     getItem('系统接口', '/system/apis'),
-    getItem('权限配置', '/system/permissions'),
+    getItem('权限配置', '/system/permissions')
   ]),
-  getItem('安全审计', '/securityaudit', <DynamicIcon iconName={'FileProtectOutlined'} />, [
-    getItem('登录日志', '/securityaudit/login'),
-    getItem('操作日志', '/securityaudit/operation'),
-  ])
+  getItem('安全审计', '/securityaudit', <DynamicIcon iconName={'FileProtectOutlined'} />, [getItem('登录日志', '/securityaudit/login'), getItem('操作日志', '/securityaudit/operation')])
 ];
-
 
 const AdminLayout = () => {
   // 消息提示
@@ -61,7 +57,7 @@ const AdminLayout = () => {
   const [openKeys, setOpenKeys] = useState([pathname]); // 展开菜单，父级菜单
   const [selectedKeys, setSelectedKeys] = useState([pathname]); // 选中菜单
   useEffect(() => {
-    setOpenKeys(TreeFindPath(RouteRules, data => data.path === pathname));
+    setOpenKeys(TreeFindPath(RouteRules, (data) => data.path === pathname));
     setSelectedKeys(pathname);
   }, [pathname]);
 
@@ -89,11 +85,7 @@ const AdminLayout = () => {
       disabled: true
     },
     {
-      label: (
-        <a target="_blank">
-          修改资料
-        </a>
-      ),
+      label: <a target="_blank">修改资料</a>,
       key: '1',
       onClick: () => {
         navigate('/me');
@@ -118,20 +110,29 @@ const AdminLayout = () => {
           </div>
         </div>
         <div className="admin-right">
-          <Badge count={userInfo?.gender === 1 ? <ManOutlined style={{ backgroundColor: '#165dff' }} /> :
-            userInfo?.gender === 2 ? <WomanOutlined style={{ backgroundColor: '#ff4d4f' }} /> :
-              <QuestionOutlined style={{ backgroundColor: '#999' }} />}>
-            <Dropdown menu={{
-              items: dropdownMenus
-            }}>
+          <Badge
+            count={
+              userInfo?.gender === 1 ? (
+                <ManOutlined style={{ backgroundColor: '#165dff' }} />
+              ) : userInfo?.gender === 2 ? (
+                <WomanOutlined style={{ backgroundColor: '#ff4d4f' }} />
+              ) : (
+                <QuestionOutlined style={{ backgroundColor: '#999' }} />
+              )
+            }
+          >
+            <Dropdown
+              menu={{
+                items: dropdownMenus
+              }}
+            >
               <Avatar shape="circle" size={30} src={userInfo?.avatar} />
             </Dropdown>
-        </Badge>
+          </Badge>
         </div>
       </Header>
       <Layout className="admin-main">
-        <Sider className="admin-sider" theme="light" width={menuWidth} collapsedWidth={menuCollapsedWidth} collapsible
-               collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+        <Sider className="admin-sider" theme="light" width={menuWidth} collapsedWidth={menuCollapsedWidth} collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
           <Menu
             className="admin-menu"
             mode="inline"

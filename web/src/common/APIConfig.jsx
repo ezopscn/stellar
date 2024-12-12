@@ -21,7 +21,7 @@ const Apis = {
   System: {
     User: {
       List: BackendURL + '/system/user/list', // 用户列表
-      Info: BackendURL + '/system/user/detail', // 当前用户详情
+      Info: BackendURL + '/system/user/detail' // 当前用户详情
     },
     Menu: {
       Tree: BackendURL + '/system/menu/tree' // 菜单树

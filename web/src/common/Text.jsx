@@ -3,7 +3,7 @@ import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
 import { GithubOutlined } from '@ant-design/icons';
 
-// 底部内容 
+// 底部内容
 const FooterText = () => {
   // 运行环境
   const runEnv = window.CONFIG.env;
@@ -35,7 +35,11 @@ const FooterText = () => {
 
   return (
     <>
-      <b>👻 STELLAR </b>© 2024 EZOPS.CN. Current Version: {versionText} / Latest Version: <a href='https://github.com/ezopscn/stellar/releases' target='_blank' rel='noreferrer'><GithubOutlined /></a> / {runEnvText}
+      <b>👻 STELLAR </b>© 2024 EZOPS.CN. Current Version: {versionText} / Latest Version:{' '}
+      <a href="https://github.com/ezopscn/stellar/releases" target="_blank" rel="noreferrer">
+        <GithubOutlined />
+      </a>{' '}
+      / {runEnvText}
     </>
   );
 };

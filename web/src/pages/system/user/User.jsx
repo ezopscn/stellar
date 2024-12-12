@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Button, Col, Form, Input, Row, Space, Table, App, Avatar, Tag, Descriptions, TreeSelect, Select, Modal, Radio } from 'antd';
-import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ManOutlined, WomanOutlined, QuestionOutlined } from '@ant-design/icons';
+import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ManOutlined, WomanOutlined, QuestionOutlined, SelectOutlined } from '@ant-design/icons';
 import { TitleSuffix } from '@/common/Text.jsx';
 import { AxiosGet } from '@/utils/Request';
 import { Apis } from '@/common/APIConfig';
@@ -21,27 +21,29 @@ const User = () => {
   /////////////////////////////////////////////////////
   // 搜索栏
   /////////////////////////////////////////////////////
-  // 更多搜索
-  const [expand, setExpand] = useState(false);
+  const defaultExpandItemCount = 8; // 默认展开的搜索项数量
+  const [expand, setExpand] = useState(false); // 是否展开更多搜索
+  const [roleList, setRoleList] = useState([]); // 下拉菜单的角色列表数据
+  const [jobPositionList, setJobPositionList] = useState([]); // 下拉菜单的岗位列表数据
+  const [departmentList, setDepartmentList] = useState([]); // 下拉菜单的部门列表数据
 
-  // 获取角色、岗位、部门列表
-  const [roleList, setRoleList] = useState([]);
-  const [jobPositionList, setJobPositionList] = useState([]);
-  const [departmentList, setDepartmentList] = useState([]);
+  // 页面加载的时候一次性获取依赖的异步数据
   useEffect(() => {
-    const fetchList = async (api, setter) => {
+    // 通过 tree 参数来区分是否是树结构
+    const fetchList = async (api, setter, tree = false) => {
       try {
         const res = await AxiosGet(api);
         if (res.code === 200) {
-          // 部门树结构需要单独处理
-          if (api === Apis.System.Department.List) {
+          if (tree) {
             const treeData = GenerateSelectTree(res.data, 0);
             setter(treeData);
           } else {
-            setter(res.data.map(item => ({
-              label: item.name,
-              value: item.id,
-            })));
+            setter(
+              res.data.map((item) => ({
+                label: item.name,
+                value: item.id
+              }))
+            );
           }
         } else {
           message.error(res.message);
@@ -52,65 +54,76 @@ const User = () => {
     };
     fetchList(Apis.System.Role.List, setRoleList);
     fetchList(Apis.System.JobPosition.List, setJobPositionList);
-    fetchList(Apis.System.Department.List, setDepartmentList);
+    fetchList(Apis.System.Department.List, setDepartmentList, true);
   }, []);
 
-  // 列表数据
+  // 定义筛选列表和数据限制，支持类型：input、select、checkbox
   const filterFields = [
     {
       label: '用户名',
       name: 'username',
       placeholder: '使用用户名进行搜索',
       type: 'input',
-      rules: [{
-        message: '用户名长度不能超过30个字符',
-        max: 30,
-      }],
+      rules: [
+        {
+          message: '用户名长度不能超过30个字符',
+          max: 30
+        }
+      ]
     },
     {
       label: '姓名',
       name: 'name',
-      placeholder: '使用中文名，英文名进行搜索',
+      placeholder: '使用中文名或者英文名进行搜索',
       type: 'input',
-      rules: [{
-        message: '姓名长度不能超过30个字符',
-        max: 30,
-      }],
+      rules: [
+        {
+          message: '姓名长度不能超过30个字符',
+          max: 30
+        }
+      ]
     },
     {
       label: '邮箱',
       name: 'email',
       placeholder: '使用邮箱地址进行搜索',
       type: 'input',
-      rules: [{
-        message: '邮箱长度不能超过30个字符',
-        max: 50,
-      }],
+      rules: [
+        {
+          message: '邮箱长度不能超过30个字符',
+          max: 50
+        }
+      ]
     },
     {
       label: '手机号',
       name: 'phone',
       placeholder: '使用手机号码进行搜索',
       type: 'input',
-      rules: [{
-        message: '手机号长度不能超过15个字符',
-        max: 15,
-      }],
+      rules: [
+        {
+          message: '手机号长度不能超过15个字符',
+          max: 15
+        }
+      ]
     },
     {
       label: '状态',
       name: 'status',
       placeholder: '选择用户状态进行搜索',
       type: 'select',
+      search: false,
+      tree: false,
+      multiple: false,
       data: [
         {
           label: '启用',
-          value: 1,
+          value: 1
         },
         {
           label: '禁用',
-          value: 0,
-        },
+          value: 0
+        }
       ],
       rules: []
     },
@@ -119,19 +132,22 @@ const User = () => {
       name: 'gender',
       placeholder: '选择性别进行搜索',
       type: 'select',
+      search: false,
+      tree: false,
+      multiple: false,
       data: [
         {
           label: '男',
-          value: 1,
+          value: 1
         },
         {
           label: '女',
-          value: 2,
+          value: 2
         },
         {
           label: '未知',
-          value: 3,
-        },
+          value: 3
+        }
       ],
       rules: []
     },
@@ -142,6 +158,7 @@ const User = () => {
       type: 'select',
       search: true,
       tree: true,
+      multiple: false,
       data: departmentList,
       rules: []
     },
@@ -151,6 +168,8 @@ const User = () => {
       placeholder: '选择岗位进行搜索',
       type: 'select',
       search: true,
+      tree: false,
+      multiple: false,
       data: jobPositionList,
       rules: []
     },
@@ -160,30 +179,41 @@ const User = () => {
       placeholder: '选择角色进行搜索',
       type: 'select',
       search: true,
+      tree: false,
+      multiple: false,
       data: roleList,
       rules: []
-    },
+    }
   ];
-
-  // 默认展开的搜索项数量
-  const defaultExpandItemCount = 8;
 
   // 获取搜索栏字段
   const getFilterFields = () => {
-    const children = [];   // 子元素
+    const children = []; // 子元素
 
     // 生成搜索表单
     filterFields.slice(0, expand ? filterFields.length : defaultExpandItemCount).forEach((field, index) => {
       children.push(
         <Col span={6} key={field.label}>
-          <Form.Item
-            name={field.name}
-            label={field.label}
-            rules={field.rules}
-          >
-            {field.type === "input" ? <Input placeholder={field.placeholder} allowClear={true} autoComplete='off' /> : field.tree ?
-              <TreeSelect placeholder={field.placeholder} treeData={field.data} showSearch={field.search} treeNodeFilterProp='label' allowClear={true} treeDefaultExpandAll /> :
-              <Select placeholder={field.placeholder} options={field.data} showSearch={field.search} optionFilterProp='label' allowClear={true} />}
+          <Form.Item name={field.name} label={field.label} rules={field.rules}>
+            {field.type === 'input' ? (
+              <Input placeholder={field.placeholder} allowClear={true} autoComplete="off" />
+            ) : field.type === 'select' ? (
+              field.tree ? (
+                <TreeSelect
+                  multiple={field.multiple}
+                  placeholder={field.placeholder}
+                  treeData={field.data}
+                  showSearch={field.search}
+                  treeNodeFilterProp="label"
+                  allowClear={true}
+                  treeDefaultExpandAll
+                />
+              ) : (
+                <Select mode={field.multiple ? 'multiple' : 'default'} placeholder={field.placeholder} options={field.data} showSearch={field.search} optionFilterProp="label" allowClear={true} />
+              )
+            ) : field.type === 'checkbox' ? (
+              <Checkbox.Group options={field.data} />
+            ) : null}
           </Form.Item>
         </Col>
       );
@@ -204,12 +234,12 @@ const User = () => {
     {
       title: '中文名',
       dataIndex: 'cnName',
-      minWidth: 80,
+      minWidth: 80
     },
     {
       title: '英文名',
       dataIndex: 'enName',
-      minWidth: 80,
+      minWidth: 80
     },
     {
       title: '性别',
@@ -228,22 +258,22 @@ const User = () => {
     {
       title: '用户名',
       dataIndex: 'username',
-      minWidth: 80,
+      minWidth: 80
     },
     {
       title: '邮箱',
-      dataIndex: 'email',
+      dataIndex: 'email'
     },
     {
       title: '手机号',
-      dataIndex: 'phone',
+      dataIndex: 'phone'
     },
     {
       title: '部门',
       dataIndex: 'systemDepartments',
       minWidth: 100,
       render: (systemDepartments) => {
-        return systemDepartments?.map(department => department.name).join(',');
+        return systemDepartments?.map((department) => department.name).join(',');
       }
     },
     {
@@ -251,7 +281,7 @@ const User = () => {
       dataIndex: 'systemJobPositions',
       minWidth: 120,
       render: (systemJobPositions) => {
-        return systemJobPositions?.map(jobPosition => jobPosition.name).join(',');
+        return systemJobPositions?.map((jobPosition) => jobPosition.name).join(',');
       }
     },
     {
@@ -259,11 +289,23 @@ const User = () => {
       dataIndex: ['systemRole', 'name'],
       render: (name) => {
         if (name === '超级管理员') {
-          return <Tag bordered={false} color="magenta">{name}</Tag>;
+          return (
+            <Tag bordered={false} color="magenta">
+              {name}
+            </Tag>
+          );
         } else if (name === '管理员') {
-          return <Tag bordered={false} color="volcano">{name}</Tag>;
+          return (
+            <Tag bordered={false} color="volcano">
+              {name}
+            </Tag>
+          );
         } else if (name === '运维') {
-          return <Tag bordered={false} color='green'>{name}</Tag>;
+          return (
+            <Tag bordered={false} color="green">
+              {name}
+            </Tag>
+          );
         } else {
           return <Tag bordered={false}>{name}</Tag>;
         }
@@ -274,9 +316,17 @@ const User = () => {
       dataIndex: 'status',
       render: (status) => {
         if (status === 1) {
-          return <Tag bordered={false} color="green">启用</Tag>;
+          return (
+            <Tag bordered={false} color="green">
+              启用
+            </Tag>
+          );
         } else {
-          return <Tag bordered={false} color="red">禁用</Tag>;
+          return (
+            <Tag bordered={false} color="red">
+              禁用
+            </Tag>
+          );
         }
       }
     },
@@ -289,8 +339,8 @@ const User = () => {
           <a>编辑</a>
           {record.status === 1 ? <a style={{ color: '#ff4d4f' }}>禁用</a> : <a>启用</a>}
         </Space>
-      ),
-    },
+      )
+    }
   ];
 
   // 表格行选择
@@ -369,12 +419,12 @@ const User = () => {
     <>
       <Helmet>
         <title>{title}</title>
-        <meta name='description' content={title} />
+        <meta name="description" content={title} />
       </Helmet>
       {/* 页面头部介绍 */}
-      <div className='admin-page-header'>
-        <div className='admin-page-title'>用户中心 / USER MANAGEMENT.</div>
-        <div className='admin-page-desc'>
+      <div className="admin-page-header">
+        <div className="admin-page-title">用户中心 / USER MANAGEMENT.</div>
+        <div className="admin-page-desc">
           <div>用户是系统的核心资产之一，也是许多其它资源的强制依赖，所以对于用户的管理，我提供了以下的要求和建议，请知悉：</div>
           <ul>
             <li>出于数据安全考虑，系统将强制使用禁用用户来替代删除用户，以此保证数据的可靠性和稳定性。</li>
@@ -383,18 +433,25 @@ const User = () => {
         </div>
       </div>
       {/* 页面主体 */}
-      <div className='admin-page-main'>
+      <div className="admin-page-main">
         {/* 搜索栏 */}
-        <div className='admin-page-search'>
-          <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name='userFilterForm' onFinish={filterUserListHandle}>
+        <div className="admin-page-search">
+          <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="userFilterForm" onFinish={filterUserListHandle}>
             <Row gutter={24}>
               {getFilterFields()}
-              <Col span={24} key='x' style={{ marginTop: '10px', textAlign: 'right' }}>
+              <Col span={24} key="x" style={{ marginTop: '10px', textAlign: 'right' }}>
                 <Space>
-                  <Button icon={<SearchOutlined />} htmlType='submit'>搜索用户</Button>
-                  <Button icon={<ClearOutlined />} onClick={() => {
-                    form.resetFields();
-                  }}>清理条件</Button>
+                  <Button icon={<SearchOutlined />} htmlType="submit">
+                    搜索用户
+                  </Button>
+                  <Button
+                    icon={<ClearOutlined />}
+                    onClick={() => {
+                      form.resetFields();
+                    }}
+                  >
+                    清理条件
+                  </Button>
                   <a
                     onClick={() => {
                       setExpand(!expand);
@@ -408,17 +465,22 @@ const User = () => {
           </Form>
         </div>
         {/* 表格 */}
-        <div className='admin-page-list'>
-          <div className='admin-page-btn-group'>
-            <Button icon={<UserAddOutlined />} onClick={() => {
-              setUserModalVisible(true);
-            }}>添加用户</Button>
+        <div className="admin-page-list">
+          <div className="admin-page-btn-group">
+            <Button
+              icon={<UserAddOutlined />}
+              onClick={() => {
+                setUserModalVisible(true);
+              }}
+            >
+              添加用户
+            </Button>
           </div>
           <Table
             // 表格布局大小
-            size='small'
+            size="small"
             // 表格布局方式，支持 fixed、auto
-            tableLayout='auto'
+            tableLayout="auto"
             // 表格行选择
             rowSelection={{
               type: 'checkbox',
@@ -432,28 +494,28 @@ const User = () => {
                 const items = [
                   {
                     label: '用户创建者',
-                    children: record.creator.split(',')[0] + ' / ' + record.creator.split(',')[1],
+                    children: record.creator.split(',')[0] + ' / ' + record.creator.split(',')[1]
                   },
                   {
                     label: '个人介绍',
-                    children: record.description,
+                    children: record.description
                   },
                   {
                     label: '最后登录 IP',
-                    children: record.lastLoginIP,
+                    children: record.lastLoginIP
                   },
                   {
                     label: '最后登录时间',
-                    children: record.lastLoginTime,
-                  },
-                ]
-                return <Descriptions column={1} items={items} />
+                    children: record.lastLoginTime
+                  }
+                ];
+                return <Descriptions column={1} items={items} />;
               },
               rowExpandable: (record) => record.name !== 'Not Expandable'
             }}
             dataSource={userList}
             // 行唯一标识
-            rowKey='id'
+            rowKey="id"
             // 表格分页
             pagination={{
               pageSize: pageSize,
@@ -470,16 +532,20 @@ const User = () => {
             }}
             // 表格滚动，目的是为了最后一列固定
             scroll={{
-              x: 'max-content',
+              x: 'max-content'
             }}
           />
         </div>
       </div>
 
       {/* 用户添加弹窗 */}
-      <Modal title="添加用户" open={userModalVisible} onOk={addUserHandle} onCancel={() => {
-        setUserModalVisible(false);
-      }}
+      <Modal
+        title="添加用户"
+        open={userModalVisible}
+        onOk={addUserHandle}
+        onCancel={() => {
+          setUserModalVisible(false);
+        }}
         width={400}
         maskClosable={false}
         footer={[
@@ -488,26 +554,26 @@ const User = () => {
           </Button>
         ]}
       >
-        <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name='userAddForm' onFinish={addUserHandle}>
+        <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="userAddForm" onFinish={addUserHandle}>
           <Form.Item
             name="username"
             label="用户名"
             rules={[
               {
                 required: true,
-                message: '用户名不能为空',
+                message: '用户名不能为空'
               },
               {
                 pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,
-                message: '用户名只能以字母开头，且只能包含字母、数字和下划线',
+                message: '用户名只能以字母开头，且只能包含字母、数字和下划线'
               },
               {
                 max: 30,
-                message: '用户名长度不能超过30个字符',
+                message: '用户名长度不能超过30个字符'
               },
               {
                 min: 3,
-                message: '用户名长度不能小于3个字符',
+                message: '用户名长度不能小于3个字符'
               }
             ]}
           >
@@ -519,19 +585,19 @@ const User = () => {
             rules={[
               {
                 required: true,
-                message: '密码不能为空',
+                message: '密码不能为空'
               },
               {
                 max: 30,
-                message: '长度不能超过30个字符',
+                message: '长度不能超过30个字符'
               },
               {
                 min: 8,
-                message: '长度不能小于8个字符',
+                message: '长度不能小于8个字符'
               },
               {
                 pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-                message: '必须包含至少一个字母、数字和特殊字符',
+                message: '必须包含至少一个字母、数字和特殊字符'
               }
             ]}
           >
@@ -544,19 +610,19 @@ const User = () => {
             rules={[
               {
                 required: true,
-                message: '确认密码不能为空',
+                message: '确认密码不能为空'
               },
               {
                 max: 30,
-                message: '长度不能超过30个字符',
+                message: '长度不能超过30个字符'
               },
               {
                 min: 8,
-                message: '长度不能小于8个字符',
+                message: '长度不能小于8个字符'
               },
               {
                 pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-                message: '必须包含至少一个字母、数字和特殊字符',
+                message: '必须包含至少一个字母、数字和特殊字符'
               }
             ]}
           >
@@ -568,19 +634,19 @@ const User = () => {
             rules={[
               {
                 required: true,
-                message: '中文名不能为空',
+                message: '中文名不能为空'
               },
               {
                 pattern: /^[^\d\W]+$/,
-                message: '中文名只能包含汉字',
+                message: '中文名只能包含汉字'
               },
               {
                 max: 30,
-                message: '中文名长度不能超过30个字符',
+                message: '中文名长度不能超过30个字符'
               },
               {
                 min: 2,
-                message: '中文名长度不能小于2个字符',
+                message: '中文名长度不能小于2个字符'
               }
             ]}
           >
@@ -592,19 +658,19 @@ const User = () => {
             rules={[
               {
                 required: true,
-                message: '英文名不能为空',
+                message: '英文名不能为空'
               },
               {
                 pattern: /^[a-zA-Z]+$/,
-                message: '英文名只能包含字母',
+                message: '英文名只能包含字母'
               },
               {
                 max: 30,
-                message: '英文名长度不能超过30个字符',
+                message: '英文名长度不能超过30个字符'
               },
               {
                 min: 2,
-                message: '英文名长度不能小于2个字符',
+                message: '英文名长度不能小于2个字符'
               }
             ]}
           >
@@ -616,12 +682,12 @@ const User = () => {
             rules={[
               {
                 type: 'email',
-                message: '邮箱格式不正确',
+                message: '邮箱格式不正确'
               },
               {
                 required: true,
-                message: '邮箱不能为空',
-              },
+                message: '邮箱不能为空'
+              }
             ]}
           >
             <Input />
@@ -632,8 +698,8 @@ const User = () => {
             rules={[
               {
                 required: true,
-                message: '性别不能为空',
-              },
+                message: '性别不能为空'
+              }
             ]}
           >
             <Select>
@@ -648,11 +714,11 @@ const User = () => {
             rules={[
               {
                 required: true,
-                message: '部门不能为空',
-              },
+                message: '部门不能为空'
+              }
             ]}
           >
-            <TreeSelect multiple placeholder="选择部门" treeData={departmentList} showSearch treeNodeFilterProp='label' allowClear={true} treeDefaultExpandAll />
+            <TreeSelect multiple placeholder="选择部门" treeData={departmentList} showSearch treeNodeFilterProp="label" allowClear={true} treeDefaultExpandAll />
           </Form.Item>
           <Form.Item
             name="jobPosition"
@@ -660,11 +726,11 @@ const User = () => {
             rules={[
               {
                 required: true,
-                message: '岗位不能为空',
-              },
+                message: '岗位不能为空'
+              }
             ]}
           >
-            <Select mode="multiple" placeholder="选择岗位" options={jobPositionList} showSearch optionFilterProp='label' allowClear={true} />
+            <Select mode="multiple" placeholder="选择岗位" options={jobPositionList} showSearch optionFilterProp="label" allowClear={true} />
           </Form.Item>
         </Form>
       </Modal>
