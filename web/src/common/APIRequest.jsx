@@ -1,9 +1,5 @@
-import { GenerateTreeNode, GenerateSelectTree } from './GenerateTree';
-import { AxiosGet } from './Request';
-import { message } from 'antd';
-
-// 消息提示
-const { message } = App.useApp();
+import { GenerateTreeNode, GenerateSelectTree } from '@/common/GenerateTree';
+import { AxiosGet } from '@/utils/Request';
 
 // API 请求方法
 const APIRequest = {
@@ -19,7 +15,7 @@ const APIRequest = {
           setter(res.data);
         }
       } else {
-        message.error(res.message);
+        console.log(res.message);
       }
     } catch (error) {
       console.log(`后端服务异常，接口请求失败：${api}`);
@@ -43,7 +39,7 @@ const APIRequest = {
           );
         }
       } else {
-        message.error(res.message);
+        console.log(res.message);
       }
     } catch (error) {
       console.log(`后端服务异常，接口请求失败：${api}`);
@@ -51,3 +47,5 @@ const APIRequest = {
     }
   }
 };
+
+export default APIRequest;
