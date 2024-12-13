@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { Button, Col, Form, Input, Row, Space, Table, Avatar, Tag, Descriptions, TreeSelect, Select, Modal, App } from 'antd';
-import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ManOutlined, WomanOutlined, QuestionOutlined } from '@ant-design/icons';
+import { Button, Col, Form, Input, Row, Space, Table, Avatar, Tag, Descriptions, TreeSelect, Select, Modal, App, Upload } from 'antd';
+import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ManOutlined, WomanOutlined, QuestionOutlined, DownloadOutlined, UploadOutlined, InboxOutlined } from '@ant-design/icons';
 import { TitleSuffix } from '@/common/Text.jsx';
 import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
 import APIRequest from '@/common/APIRequest.jsx';
+const { Dragger } = Upload;
 
 const User = () => {
   const { message } = App.useApp(); // 消息提示
@@ -353,6 +354,7 @@ const User = () => {
   // 添加弹窗
   /////////////////////////////////////////////////////
   const [addModalVisible, setAddModalVisible] = useState(false);
+  const [multiAddModalVisible, setMultiAddModalVisible] = useState(false);
 
   // 定义添加数据的字段 
   const addRecordFields = [
@@ -586,6 +588,46 @@ const User = () => {
     console.log('添加数据：', data);
   };
 
+  // 批量导入表格列
+  const mutiAddRecordColumns = [
+    {
+      title: '序号',
+      dataIndex: 'index',
+      width: 50
+    },
+    {
+      title: '用户名',
+      dataIndex: 'username',
+      width: '100px'
+    },
+    {
+      title: '中文名',
+      dataIndex: 'cnName'
+    },
+    {
+      title: '英文名',
+      dataIndex: 'enName'
+    },
+    {
+      title: '导入结果',
+      dataIndex: 'result',
+      render: (result) => {
+        return result ? <Tag color="green">成功</Tag> : <Tag color="red">失败</Tag>;
+      }
+    },
+    {
+      title: '错误信息',
+      dataIndex: 'error'
+    }
+  ];
+
+  // 批量导入
+  const mutiAddRecordHandle = (data) => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.xlsx';
+  };
+
   return (
     <>
       {/* 页面 header */}
@@ -628,9 +670,19 @@ const User = () => {
         {/* 表格 */}
         <div className="admin-page-list">
           <div className="admin-page-btn-group">
-            <Button icon={<UserAddOutlined />} onClick={() => setAddModalVisible(true)}>
-              添加{pageKeyword}
-            </Button>
+            <Space>
+              <Button icon={<UserAddOutlined />} onClick={() => setAddModalVisible(true)}>
+                添加{pageKeyword}
+              </Button>
+              <Button icon={<UploadOutlined />} onClick={() => setMultiAddModalVisible(true)}>批量导入</Button>
+            </Space>
+            <Space style={{ float: 'right' }}>
+              <Button icon={<DownloadOutlined />} onClick={() => {
+                window.open("/template/用户批量添加模板.xlsx")
+              }}>
+                模板下载
+              </Button>
+            </Space>
           </div>
           <Table
             // 表格布局大小
@@ -711,7 +763,60 @@ const User = () => {
           </Form.Item>
         </Form>
       </Modal>
+
+      {/* 批量导入弹窗 */}
+      <Modal
+        title={'批量导入' + pageKeyword}
+        open={multiAddModalVisible}
+        onOk={mutiAddRecordHandle}
+        onCancel={() => setMultiAddModalVisible(false)}
+        width={800}
+        maskClosable={false}
+        footer={null}
+      >
+        <div>
+          <Dragger>
+            <p className="ant-upload-drag-icon">
+              <InboxOutlined />
+            </p>
+            <p className="ant-upload-text">点击或者拖拽批量导入模板文件到此区域完成创建</p>
+            <p className="ant-upload-hint">
+              支持单个或者批量导入，严格禁止上传公司数据或者其它违规文件。
+              </p>
+          </Dragger>
+          <div style={{ marginTop: '10px' }}>
+            <Button type="primary" htmlType="submit" block>
+              批量导入
+            </Button>
+          </div>
+          <div style={{ marginTop: '10px' }}>
+          <Table
+            // 表格布局大小
+            size="small"
+            // 表格布局方式，支持 fixed、auto
+            tableLayout="auto"
+            // 表格列
+            columns={mutiAddRecordColumns}
+            dataSource={[]}
+            // 行唯一标识
+            rowKey="id"
+            // 表格分页
+            pagination={{
+              pageSize: 10,
+              current: 1,
+              total: 10,
+              showTotal: (total) => `总共 ${total} 条记录`,
+              showSizeChanger: true,
+              showQuickJumper: true,
+            }}
+            // 表格滚动，目的是为了最后一列固定
+            scroll={{ x: 'max-content' }}
+          />
+          </div>
+        </div>
+      </Modal>
     </>
+    
   );
 };
 
