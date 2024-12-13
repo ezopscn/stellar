@@ -193,6 +193,10 @@
   height: 18px;
 }
 
+.ant-table .ant-btn {
+  padding: 0 5px;
+}
+
 .ant-pagination .ant-pagination-item-active {
   background-color: #001529;
   border: none;
@@ -219,14 +223,6 @@
   line-height: 20px;
 }
 
-// .ant-btn-default,
-// .ant-btn-default:not(:disabled):not(.ant-btn-disabled):hover {
-//   border-color: #001529;
-//   background: #001529;
-//   color: #ffffff;
-//   box-shadow: none;
-// }
-
 .ant-pagination .ant-pagination-item a {
   font-size: 12px;
 }
@@ -251,4 +247,25 @@
 .ant-upload-wrapper .ant-upload-drag p.ant-upload-hint {
   margin: 10px 0;
   font-size: 12px;
+}
+
+.ant-pagination .ant-pagination-options-quick-jumper input:focus, 
+.ant-pagination .ant-pagination-options-quick-jumper input:focus-within {
+  border-color: @FONT-COLOR;
+  box-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1);
+  outline: 0;
+  background-color: #ffffff;
+}
+
+.ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  color: rgba(0, 0, 0, 0.88);
+  font-weight: 600;
+  background-color: #e6f4ff;
+}
+
+.ant-select-focused.ant-select-outlined:not(.ant-select-disabled):not(.ant-select-customize-input):not(.ant-pagination-size-changer) .ant-select-selector {
+  border-color: @FONT-COLOR;
+  box-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1);
+  outline: 0;
+  background-color: #ffffff;
 }

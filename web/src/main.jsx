@@ -20,6 +20,8 @@ createRoot(document.getElementById('root')).render(
     theme={{
       hashed: false, // 禁用 css hash
       token: {
+        colorLink: '#003399', // 链接颜色
+        colorPrimary: '#001529', // 主色调
         borderRadius: 0, // 圆角
         fontFamily: 'MiSans, serif', // 文字字体
         fontSize: 13, // 默认字号

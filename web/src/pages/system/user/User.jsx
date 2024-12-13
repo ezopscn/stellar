@@ -1,7 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Button, Col, Form, Input, Row, Space, Table, Avatar, Tag, Descriptions, TreeSelect, Select, Modal, App, Upload } from 'antd';
-import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ManOutlined, WomanOutlined, QuestionOutlined, DownloadOutlined, UploadOutlined, InboxOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import {
+  ClearOutlined,
+  DownOutlined,
+  SearchOutlined,
+  UserAddOutlined,
+  ManOutlined,
+  WomanOutlined,
+  QuestionOutlined,
+  DownloadOutlined,
+  UploadOutlined,
+  InboxOutlined,
+  ClockCircleOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  RestOutlined,
+  UnorderedListOutlined
+} from '@ant-design/icons';
 import { TitleSuffix } from '@/common/Text.jsx';
 import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
@@ -302,10 +318,14 @@ const User = () => {
       key: 'action',
       fixed: 'right',
       render: (_, record) => (
-        <Space size="middle">
-          <a>编辑</a>
-          {record.status === 1 ? <a style={{ color: '#ff4d4f' }}>禁用</a> : <a>启用</a>}
-        </Space>
+        <>
+          <Button color="primary" variant="link" icon={<EditOutlined />} disabled={record.id === 1}>编辑</Button>
+          {record.status === 1 ? (
+            <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={record.id === 1}>禁用</Button>
+          ) : (
+            <Button color="success" variant="link" icon={<RestOutlined />} disabled={record.id === 1}>启用</Button>
+          )}
+        </>
       )
     }
   ];
@@ -357,7 +377,7 @@ const User = () => {
   const [multiAddModalVisible, setMultiAddModalVisible] = useState(false);
   const [mutiAddHistoryVisible, setMutiAddHistoryVisible] = useState(false);
 
-  // 定义添加数据的字段 
+  // 定义添加数据的字段
   const addRecordFields = [
     {
       label: '用户名',
@@ -461,7 +481,7 @@ const User = () => {
           type: 'email',
           message: '邮箱格式不正确'
         }
-      ] 
+      ]
     },
     {
       label: '手机号',
@@ -486,7 +506,10 @@ const User = () => {
       search: false,
       tree: false,
       multiple: false,
-      data: [{ label: '是', value: 1 }, { label: '否', value: 0 }],
+      data: [
+        { label: '是', value: 1 },
+        { label: '否', value: 0 }
+      ],
       rules: [
         {
           required: true,
@@ -573,11 +596,17 @@ const User = () => {
     addRecordFields.forEach((item) => {
       children.push(
         <Form.Item key={item.name} label={item.label} name={item.name} rules={item.rules}>
-          {item.type === 'input' ? <Input placeholder={item.placeholder} allowClear={true} /> 
-            : item.type === 'inputPassword' ? <Input.Password placeholder={item.placeholder} allowClear={true} /> 
-            : item.type === 'select' ? <Select mode={item.multiple ? 'multiple' : 'default'} options={item.data} showSearch={item.search} optionFilterProp="label" placeholder={item.placeholder} allowClear={true} />
-            : item.type === 'treeSelect' ? <TreeSelect multiple={item.multiple} placeholder={item.placeholder} treeData={item.data} showSearch={item.search} treeNodeFilterProp="label" allowClear={true} treeDefaultExpandAll />
-            : item.type === 'textarea' ? <Input.TextArea placeholder={item.placeholder} allowClear={true} /> : null}
+          {item.type === 'input' ? (
+            <Input placeholder={item.placeholder} allowClear={true} />
+          ) : item.type === 'inputPassword' ? (
+            <Input.Password placeholder={item.placeholder} allowClear={true} />
+          ) : item.type === 'select' ? (
+            <Select mode={item.multiple ? 'multiple' : 'default'} options={item.data} showSearch={item.search} optionFilterProp="label" placeholder={item.placeholder} allowClear={true} />
+          ) : item.type === 'treeSelect' ? (
+            <TreeSelect multiple={item.multiple} placeholder={item.placeholder} treeData={item.data} showSearch={item.search} treeNodeFilterProp="label" allowClear={true} treeDefaultExpandAll />
+          ) : item.type === 'textarea' ? (
+            <Input.TextArea placeholder={item.placeholder} allowClear={true} />
+          ) : null}
         </Form.Item>
       );
     });
@@ -593,35 +622,43 @@ const User = () => {
   const mutiAddHistoryColumns = [
     {
       title: '任务ID',
-      dataIndex: 'taskId',
+      dataIndex: 'taskId'
     },
     {
       title: '执行人',
-      dataIndex: 'executor',
+      dataIndex: 'executor'
     },
     {
       title: '记录数',
-      dataIndex: 'recordCount',
+      dataIndex: 'recordCount'
     },
     {
       title: '成功数',
-      dataIndex: 'successCount',
+      dataIndex: 'successCount'
     },
     {
       title: '失败数',
-      dataIndex: 'failCount',
+      dataIndex: 'failCount'
     },
     {
       title: '任务状态',
       dataIndex: 'taskStatus',
+      render: (_, record) => {
+        const statusMap = {
+          1: { text: '执行中', color: 'gray' },
+          2: { text: '执行成功', color: 'green' },
+          3: { text: '执行失败', color: 'red' }
+        };
+        return <Tag color={statusMap[record.taskStatus].color}>{statusMap[record.taskStatus].text}</Tag>;
+      }
     },
     {
       title: '任务开始时间',
-      dataIndex: 'taskStartTime',
+      dataIndex: 'taskStartTime'
     },
     {
       title: '任务结束时间',
-      dataIndex: 'taskEndTime',
+      dataIndex: 'taskEndTime'
     },
     {
       title: '操作',
@@ -629,7 +666,9 @@ const User = () => {
       fixed: 'right',
       render: (_, record) => (
         <Space size="middle">
-          <a>查看明细</a>
+          <a>
+            <UnorderedListOutlined /> 查看明细
+          </a>
         </Space>
       )
     }
@@ -669,8 +708,12 @@ const User = () => {
               {getFilterFields()}
               <Col span={24} key="x" style={{ marginTop: '10px', textAlign: 'right' }}>
                 <Space>
-                  <Button icon={<SearchOutlined />} htmlType="submit">条件搜索</Button>
-                  <Button icon={<ClearOutlined />} onClick={() => form.resetFields()}>清理条件</Button>
+                  <Button icon={<SearchOutlined />} htmlType="submit">
+                    条件搜索
+                  </Button>
+                  <Button icon={<ClearOutlined />} onClick={() => form.resetFields()}>
+                    清理条件
+                  </Button>
                   {filterFields.length > defaultExpandItemCount && (
                     <a onClick={() => setExpand(!expand)}>
                       <DownOutlined rotate={expand ? 180 : 0} /> {expand ? '收起条件' : '展开更多'}
@@ -688,12 +731,17 @@ const User = () => {
               <Button type="primary" icon={<UserAddOutlined />} onClick={() => setAddModalVisible(true)}>
                 添加{pageKeyword}
               </Button>
-              <Button icon={<UploadOutlined />} onClick={() => setMultiAddModalVisible(true)}>批量导入</Button>
+              <Button icon={<UploadOutlined />} onClick={() => setMultiAddModalVisible(true)}>
+                批量导入
+              </Button>
             </Space>
             <Space style={{ float: 'right' }}>
-              <Button icon={<DownloadOutlined />} onClick={() => {
-                window.open("/template/用户批量添加模板.xlsx")
-              }}>
+              <Button
+                icon={<DownloadOutlined />}
+                onClick={() => {
+                  window.open('/template/用户批量添加模板.xlsx');
+                }}
+              >
                 模板下载
               </Button>
               <Button icon={<ClockCircleOutlined />} onClick={() => setMutiAddHistoryVisible(true)}>
@@ -762,15 +810,7 @@ const User = () => {
       </div>
 
       {/* 用户添加弹窗 */}
-      <Modal
-        title={'添加' + pageKeyword}
-        open={addModalVisible}
-        onOk={addRecordHandle}
-        onCancel={() => setAddModalVisible(false)}
-        width={400}
-        maskClosable={false}
-        footer={null}
-      >
+      <Modal title={'添加' + pageKeyword} open={addModalVisible} onOk={addRecordHandle} onCancel={() => setAddModalVisible(false)} width={400} maskClosable={false} footer={null}>
         <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="addRecordForm" onFinish={addRecordHandle} autoComplete="off">
           {getAddRecordFields()}
           <Form.Item wrapperCol={{ span: 24 }}>
@@ -782,24 +822,14 @@ const User = () => {
       </Modal>
 
       {/* 批量导入弹窗 */}
-      <Modal
-        title={'批量导入' + pageKeyword}
-        open={multiAddModalVisible}
-        onOk={mutiAddRecordHandle}
-        onCancel={() => setMultiAddModalVisible(false)}
-        width={800}
-        maskClosable={false}
-        footer={null}
-      >
+      <Modal title={'批量导入' + pageKeyword} open={multiAddModalVisible} onOk={mutiAddRecordHandle} onCancel={() => setMultiAddModalVisible(false)} width={800} maskClosable={false} footer={null}>
         <div>
           <Dragger>
             <p className="ant-upload-drag-icon">
               <InboxOutlined />
             </p>
             <p className="ant-upload-text">点击或者拖拽批量导入模板文件到此区域完成创建</p>
-            <p className="ant-upload-hint">
-              支持单个或者批量导入，严格禁止上传公司数据或者其它违规文件。
-              </p>
+            <p className="ant-upload-hint">支持单个或者批量导入，严格禁止上传公司数据或者其它违规文件。</p>
           </Dragger>
           <div style={{ marginTop: '10px' }}>
             <Button type="primary" htmlType="submit" block>
@@ -810,14 +840,7 @@ const User = () => {
       </Modal>
 
       {/* 批量导入记录 */}
-      <Modal
-        title={'批量导入记录'}
-        open={mutiAddHistoryVisible}
-        onCancel={() => setMutiAddHistoryVisible(false)}
-        width={1200}
-        maskClosable={false}
-        footer={null}
-      >
+      <Modal title={'批量导入记录'} open={mutiAddHistoryVisible} onCancel={() => setMutiAddHistoryVisible(false)} width={1200} maskClosable={false} footer={null}>
         <Table
           // 表格布局大小
           size="small"
