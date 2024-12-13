@@ -252,20 +252,51 @@
 .ant-pagination .ant-pagination-options-quick-jumper input:focus, 
 .ant-pagination .ant-pagination-options-quick-jumper input:focus-within {
   border-color: @FONT-COLOR;
-  box-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+  outline: 0;
+  background-color: #ffffff;
+}
+
+.ant-pagination .ant-pagination-options-quick-jumper input:hover {
+  border-color: @FONT-COLOR;
+}
+
+.ant-select-focused.ant-select-outlined:not(.ant-select-disabled):not(.ant-select-customize-input):not(.ant-pagination-size-changer) .ant-select-selector {
+  border-color: @FONT-COLOR;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+  outline: 0;
+  background-color: #ffffff;
+}
+
+.ant-input-outlined:focus, .ant-input-outlined:focus-within {
+  border-color: @FONT-COLOR;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
   outline: 0;
   background-color: #ffffff;
 }
 
 .ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-  color: rgba(0, 0, 0, 0.88);
-  font-weight: 600;
-  background-color: #e6f4ff;
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
-.ant-select-focused.ant-select-outlined:not(.ant-select-disabled):not(.ant-select-customize-input):not(.ant-pagination-size-changer) .ant-select-selector {
+.ant-tree-select-dropdown .ant-select-tree .ant-select-tree-node-content-wrapper.ant-select-tree-node-selected {
+  background-color: rgba(0, 0, 0, 0.05);
+  font-weight: bold;
+}
+
+.ant-select-outlined:not(.ant-select-disabled):not(.ant-select-customize-input):not(.ant-pagination-size-changer):hover .ant-select-selector {
   border-color: @FONT-COLOR;
-  box-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1);
-  outline: 0;
-  background-color: #ffffff;
+}
+
+.ant-input-outlined:hover {
+  border-color: @FONT-COLOR;
+}
+
+.rc-virtual-list-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+  border-radius: 0 !important;
+}
+
+.ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) .ant-select-item-option-state {
+  color: @FONT-COLOR;
 }
