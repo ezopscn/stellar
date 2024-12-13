@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Button, Col, Form, Input, Row, Space, Table, Avatar, Tag, Descriptions, TreeSelect, Select, Modal, App, Upload } from 'antd';
-import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ManOutlined, WomanOutlined, QuestionOutlined, DownloadOutlined, UploadOutlined, InboxOutlined } from '@ant-design/icons';
+import { ClearOutlined, DownOutlined, SearchOutlined, UserAddOutlined, ManOutlined, WomanOutlined, QuestionOutlined, DownloadOutlined, UploadOutlined, InboxOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { TitleSuffix } from '@/common/Text.jsx';
 import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
@@ -355,6 +355,7 @@ const User = () => {
   /////////////////////////////////////////////////////
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [multiAddModalVisible, setMultiAddModalVisible] = useState(false);
+  const [mutiAddHistoryVisible, setMutiAddHistoryVisible] = useState(false);
 
   // 定义添加数据的字段 
   const addRecordFields = [
@@ -588,36 +589,49 @@ const User = () => {
     console.log('添加数据：', data);
   };
 
-  // 批量导入表格列
-  const mutiAddRecordColumns = [
+  // 批量导入记录表格列
+  const mutiAddHistoryColumns = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      width: 50
+      title: '任务ID',
+      dataIndex: 'taskId',
     },
     {
-      title: '用户名',
-      dataIndex: 'username',
-      width: '100px'
+      title: '执行人',
+      dataIndex: 'executor',
     },
     {
-      title: '中文名',
-      dataIndex: 'cnName'
+      title: '记录数',
+      dataIndex: 'recordCount',
     },
     {
-      title: '英文名',
-      dataIndex: 'enName'
+      title: '成功数',
+      dataIndex: 'successCount',
     },
     {
-      title: '导入结果',
-      dataIndex: 'result',
-      render: (result) => {
-        return result ? <Tag color="green">成功</Tag> : <Tag color="red">失败</Tag>;
-      }
+      title: '失败数',
+      dataIndex: 'failCount',
     },
     {
-      title: '错误信息',
-      dataIndex: 'error'
+      title: '任务状态',
+      dataIndex: 'taskStatus',
+    },
+    {
+      title: '任务开始时间',
+      dataIndex: 'taskStartTime',
+    },
+    {
+      title: '任务结束时间',
+      dataIndex: 'taskEndTime',
+    },
+    {
+      title: '操作',
+      key: 'action',
+      fixed: 'right',
+      render: (_, record) => (
+        <Space size="middle">
+          <a>查看明细</a>
+        </Space>
+      )
     }
   ];
 
@@ -671,7 +685,7 @@ const User = () => {
         <div className="admin-page-list">
           <div className="admin-page-btn-group">
             <Space>
-              <Button icon={<UserAddOutlined />} onClick={() => setAddModalVisible(true)}>
+              <Button type="primary" icon={<UserAddOutlined />} onClick={() => setAddModalVisible(true)}>
                 添加{pageKeyword}
               </Button>
               <Button icon={<UploadOutlined />} onClick={() => setMultiAddModalVisible(true)}>批量导入</Button>
@@ -681,6 +695,9 @@ const User = () => {
                 window.open("/template/用户批量添加模板.xlsx")
               }}>
                 模板下载
+              </Button>
+              <Button icon={<ClockCircleOutlined />} onClick={() => setMutiAddHistoryVisible(true)}>
+                导入记录
               </Button>
             </Space>
           </div>
@@ -789,34 +806,33 @@ const User = () => {
               批量导入
             </Button>
           </div>
-          <div style={{ marginTop: '10px' }}>
-          <Table
-            // 表格布局大小
-            size="small"
-            // 表格布局方式，支持 fixed、auto
-            tableLayout="auto"
-            // 表格列
-            columns={mutiAddRecordColumns}
-            dataSource={[]}
-            // 行唯一标识
-            rowKey="id"
-            // 表格分页
-            pagination={{
-              pageSize: 10,
-              current: 1,
-              total: 10,
-              showTotal: (total) => `总共 ${total} 条记录`,
-              showSizeChanger: true,
-              showQuickJumper: true,
-            }}
-            // 表格滚动，目的是为了最后一列固定
-            scroll={{ x: 'max-content' }}
-          />
-          </div>
         </div>
       </Modal>
+
+      {/* 批量导入记录 */}
+      <Modal
+        title={'批量导入记录'}
+        open={mutiAddHistoryVisible}
+        onCancel={() => setMutiAddHistoryVisible(false)}
+        width={1200}
+        maskClosable={false}
+        footer={null}
+      >
+        <Table
+          // 表格布局大小
+          size="small"
+          // 表格布局方式，支持 fixed、auto
+          tableLayout="auto"
+          // 表格列
+          columns={mutiAddHistoryColumns}
+          dataSource={[]}
+          // 行唯一标识
+          rowKey="id"
+          // 表格滚动，目的是为了最后一列固定
+          scroll={{ x: 'max-content' }}
+        />
+      </Modal>
     </>
-    
   );
 };
 
