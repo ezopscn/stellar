@@ -72,7 +72,7 @@ var systemMenus = []model.SystemMenu{
 			},
 			{
 				Id:       1920,
-				Label:    "职位管理	",
+				Label:    "职位管理",
 				Key:      "/system/jobpositions",
 				Sort:     1920,
 				ParentId: 1900,
@@ -105,8 +105,8 @@ var systemMenus = []model.SystemMenu{
 			},
 			{
 				Id:       1950,
-				Label:    "用户角色",
-				Key:      "/system/userroles",
+				Label:    "菜单管理",
+				Key:      "/system/menus",
 				Sort:     1950,
 				ParentId: 1900,
 				SystemRoles: []model.SystemRole{
@@ -116,8 +116,8 @@ var systemMenus = []model.SystemMenu{
 			},
 			{
 				Id:       1960,
-				Label:    "系统菜单",
-				Key:      "/system/menus",
+				Label:    "接口管理",
+				Key:      "/system/apis",
 				Sort:     1960,
 				ParentId: 1900,
 				SystemRoles: []model.SystemRole{
@@ -127,20 +127,9 @@ var systemMenus = []model.SystemMenu{
 			},
 			{
 				Id:       1970,
-				Label:    "系统接口",
-				Key:      "/system/apis",
-				Sort:     1970,
-				ParentId: 1900,
-				SystemRoles: []model.SystemRole{
-					systemRoles[0],
-					systemRoles[1],
-				},
-			},
-			{
-				Id:       1980,
-				Label:    "系统授权",
+				Label:    "权限管理",
 				Key:      "/system/permissions",
-				Sort:     1980,
+				Sort:     1970,
 				ParentId: 1900,
 				SystemRoles: []model.SystemRole{
 					systemRoles[0],
