@@ -1,7 +1,7 @@
 // 路由匹配
 import { useEffect } from 'react';
-import { RouteRules } from '@/routes/RouteRules.jsx';
 import { useLocation, useNavigate } from 'react-router';
+import { RouteRules } from '@/routes/RouteRules.jsx';
 import { GetToken } from '@/utils/Token.jsx';
 import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';

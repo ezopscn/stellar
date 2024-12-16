@@ -1,8 +1,8 @@
 import { Outlet, useNavigate } from 'react-router';
-import { Logo } from '@/common/Image.jsx';
-import { FooterText } from '@/common/Text.jsx';
 import { Button } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Logo } from '@/common/Image.jsx';
+import { FooterText } from '@/common/Text.jsx';
 
 const ErrorLayout = () => {
   const navigate = useNavigate();

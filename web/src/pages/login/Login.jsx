@@ -1,8 +1,8 @@
 import { App, Button, Checkbox, Divider, Form, Input } from 'antd';
 import { DingtalkOutlined, InsuranceOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router';
 import { AxiosPost } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
-import { useNavigate } from 'react-router';
 import { SetToken } from '@/utils/Token.jsx';
 
 const Login = () => {

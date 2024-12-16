@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Avatar, Badge, Dropdown, Layout, Menu, App } from 'antd';
-import { Logo } from '@/common/Image.jsx';
 import { Outlet, useLocation, useNavigate } from 'react-router';
+import { jwtDecode } from 'jwt-decode';
+import { Logo } from '@/common/Image.jsx';
 import { FooterText } from '@/common/Text.jsx';
 import { TreeFindPath } from '@/utils/Path.jsx';
 import { RouteRules } from '@/routes/RouteRules.jsx';
 import { DynamicIcon } from '@/utils/IconLoad.jsx';
 import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
-import { jwtDecode } from 'jwt-decode';
 import { ManOutlined, WomanOutlined, QuestionOutlined } from '@ant-design/icons';
 
 const { Header, Content, Sider } = Layout;
