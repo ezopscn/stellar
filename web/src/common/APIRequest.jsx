@@ -1,5 +1,5 @@
 import { AxiosGet } from '@/utils/Request.jsx';
-import { GenerateTreeNode, GenerateSelectTree } from '@/utils/GenerateTree.jsx';
+import { GenerateTreeNode, GenerateSelectTree } from '@/utils/Tree.jsx';
 
 // API 请求方法
 const APIRequest = {
