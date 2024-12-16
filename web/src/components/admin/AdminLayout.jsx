@@ -30,13 +30,13 @@ const siderMenus = [
   getItem('数据源', '/datasources', <DynamicIcon iconName={'ApiOutlined'} />),
   getItem('个人中心', '/me', <DynamicIcon iconName={'UserOutlined'} />),
   getItem('系统设置', '/system', <DynamicIcon iconName={'ClusterOutlined'} />, [
-    getItem('组织架构', '/system/departments'),
+    getItem('部门管理', '/system/departments'),
     getItem('职位管理', '/system/jobpositions'),
     getItem('用户管理', '/system/users'),
-    getItem('用户角色', '/system/roles'),
-    getItem('系统菜单', '/system/menus'),
-    getItem('系统接口', '/system/apis'),
-    getItem('权限配置', '/system/permissions')
+    getItem('角色管理', '/system/roles'),
+    getItem('菜单管理', '/system/menus'),
+    getItem('接口管理', '/system/apis'),
+    getItem('权限管理', '/system/permissions')
   ]),
   getItem('安全审计', '/securityaudit', <DynamicIcon iconName={'FileProtectOutlined'} />, [getItem('登录日志', '/securityaudit/login'), getItem('操作日志', '/securityaudit/operation')])
 ];

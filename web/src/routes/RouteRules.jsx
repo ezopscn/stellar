@@ -46,7 +46,7 @@ export const RouteRules = [
         children: [
           {
             path: '/system/departments',
-            name: '组织架构',
+            name: '部门管理',
             auth: true,
             element: RouteLazyLoad(React.lazy(() => import('../pages/system/department/SystemDepartment.jsx')))
           },
@@ -64,25 +64,25 @@ export const RouteRules = [
           },
           {
             path: '/system/roles',
-            name: '用户角色',
+            name: '角色管理',
             auth: true,
             element: RouteLazyLoad(React.lazy(() => import('../pages/system/role/SystemRole.jsx')))
           },
           {
             path: '/system/menus',
-            name: '系统菜单',
+            name: '菜单管理',
             auth: true,
             element: RouteLazyLoad(React.lazy(() => import('../pages/system/menu/SystemMenu.jsx')))
           },
           {
             path: '/system/apis',
-            name: '系统接口',
+            name: '接口管理',
             auth: true,
             element: RouteLazyLoad(React.lazy(() => import('../pages/system/api/SystemApi.jsx')))
           },
           {
             path: '/system/permissions',
-            name: '权限配置',
+            name: '权限管理',
             auth: true,
             element: RouteLazyLoad(React.lazy(() => import('../pages/system/permission/SystemPermission.jsx')))
           }
