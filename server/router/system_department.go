@@ -3,13 +3,16 @@ package router
 import (
 	v1 "stellar/api/v1"
 
-	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
 
-// 系统部门路由
-func SystemDepartmentAuthRoutes(rg *gin.RouterGroup, auth *jwt.GinJWTMiddleware) gin.IRoutes {
-	authRG := rg.Use(auth.MiddlewareFunc())
-	authRG.GET("/list", v1.SystemDepartmentListHandler)
-	return authRG
+// 系统部门路由，不需要权限校验
+func SystemDepartmentAuthRoutes(rg *gin.RouterGroup) gin.IRoutes {
+	return rg
+}
+
+// 系统部门路由，需要权限校验
+func SystemDepartmentAuthAndPermissionRoutes(rg *gin.RouterGroup) gin.IRoutes {
+	rg.GET("/list", v1.SystemDepartmentListHandler)
+	return rg
 }

@@ -30,7 +30,7 @@ const Apis = {
       List: BackendURL + '/system/role/list' // 角色列表
     },
     JobPosition: {
-      List: BackendURL + '/system/job/position/list' // 岗位列表
+      List: BackendURL + '/system/jobPosition/list' // 岗位列表
     },
     Department: {
       List: BackendURL + '/system/department/list' // 部门列表

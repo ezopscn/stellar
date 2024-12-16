@@ -42,6 +42,7 @@ var startCmd = &cobra.Command{
 		initialize.AccessLogger() // 初始化访问日志
 		initialize.MySQL()        // 初始化 MySQL
 		initialize.Redis()        // 初始化 Redis
+		initialize.Casbin()       // 初始化 Casbin
 		initialize.ClientId()     // 初始化客户端 ID
 
 		go func() {

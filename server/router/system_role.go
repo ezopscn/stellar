@@ -3,13 +3,16 @@ package router
 import (
 	v1 "stellar/api/v1"
 
-	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
 
-// 角色路由
-func SystemRoleAuthRoutes(rg *gin.RouterGroup, auth *jwt.GinJWTMiddleware) gin.IRoutes {
-	authRG := rg.Use(auth.MiddlewareFunc())
-	authRG.GET("/list", v1.SystemRoleListHandler)
-	return authRG
+// 角色路由，不需要权限校验
+func SystemRoleAuthRoutes(rg *gin.RouterGroup) gin.IRoutes {
+	return rg
+}
+
+// 角色路由，需要权限校验
+func SystemRoleAuthAndPermissionRoutes(rg *gin.RouterGroup) gin.IRoutes {
+	rg.GET("/list", v1.SystemRoleListHandler)
+	return rg
 }

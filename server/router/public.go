@@ -18,8 +18,7 @@ func PublicRouter(rg *gin.RouterGroup, auth *jwt.GinJWTMiddleware) gin.IRoutes {
 
 // 登录路由组
 func PublicAuthRoutes(rg *gin.RouterGroup, auth *jwt.GinJWTMiddleware) gin.IRoutes {
-	authRG := rg.Use(auth.MiddlewareFunc())
-	authRG.GET("/token/verification", v1.TokenVerificationHandler) // Token 校验
-	authRG.GET("/logout", auth.LogoutHandler)                      // 用户注销
-	return authRG
+	rg.GET("/token/verification", v1.TokenVerificationHandler) // Token 校验
+	rg.GET("/logout", auth.LogoutHandler)                      // 用户注销
+	return rg
 }

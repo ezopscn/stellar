@@ -319,7 +319,7 @@ const SystemUser = () => {
       fixed: 'right',
       render: (_, record) => (
         <>
-          <Button color="primary" variant="link" icon={<EditOutlined />} disabled={record.id === 1}>编辑</Button>
+          <Button color="primary" variant="link" icon={<EditOutlined />}>编辑</Button>
           {record.status === 1 ? (
             <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={record.id === 1}>禁用</Button>
           ) : (

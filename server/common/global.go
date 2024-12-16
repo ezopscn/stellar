@@ -3,6 +3,7 @@ package common
 import (
 	"embed"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -49,10 +50,11 @@ const (
 
 // 全局工具
 var (
-	FS         embed.FS           // 打包的静态资源，用于全局使用
-	Config     *Configuration     // 配置文件解析
-	SystemLog  *zap.SugaredLogger // 系统日志工具
-	AccessLog  *zap.SugaredLogger // 访问日志工具
-	MySQLDB    *gorm.DB           // 数据库连接
-	RedisCache *redis.Client      // 缓存连接
+	FS             embed.FS           // 打包的静态资源，用于全局使用
+	Config         *Configuration     // 配置文件解析
+	SystemLog      *zap.SugaredLogger // 系统日志工具
+	AccessLog      *zap.SugaredLogger // 访问日志工具
+	MySQLDB        *gorm.DB           // 数据库连接
+	RedisCache     *redis.Client      // 缓存连接
+	CasbinEnforcer *casbin.Enforcer   // Casbin 策略执行器
 )

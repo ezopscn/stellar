@@ -18,15 +18,16 @@ type SystemUserFilterRequest struct {
 
 // 添加用户请求
 type SystemUserAddRequest struct {
-	Username     *string `json:"username"`
-	Password     *string `json:"password"`
-	CNName       *string `json:"cnName"`
-	ENName       *string `json:"enName"`
-	Email        *string `json:"email"`
-	Phone        *string `json:"phone"`
-	Gender       *uint   `json:"gender"`
-	Departments  []uint  `json:"departments"`
-	JobPositions []uint  `json:"jobPositions"`
-	Roles        []uint  `json:"roles"`
-	Creator      *string `json:"creator"`
+	Username     *string `form:"username" json:"username"`
+	Password     *string `form:"password" json:"password"`
+	CNName       *string `form:"cnName" json:"cnName"`
+	ENName       *string `form:"enName" json:"enName"`
+	Email        *string `form:"email" json:"email"`
+	Phone        *string `form:"phone" json:"phone"`
+	HidePhone    *uint   `form:"hidePhone" json:"hidePhone"`
+	Gender       *uint   `form:"gender" json:"gender"`
+	Departments  []uint  `form:"departments" json:"departments"`
+	JobPositions []uint  `form:"jobPositions" json:"jobPositions"`
+	Role         *uint   `form:"role" json:"role"`
+	Description  *string `form:"description" json:"description"`
 }
