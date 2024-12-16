@@ -1,4 +1,4 @@
-const Api = () => {
+const SystemApi = () => {
   return (
     <>
       <div className="admin-page-header admin-unselect">
@@ -15,4 +15,4 @@ const Api = () => {
   );
 };
 
-export default Api;
+export default SystemApi;

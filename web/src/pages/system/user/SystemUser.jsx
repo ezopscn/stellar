@@ -24,7 +24,7 @@ import { Apis } from '@/common/APIConfig.jsx';
 import APIRequest from '@/common/APIRequest.jsx';
 const { Dragger } = Upload;
 
-const User = () => {
+const SystemUser = () => {
   const { message } = App.useApp(); // 消息提示
   const [form] = Form.useForm(); // 表单
 
@@ -859,4 +859,4 @@ const User = () => {
   );
 };
 
-export default User;
+export default SystemUser;

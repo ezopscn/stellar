@@ -48,43 +48,43 @@ export const RouteRules = [
             path: '/system/departments',
             name: '组织架构',
             auth: true,
-            element: RouteLazyLoad(React.lazy(() => import('../pages/system/department/Department.jsx')))
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/department/SystemDepartment.jsx')))
           },
           {
             path: '/system/jobpositions',
             name: '职位管理',
             auth: true,
-            element: RouteLazyLoad(React.lazy(() => import('../pages/system/jobposition/JobPosition.jsx')))
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/jobposition/SystemJobPosition.jsx')))
           },
           {
             path: '/system/users',
             name: '用户管理',
             auth: true,
-            element: RouteLazyLoad(React.lazy(() => import('../pages/system/user/User.jsx')))
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/user/SystemUser.jsx')))
           },
           {
             path: '/system/roles',
             name: '用户角色',
             auth: true,
-            element: RouteLazyLoad(React.lazy(() => import('../pages/system/role/Role.jsx')))
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/role/SystemRole.jsx')))
           },
           {
             path: '/system/menus',
             name: '系统菜单',
             auth: true,
-            element: RouteLazyLoad(React.lazy(() => import('../pages/system/menu/Menu.jsx')))
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/menu/SystemMenu.jsx')))
           },
           {
             path: '/system/apis',
             name: '系统接口',
             auth: true,
-            element: RouteLazyLoad(React.lazy(() => import('../pages/system/api/Api.jsx')))
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/api/SystemApi.jsx')))
           },
           {
             path: '/system/permissions',
             name: '权限配置',
             auth: true,
-            element: RouteLazyLoad(React.lazy(() => import('../pages/system/permission/Permission.jsx')))
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/permission/SystemPermission.jsx')))
           }
         ]
       },

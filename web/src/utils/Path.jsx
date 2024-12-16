@@ -1,5 +1,5 @@
 // 通过子菜单 path 获取父级菜单列表
-export function TreeFindPath(tree, func, path = []) {
+export const TreeFindPath = (tree, func, path = []) => {
   if (!tree) return [];
   for (const data of tree) {
     path.push(data.path);

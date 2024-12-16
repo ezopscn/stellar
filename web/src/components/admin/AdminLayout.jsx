@@ -14,7 +14,7 @@ import { ManOutlined, WomanOutlined, QuestionOutlined } from '@ant-design/icons'
 const { Header, Content, Sider } = Layout;
 
 // 生成菜单
-function getItem(label, key, icon, children) {
+const getItem = (label, key, icon, children) => {
   return {
     key,
     icon,

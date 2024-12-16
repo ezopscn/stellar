@@ -1,8 +1,8 @@
-const Department = () => {
+const SystemRole = () => {
   return (
     <>
       <div className="admin-page-header admin-unselect">
-        <div className="admin-page-title">组织架构 / DEPARTMENT MANAGEMENT.</div>
+        <div className="admin-page-title">用户角色 / USER ROLE MANAGEMENT.</div>
         <div className="admin-page-desc">
           <ul>
             <li>出于数据安全考虑，系统强制使用禁用用户替代删除用户。</li>
@@ -15,4 +15,4 @@ const Department = () => {
   );
 };
 
-export default Department;
+export default SystemRole;

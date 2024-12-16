@@ -1,5 +1,5 @@
 // 递归生成 TreeSelect
-function GenerateSelectTree(dataList, parentId) {
+const GenerateSelectTree = (dataList, parentId) => {
   const tree = [];
   for (const item of dataList) {
     if (item.parentId === parentId) {
@@ -22,7 +22,7 @@ function GenerateSelectTree(dataList, parentId) {
 }
 
 // 递归生成 TreeNode
-function GenerateTreeNode(dataList, parentId) {
+const GenerateTreeNode = (dataList, parentId) => {
   const tree = [];
   for (const item of dataList) {
     if (item.parentId === parentId) {

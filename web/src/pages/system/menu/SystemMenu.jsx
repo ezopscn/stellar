@@ -1,8 +1,8 @@
-const JobPosition = () => {
+const SystemMenu = () => {
   return (
     <>
       <div className="admin-page-header admin-unselect">
-        <div className="admin-page-title">职位管理 / JOB POSITON MANAGEMENT.</div>
+        <div className="admin-page-title">系统菜单 / MENU MANAGEMENT.</div>
         <div className="admin-page-desc">
           <ul>
             <li>出于数据安全考虑，系统强制使用禁用用户替代删除用户。</li>
@@ -15,4 +15,4 @@ const JobPosition = () => {
   );
 };
 
-export default JobPosition;
+export default SystemMenu;
