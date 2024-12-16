@@ -61,7 +61,7 @@ var systemMenus = []model.SystemMenu{
 		Children: []model.SystemMenu{
 			{
 				Id:       1910,
-				Label:    "组织架构",
+				Label:    "部门管理",
 				Key:      "/system/departments",
 				Sort:     1910,
 				ParentId: 1900,
