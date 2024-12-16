@@ -36,7 +36,6 @@ const siderMenus = [
     getItem('角色管理', '/system/roles'),
     getItem('菜单管理', '/system/menus'),
     getItem('接口管理', '/system/apis'),
-    getItem('权限管理', '/system/permissions')
   ]),
   getItem('安全审计', '/securityaudit', <DynamicIcon iconName={'FileProtectOutlined'} />, [getItem('登录日志', '/securityaudit/login'), getItem('操作日志', '/securityaudit/operation')])
 ];

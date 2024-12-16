@@ -80,12 +80,6 @@ export const RouteRules = [
             auth: true,
             element: RouteLazyLoad(React.lazy(() => import('../pages/system/api/SystemApi.jsx')))
           },
-          {
-            path: '/system/permissions',
-            name: '权限管理',
-            auth: true,
-            element: RouteLazyLoad(React.lazy(() => import('../pages/system/permission/SystemPermission.jsx')))
-          }
         ]
       },
       {

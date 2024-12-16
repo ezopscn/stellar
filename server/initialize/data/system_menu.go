@@ -57,6 +57,7 @@ var systemMenus = []model.SystemMenu{
 		SystemRoles: []model.SystemRole{
 			systemRoles[0],
 			systemRoles[1],
+			systemRoles[2],
 		},
 		Children: []model.SystemMenu{
 			{
@@ -68,6 +69,7 @@ var systemMenus = []model.SystemMenu{
 				SystemRoles: []model.SystemRole{
 					systemRoles[0],
 					systemRoles[1],
+					systemRoles[2],
 				},
 			},
 			{
@@ -90,6 +92,7 @@ var systemMenus = []model.SystemMenu{
 				SystemRoles: []model.SystemRole{
 					systemRoles[0],
 					systemRoles[1],
+					systemRoles[2],
 				},
 			},
 			{
@@ -119,17 +122,6 @@ var systemMenus = []model.SystemMenu{
 				Label:    "接口管理",
 				Key:      "/system/apis",
 				Sort:     1960,
-				ParentId: 1900,
-				SystemRoles: []model.SystemRole{
-					systemRoles[0],
-					systemRoles[1],
-				},
-			},
-			{
-				Id:       1970,
-				Label:    "权限管理",
-				Key:      "/system/permissions",
-				Sort:     1970,
 				ParentId: 1900,
 				SystemRoles: []model.SystemRole{
 					systemRoles[0],

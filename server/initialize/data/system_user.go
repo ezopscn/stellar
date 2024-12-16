@@ -59,7 +59,7 @@ var systemUsers = []model.SystemUser{
 		Gender:       trans.Uint(2),
 		Avatar:       RandomFemaleAvatar(),
 		Description:  "系统运维工程师",
-		Status:       trans.Uint(0),
+		Status:       trans.Uint(1),
 		Creator:      defaultCreator,
 		SystemRoleId: 3,
 	},

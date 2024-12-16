@@ -13,8 +13,8 @@ import (
 func Casbin(ctx *gin.Context) {
 	// sub: 用户角色关键字
 	sub, _ := utils.ExtractStringResultFromContext(ctx, "systemRoleKeyword")
-	// obj: 请求路径
-	obj := strings.TrimPrefix(ctx.Request.RequestURI, common.SystemApiPrefix)
+	// obj: 请求路径，对于带参数的 GET 请求需要去掉参数
+	obj := strings.Split(strings.TrimPrefix(ctx.Request.RequestURI, common.SystemApiPrefix), "?")[0]
 	// act: 请求方法
 	act := ctx.Request.Method
 	// 执行 Casbin 策略

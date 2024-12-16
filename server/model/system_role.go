@@ -8,6 +8,7 @@ type SystemRole struct {
 	Description string       `gorm:"column:description;not null;comment:角色描述" json:"description"`
 	SystemUsers []uint       `gorm:"-" json:"systemUsers,omitempty"`
 	SystemMenus []SystemMenu `gorm:"many2many:system_role_menu_relation" json:"systemMenus,omitempty"`
+	SystemApis  []SystemApi  `gorm:"many2many:system_role_api_relation" json:"systemApis,omitempty"`
 }
 
 // 表名设置

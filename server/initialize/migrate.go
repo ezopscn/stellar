@@ -17,6 +17,8 @@ func MigrateTable() {
 	common.MySQLDB.AutoMigrate(new(model.SystemUser))            // 用户
 	common.MySQLDB.AutoMigrate(new(model.SystemRole))            // 角色
 	common.MySQLDB.AutoMigrate(new(model.SystemMenu))            // 菜单
+	common.MySQLDB.AutoMigrate(new(model.SystemApiCategory))     // API分类
+	common.MySQLDB.AutoMigrate(new(model.SystemApi))             // API
 	common.MySQLDB.AutoMigrate(new(model.DatasourceType))        // 数据源类型
 	common.MySQLDB.AutoMigrate(new(model.Datasource))            // 数据源
 	common.MySQLDB.AutoMigrate(new(model.MetricTask))            // 指标任务
@@ -32,6 +34,9 @@ func MigrateData() {
 	data.InitUserData()
 	data.InitRoleData()
 	data.InitMenuData()
+	data.InitSystemApiCategoryData()
+	data.InitSystemApiData()
+	data.InitSystemCasbinRuleData()
 	data.InitDatasourceType()
 	data.InitMetricTaskData()
 	fmt.Println(time.Now().Format(common.TimeMillisecondFormat), "Data migrate completed")
