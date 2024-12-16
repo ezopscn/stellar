@@ -7,9 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 部门列表
-func DepartmentListHandler(ctx *gin.Context) {
-	departments, err := service.GetDepartmentListService()
+// 系统部门列表
+func SystemDepartmentListHandler(ctx *gin.Context) {
+	departments, err := service.GetSystemDepartmentListService()
 	if err != nil {
 		response.FailedWithMessage("获取部门列表失败")
 		return

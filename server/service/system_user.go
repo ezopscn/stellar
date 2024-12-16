@@ -11,7 +11,7 @@ import (
 )
 
 // 获取用户列表
-func GetUserListService(ctx *gin.Context) (users []model.SystemUser, pagination dto.Pagination, err error) {
+func GetSystemUserListService(ctx *gin.Context) (users []model.SystemUser, pagination dto.Pagination, err error) {
 	// 获取筛选条件
 	filter := dto.SystemUserFilterRequest{}
 	if err := ctx.ShouldBindQuery(&filter); err != nil {

@@ -15,3 +15,18 @@ type SystemUserFilterRequest struct {
 	PageSize     *uint   `form:"pageSize" json:"pageSize"`
 	IsPagination *bool   `form:"isPagination" json:"isPagination"`
 }
+
+// 添加用户请求
+type SystemUserAddRequest struct {
+	Username     *string `json:"username"`
+	Password     *string `json:"password"`
+	CNName       *string `json:"cnName"`
+	ENName       *string `json:"enName"`
+	Email        *string `json:"email"`
+	Phone        *string `json:"phone"`
+	Gender       *uint   `json:"gender"`
+	Departments  []uint  `json:"departments"`
+	JobPositions []uint  `json:"jobPositions"`
+	Roles        []uint  `json:"roles"`
+	Creator      *string `json:"creator"`
+}

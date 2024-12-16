@@ -20,9 +20,9 @@ func Router() *gin.Engine {
 		panic("JWT init error: " + err.Error())
 	}
 	{
-		router.PublicRouter(r.Group(common.SystemApiPrefix), auth)                          // 公共路由（不需要认证）
-		router.PublicAuthRoutes(r.Group(common.SystemApiPrefix), auth)                      // 公共路由（需要认证）
-		router.CurrentUserAuthRoutes(r.Group(common.SystemApiPrefix+"/current/user"), auth) // 当前用户路由（需要认证）
+		router.PublicRouter(r.Group(common.SystemApiPrefix), auth)                                // 公共路由（不需要认证）
+		router.PublicAuthRoutes(r.Group(common.SystemApiPrefix), auth)                            // 公共路由（需要认证）
+		router.CurrentSystemUserAuthRoutes(r.Group(common.SystemApiPrefix+"/current/user"), auth) // 当前用户路由（需要认证）
 		// 系统路由组
 		{
 			router.SystemUserAuthRoutes(r.Group(common.SystemApiPrefix+"/system/user"), auth)                // 用户路由（需要认证）

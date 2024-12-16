@@ -11,7 +11,7 @@ import (
 )
 
 // 用户列表接口
-func UserListHandler(ctx *gin.Context) {
+func SystemUserListHandler(ctx *gin.Context) {
 	// 获取当前用户的角色，如果是管理员以上的级别，则可以看到隐藏的手机号
 	systemRoleKeyword, err := utils.ExtractStringResultFromContext(ctx, "systemRoleKeyword")
 	if err != nil {
@@ -20,7 +20,7 @@ func UserListHandler(ctx *gin.Context) {
 	}
 
 	// 获取用户列表
-	users, pagination, err := service.GetUserListService(ctx)
+	users, pagination, err := service.GetSystemUserListService(ctx)
 	if err != nil {
 		response.FailedWithMessage("获取用户列表失败")
 		return
@@ -39,4 +39,9 @@ func UserListHandler(ctx *gin.Context) {
 		List:       users,
 		Pagination: pagination,
 	})
+}
+
+// 添加用户接口
+func SystemUserAddHandler(ctx *gin.Context) {
+
 }

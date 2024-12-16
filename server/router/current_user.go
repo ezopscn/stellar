@@ -8,8 +8,8 @@ import (
 )
 
 // 当前用户的路由组
-func CurrentUserAuthRoutes(rg *gin.RouterGroup, auth *jwt.GinJWTMiddleware) gin.IRoutes {
+func CurrentSystemUserAuthRoutes(rg *gin.RouterGroup, auth *jwt.GinJWTMiddleware) gin.IRoutes {
 	authRG := rg.Use(auth.MiddlewareFunc())
-	authRG.GET("/menu/tree", v1.GetCurrentUserSystemMenuTreeHandler) // 获取当前用户的菜单列表接口
+	authRG.GET("/menu/tree", v1.GetCurrentSystemUserSystemMenuTreeHandler) // 获取当前用户的菜单列表接口
 	return authRG
 }

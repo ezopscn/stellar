@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 菜单树列表接口
+// 系统菜单树列表接口
 func GetSystemMenuTreeHandler(ctx *gin.Context) {
 	tree, err := service.GenerateSystemMenuTreeByRoleIdService(0)
 	if err != nil {
@@ -18,8 +18,8 @@ func GetSystemMenuTreeHandler(ctx *gin.Context) {
 	response.SuccessWithData(tree)
 }
 
-// 获取当前用户的菜单树接口
-func GetCurrentUserSystemMenuTreeHandler(ctx *gin.Context) {
+// 获取当前用户的系统菜单树接口
+func GetCurrentSystemUserSystemMenuTreeHandler(ctx *gin.Context) {
 	roleId, err := utils.ExtractUintResultFromContext(ctx, "systemRoleId")
 	if err != nil {
 		response.FailedWithMessage("获取当前用户角色ID失败")
