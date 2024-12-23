@@ -721,7 +721,6 @@ const SystemUser = () => {
       const file = fileList[0]?.originFileObj;
       const reader = new FileReader();
       reader.readAsArrayBuffer(file);
-      // 逐行读取
       reader.onload = (e) => {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
@@ -877,7 +876,10 @@ const SystemUser = () => {
       </Modal>
 
       {/* 批量导入弹窗 */}
-      <Modal title={'批量导入' + pageKeyword} open={multiAddModalVisible} onCancel={() => setMultiAddModalVisible(false)} width={800} maskClosable={false} footer={null}>
+      <Modal title={'批量导入' + pageKeyword} open={multiAddModalVisible} onCancel={() => {
+        setMultiAddModalVisible(false);
+        setMutiAddRecordList([]);
+      }} width={800} maskClosable={false} footer={null}>
         <div>
           <Dragger {...mutiAddRecordProps}>
             <p className="ant-upload-drag-icon">
