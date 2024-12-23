@@ -31,8 +31,9 @@ const siderMenus = [
     getItem('活跃告警', '/alert/active'),
     getItem('告警规则', '/alert/rule'),
     getItem('告警订阅', '/alert/subscription'),
-    getItem('屏蔽规则', '/alert/block'),
+    getItem('告警屏蔽', '/alert/block'),
     getItem('告警历史', '/alert/history'),
+    getItem('告警回调', '/alert/callback'),
   ]),
   getItem('告警通知', '/alert-notification', <DynamicIcon iconName={'MailOutlined'} />, [
     getItem('通知媒介', '/alert-notification/media'),

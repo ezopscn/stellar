@@ -107,6 +107,18 @@ var systemMenus = []model.SystemMenu{
 					systemRoles[2],
 				},
 			},
+			{
+				Id:       1360,
+				Label:    "告警回调",
+				Key:      "/alert/callback",
+				Sort:     1360,
+				ParentId: 1300,
+				SystemRoles: []model.SystemRole{
+					systemRoles[0],
+					systemRoles[1],
+					systemRoles[2],
+				},
+			},
 		},
 	},
 	{

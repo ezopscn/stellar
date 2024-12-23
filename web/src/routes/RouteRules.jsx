@@ -61,6 +61,12 @@ export const RouteRules = [
             name: '告警历史',
             auth: true,
             element: RouteLazyLoad(React.lazy(() => import('../pages/alert/history/AlertHistory.jsx')))
+          },
+          {
+            path: '/alert/callback',
+            name: '告警回调',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/alert/callback/AlertCallback.jsx')))
           }
         ]
       },
