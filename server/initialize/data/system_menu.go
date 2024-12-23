@@ -283,7 +283,6 @@ var systemMenus = []model.SystemMenu{
 				ParentId: 1700,
 				SystemRoles: []model.SystemRole{
 					systemRoles[0],
-					systemRoles[1],
 				},
 			},
 			{
@@ -294,7 +293,6 @@ var systemMenus = []model.SystemMenu{
 				ParentId: 1700,
 				SystemRoles: []model.SystemRole{
 					systemRoles[0],
-					systemRoles[1],
 				},
 			},
 			{

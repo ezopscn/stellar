@@ -18,7 +18,7 @@
     <img src="https://img.shields.io/badge/-MySQL-blue?style=flat-square&logo=mysql&logoColor=white" alt="">
   </a>
   <a>
-    <img src="https://img.shields.io/badge/-Redis-c14438?style=flat-square&logo=redis&logoColor=white&link=mailto:ezops.cn@gmail.com" alt="">
+    <img src="https://img.shields.io/badge/-Redis-c14438?style=flat-square&logo=redis&logoColor=white" alt="">
   </a>
   <a>
     <img src="https://img.shields.io/badge/-React-blue?style=flat-square&logo=react&logoColor=white" alt="">
@@ -30,7 +30,7 @@
 
 <hr>
 
-### 🎉 项目说明
+### 🎉 Stellar 是什么
 
 > Stellar is a multi-data-source operational monitoring system that integrates both system monitoring and business monitoring.
 

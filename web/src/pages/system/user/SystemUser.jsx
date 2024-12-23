@@ -18,6 +18,7 @@ import {
   RestOutlined,
   UnorderedListOutlined
 } from '@ant-design/icons';
+import * as XLSX from 'xlsx';
 import { TitleSuffix } from '@/common/Text.jsx';
 import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
@@ -69,7 +70,7 @@ const SystemUser = () => {
       type: 'input',
       rules: [
         {
-          message: '姓名长度不能超过30个字符',
+          message: '姓名长度��能超过30个字符',
           max: 30
         }
       ]
@@ -674,11 +675,49 @@ const SystemUser = () => {
     }
   ];
 
+  /////////////////////////////////////////////////////
   // 批量导入
+  /////////////////////////////////////////////////////
+  const [mutiAddRecordList, setMutiAddRecordList] = useState([]);
+
+  // 批量添加方法
   const mutiAddRecordHandle = (data) => {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = '.xlsx';
+    console.log('批量导入：', data);
+  };
+
+  // 选择文件后的操作
+  const mutiAddRecordProps = {
+    name: 'file',
+    multiple: false,
+    beforeUpload(file) { // 阻止自动上传
+      // 判断如果文件不是 xlsx 后缀，则不进行上传
+      if (!file.name.endsWith('.xlsx')) {
+        message.error('请根据用户批量添加模板上传 Excel 文件');
+      }
+      return false;
+    },
+    onChange(info) {
+      // 获取文件列表，然后读取文件
+      const fileList = info.fileList;
+      // 使用 xlsx 读取文件
+      const file = fileList[0].originFileObj;
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(file);
+      // 逐行读取
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetNameList = workbook.SheetNames;
+        const json = sheetNameList.map(sheet => {
+          return XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
+        });
+        // 前 4 条数据都是模板数据，不需要
+        console.log(json[0].splice(4));
+      };
+    },
+    onDrop(e) {
+      console.log('Dropped files', e.dataTransfer.files);
+    },
   };
 
   return (
@@ -824,7 +863,7 @@ const SystemUser = () => {
       {/* 批量导入弹窗 */}
       <Modal title={'批量导入' + pageKeyword} open={multiAddModalVisible} onOk={mutiAddRecordHandle} onCancel={() => setMultiAddModalVisible(false)} width={800} maskClosable={false} footer={null}>
         <div>
-          <Dragger>
+          <Dragger {...mutiAddRecordProps}>
             <p className="ant-upload-drag-icon">
               <InboxOutlined />
             </p>
