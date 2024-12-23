@@ -7,7 +7,10 @@ import {
   InsuranceOutlined,
   UserOutlined,
   FileProtectOutlined,
-  ClusterOutlined
+  ClusterOutlined,
+  AlertOutlined,
+  MailOutlined,
+  ProjectOutlined
 } from '@ant-design/icons';
 
 // 图标字符串映射
@@ -21,7 +24,10 @@ export const IconMap = {
   InsuranceOutlined: InsuranceOutlined,
   UserOutlined: UserOutlined,
   FileProtectOutlined: FileProtectOutlined,
-  ClusterOutlined: ClusterOutlined
+  ClusterOutlined: ClusterOutlined,
+  AlertOutlined: AlertOutlined,
+  MailOutlined: MailOutlined,
+  ProjectOutlined: ProjectOutlined
 };
 
 // 生成 Icon

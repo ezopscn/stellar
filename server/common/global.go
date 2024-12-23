@@ -31,11 +31,11 @@ var (
 
 // 系统常量
 const (
-	SystemApiPrefix          = "/api/v1"                                                                                // API 前缀
-	SystemProjectName        = "Stellar"                                                                                // 项目名称
-	SystemProjectDescription = "Stellar is a middleware tool that converts data warehouse data into Prometheus metrics" // 项目描述
-	SystemDeveloperName      = "DK"                                                                                     // 开发者
-	SystemDeveloperEmail     = "ezopscn@gmail.com"                                                                      // 开发者邮箱
+	SystemApiPrefix          = "/api/v1"                                                                                                                      // API 前缀
+	SystemProjectName        = "Stellar"                                                                                                                      // 项目名称
+	SystemProjectDescription = "Stellar is a multi-data-source operational monitoring system that integrates both system monitoring and business monitoring." // 项目描述
+	SystemDeveloperName      = "DK"                                                                                                                           // 开发者
+	SystemDeveloperEmail     = "ezopscn@gmail.com"                                                                                                            // 开发者邮箱
 )
 
 // 格式常量

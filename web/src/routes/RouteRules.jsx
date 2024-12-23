@@ -22,16 +22,146 @@ export const RouteRules = [
         element: RouteLazyLoad(React.lazy(() => import('../pages/dashboard/Dashboard.jsx')))
       },
       {
-        path: '/metrics',
-        name: '监控指标',
+        path: '/query',
+        name: '即时查询',
         auth: true,
-        element: RouteLazyLoad(React.lazy(() => import('../pages/metrics/Metrics.jsx')))
+        element: RouteLazyLoad(React.lazy(() => import('../pages/query/Query.jsx')))
       },
       {
-        path: '/datasources',
-        name: '数据源',
+        path: '/alert',
+        name: '告警管理',
         auth: true,
-        element: RouteLazyLoad(React.lazy(() => import('../pages/datasources/Datasources.jsx')))
+        children: [
+          {
+            path: '/alert/active',
+            name: '活跃告警',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/alert/active/AlertActive.jsx')))
+          },
+          {
+            path: '/alert/rule',
+            name: '告警规则',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/alert/rule/AlertRule.jsx')))
+          },
+          {
+            path: '/alert/subscription',
+            name: '告警订阅',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/alert/subscription/AlertSubscription.jsx')))
+          },
+          {
+            path: '/alert/block',
+            name: '告警屏蔽',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/alert/block/AlertBlock.jsx')))
+          },
+          {
+            path: '/alert/history',
+            name: '告警历史',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/alert/history/AlertHistory.jsx')))
+          }
+        ]
+      },
+      {
+        path: '/alert-notification',
+        name: '告警通知',
+        auth: true,
+        children: [
+          {
+            path: '/alert-notification/media',
+            name: '通知媒介',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/alert-notification/media/AlertNotificationMedia.jsx')))
+          },
+          {
+            path: '/alert-notification/template',
+            name: '通知模板',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/alert-notification/template/AlertNotificationTemplate.jsx')))
+          }
+        ]
+      },
+      {
+        path: '/alert-group',
+        name: '告警分组',
+        auth: true,
+        children: [
+          {
+            path: '/alert-group/project',
+            name: '项目管理',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/alert-group/project/AlertGroupProject.jsx')))
+          },
+          {
+            path: '/alert-group/team',
+            name: '团队管理',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/alert-group/team/AlertGroupTeam.jsx')))
+          },
+          {
+            path: '/alert-group/schedule',
+            name: '人员排班',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/alert-group/schedule/AlertGroupSchedule.jsx')))
+          }
+        ]
+      },
+      {
+        path: '/datasource',
+        name: '数据来源',
+        auth: true,
+        element: RouteLazyLoad(React.lazy(() => import('../pages/datasource/Datasource.jsx')))
+      },
+      {
+        path: '/system',
+        name: '系统管理',
+        auth: true,
+        children: [
+          {
+            path: '/system/department',
+            name: '部门管理',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/department/SystemDepartment.jsx')))
+          },
+          {
+            path: '/system/job-position',
+            name: '职位管理',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/job-position/SystemJobPosition.jsx')))
+          },
+          {
+            path: '/system/user',
+            name: '用户管理',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/user/SystemUser.jsx')))
+          },
+          {
+            path: '/system/role',
+            name: '角色管理',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/role/SystemRole.jsx')))
+          },
+          {
+            path: '/system/menu',
+            name: '菜单管理',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/menu/SystemMenu.jsx')))
+          },
+          {
+            path: '/system/api',
+            name: '接口管理',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/api/SystemApi.jsx')))
+          },
+          {
+            path: '/system/permission',
+            name: '权限管理',
+            auth: true,
+            element: RouteLazyLoad(React.lazy(() => import('../pages/system/permission/SystemPermission.jsx')))
+          }
+        ]
       },
       {
         path: '/me',
@@ -40,61 +170,18 @@ export const RouteRules = [
         element: RouteLazyLoad(React.lazy(() => import('../pages/me/Me.jsx')))
       },
       {
-        path: '/system',
-        name: '系统管理',
-        auth: true,
-        children: [
-          {
-            path: '/system/departments',
-            name: '部门管理',
-            auth: true,
-            element: RouteLazyLoad(React.lazy(() => import('../pages/system/department/SystemDepartment.jsx')))
-          },
-          {
-            path: '/system/jobpositions',
-            name: '职位管理',
-            auth: true,
-            element: RouteLazyLoad(React.lazy(() => import('../pages/system/jobposition/SystemJobPosition.jsx')))
-          },
-          {
-            path: '/system/users',
-            name: '用户管理',
-            auth: true,
-            element: RouteLazyLoad(React.lazy(() => import('../pages/system/user/SystemUser.jsx')))
-          },
-          {
-            path: '/system/roles',
-            name: '角色管理',
-            auth: true,
-            element: RouteLazyLoad(React.lazy(() => import('../pages/system/role/SystemRole.jsx')))
-          },
-          {
-            path: '/system/menus',
-            name: '菜单管理',
-            auth: true,
-            element: RouteLazyLoad(React.lazy(() => import('../pages/system/menu/SystemMenu.jsx')))
-          },
-          {
-            path: '/system/apis',
-            name: '接口管理',
-            auth: true,
-            element: RouteLazyLoad(React.lazy(() => import('../pages/system/api/SystemApi.jsx')))
-          },
-        ]
-      },
-      {
-        path: '/securityaudit',
+        path: '/security-audit',
         name: '安全审计',
         auth: true,
         children: [
           {
-            path: '/securityaudit/login',
+            path: '/security-audit/login',
             name: '登录日志',
             auth: true,
             element: RouteLazyLoad(React.lazy(() => import('../pages/securityaudit/login/SecurityauditLogin.jsx')))
           },
           {
-            path: '/securityaudit/operation',
+            path: '/security-audit/operation',
             name: '操作日志',
             auth: true,
             element: RouteLazyLoad(React.lazy(() => import('../pages/securityaudit/operation/SecurityauditOperation.jsx')))

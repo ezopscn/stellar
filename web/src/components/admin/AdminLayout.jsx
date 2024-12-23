@@ -26,18 +26,38 @@ const getItem = (label, key, icon, children) => {
 // 侧边菜单
 const siderMenus = [
   getItem('工作空间', '/dashboard', <DynamicIcon iconName={'DesktopOutlined'} />),
-  getItem('指标配置', '/metrics', <DynamicIcon iconName={'ConsoleSqlOutlined'} />),
-  getItem('数据源', '/datasources', <DynamicIcon iconName={'ApiOutlined'} />),
-  getItem('个人中心', '/me', <DynamicIcon iconName={'UserOutlined'} />),
-  getItem('系统设置', '/system', <DynamicIcon iconName={'ClusterOutlined'} />, [
-    getItem('部门管理', '/system/departments'),
-    getItem('职位管理', '/system/jobpositions'),
-    getItem('用户管理', '/system/users'),
-    getItem('角色管理', '/system/roles'),
-    getItem('菜单管理', '/system/menus'),
-    getItem('接口管理', '/system/apis'),
+  getItem('即时查询', '/query', <DynamicIcon iconName={'ConsoleSqlOutlined'} />),
+  getItem('告警管理', '/alert', <DynamicIcon iconName={'AlertOutlined'} />, [
+    getItem('活跃告警', '/alert/active'),
+    getItem('告警规则', '/alert/rule'),
+    getItem('告警订阅', '/alert/subscription'),
+    getItem('屏蔽规则', '/alert/block'),
+    getItem('告警历史', '/alert/history'),
   ]),
-  getItem('安全审计', '/securityaudit', <DynamicIcon iconName={'FileProtectOutlined'} />, [getItem('登录日志', '/securityaudit/login'), getItem('操作日志', '/securityaudit/operation')])
+  getItem('告警通知', '/alert-notification', <DynamicIcon iconName={'MailOutlined'} />, [
+    getItem('通知媒介', '/alert-notification/media'),
+    getItem('通知模板', '/alert-notification/template'),
+  ]),
+  getItem('告警分组', '/alert-group', <DynamicIcon iconName={'ProjectOutlined'} />, [
+    getItem('项目管理', '/alert-group/project'),
+    getItem('团队管理', '/alert-group/team'),
+    getItem('人员排班', '/alert-group/schedule'),
+  ]),
+  getItem('数据来源', '/datasource', <DynamicIcon iconName={'ApiOutlined'} />),
+  getItem('系统设置', '/system', <DynamicIcon iconName={'ClusterOutlined'} />, [
+    getItem('部门管理', '/system/department'),
+    getItem('职位管理', '/system/job-position'),
+    getItem('用户管理', '/system/user'),
+    getItem('角色管理', '/system/role'),
+    getItem('菜单管理', '/system/menu'),
+    getItem('接口管理', '/system/api'),
+    getItem('权限管理', '/system/permission'),
+  ]),
+  getItem('个人中心', '/me', <DynamicIcon iconName={'UserOutlined'} />),
+  getItem('安全审计', '/security-audit', <DynamicIcon iconName={'FileProtectOutlined'} />, [
+    getItem('登录日志', '/security-audit/login'), 
+    getItem('操作日志', '/security-audit/operation'),
+  ])
 ];
 
 const AdminLayout = () => {

@@ -45,7 +45,7 @@ const FooterText = () => {
 };
 
 // Title
-const TitleDesc = 'Stellar is a middleware tool that converts data warehouse data into Prometheus metrics';
+const TitleDesc = 'Stellar is a multi-data-source operational monitoring system that integrates both system monitoring and business monitoring.';
 const TitleSuffix = ' | ' + TitleDesc;
 
 export { FooterText, TitleDesc, TitleSuffix };

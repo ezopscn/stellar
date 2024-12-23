@@ -35,11 +35,11 @@ func Router() *gin.Engine {
 		}
 		// 系统路由组
 		{
-			router.SystemUserAuthRoutes(authRG.Group("/system/user"))               // 用户路由
-			router.SystemRoleAuthRoutes(authRG.Group("/system/role"))               // 角色路由
-			router.SystemMenuAuthRoutes(authRG.Group("/system/menu"))               // 菜单路由
-			router.SystemJobPositionAuthRoutes(authRG.Group("/system/jobPosition")) // 岗位路由
-			router.SystemDepartmentAuthRoutes(authRG.Group("/system/department"))   // 部门路由
+			router.SystemUserAuthRoutes(authRG.Group("/system/user"))                // 用户路由
+			router.SystemRoleAuthRoutes(authRG.Group("/system/role"))                // 角色路由
+			router.SystemMenuAuthRoutes(authRG.Group("/system/menu"))                // 菜单路由
+			router.SystemJobPositionAuthRoutes(authRG.Group("/system/job-position")) // 岗位路由
+			router.SystemDepartmentAuthRoutes(authRG.Group("/system/department"))    // 部门路由
 		}
 	}
 	// 需要认证，需要权限校验的路由
@@ -49,11 +49,11 @@ func Router() *gin.Engine {
 		authPermissionRG.Use(middleware.Casbin)
 		// 系统路由组
 		{
-			router.SystemUserAuthAndPermissionRoutes(authPermissionRG.Group("/system/user"))               // 用户路由
-			router.SystemRoleAuthAndPermissionRoutes(authPermissionRG.Group("/system/role"))               // 角色路由
-			router.SystemMenuAuthAndPermissionRoutes(authPermissionRG.Group("/system/menu"))               // 菜单路由
-			router.SystemJobPositionAuthAndPermissionRoutes(authPermissionRG.Group("/system/jobPosition")) // 岗位路由
-			router.SystemDepartmentAuthAndPermissionRoutes(authPermissionRG.Group("/system/department"))   // 部门路由
+			router.SystemUserAuthAndPermissionRoutes(authPermissionRG.Group("/system/user"))                // 用户路由
+			router.SystemRoleAuthAndPermissionRoutes(authPermissionRG.Group("/system/role"))                // 角色路由
+			router.SystemMenuAuthAndPermissionRoutes(authPermissionRG.Group("/system/menu"))                // 菜单路由
+			router.SystemJobPositionAuthAndPermissionRoutes(authPermissionRG.Group("/system/job-position")) // 岗位路由
+			router.SystemDepartmentAuthAndPermissionRoutes(authPermissionRG.Group("/system/department"))    // 部门路由
 		}
 	}
 	return r
