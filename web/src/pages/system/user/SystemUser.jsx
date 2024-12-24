@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { Button, Col, Form, Input, Row, Space, Table, Avatar, Tag, Descriptions, TreeSelect, Select, Modal, App, Upload, Divider } from 'antd';
+import { Button, Col, Form, Input, Row, Space, Table, Avatar, Tag, Descriptions, TreeSelect, Select, Modal, App, Upload, Dropdown } from 'antd';
 import {
   ClearOutlined,
   DownOutlined,
@@ -210,17 +210,6 @@ const SystemUser = () => {
   const defaultPageNumber = 1; // 默认页码
   const defaultTotal = 0; // 默认数据总数
   const isPagination = true; // 是否需要分页
-
-  // 表格：行选择
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === 'Disabled User',
-      name: record.name
-    })
-  };
 
   // 表格：列
   const tableColumns = [
@@ -763,6 +752,66 @@ const SystemUser = () => {
     } // 单文件不需要再定义 drop，删除也是 change 的一种
   };
 
+  /////////////////////////////////////////////////////
+  // 批量操作菜单
+  /////////////////////////////////////////////////////
+  const [mutiOperationKey, setMutiOperationKey] = useState('');
+  // 表格：行选择
+  const rowSelection = {
+    selectedRowKeys: mutiOperationKey,
+    onChange: (selectedRowKeys, selectedRows) => {
+      setMutiOperationKey(selectedRowKeys);
+    },
+    getCheckboxProps: (record) => ({
+      // 默认初始化用户不能被选中
+      disabled: record.id === 1 || record.id === 2,
+    })
+  };
+
+  // 批量操作菜单
+  const mutiOperationMenuProps = {
+    items: [
+      {
+        label: '批量禁用',
+        key: 'disable',
+        danger: true,
+        disabled: mutiOperationKey.length === 0
+      },
+      {
+        label: '批量启用',
+        key: 'enable',
+        danger: false,
+        disabled: mutiOperationKey.length === 0
+      }
+    ],
+    onClick: (key) => {
+      if (mutiOperationKey.length > 0) {
+        const modifyStatus = async () => {
+          const req = {
+            ids: mutiOperationKey,
+            operate: key.key
+          };
+          console.log(mutiOperationKey);
+          console.log(key.key);
+          try {
+            const res = await AxiosPost(Apis.System.User.StatusModify, req);
+            if (res.code === 200) {
+              message.success('批量操作成功');
+              setMutiOperationKey([]);
+              // 刷新数据
+              setPageNumber(1);
+            } else {
+              message.error(res.message);
+            }
+          } catch (error) {
+            message.error('批量操作失败：' + error);
+          }
+        };
+        modifyStatus();
+      }
+    }
+  };
+
   return (
     <>
       {/* 页面 header */}
@@ -816,6 +865,14 @@ const SystemUser = () => {
               <Button icon={<UploadOutlined />} onClick={() => setMultiAddModalVisible(true)}>
                 批量导入
               </Button>
+              <Dropdown menu={mutiOperationMenuProps}>
+                <Button>
+                  <Space>
+                    <DownOutlined />
+                    批量操作
+                  </Space>
+                </Button>
+              </Dropdown>
             </Space>
             <Space style={{ float: 'right' }}>
               <Button

@@ -9,3 +9,12 @@ func IsStringInSlice(str string, slice []string) bool {
 	}
 	return false
 }
+
+func IsUintInSlice(num uint, slice []uint) bool {
+	for _, s := range slice {
+		if s == num {
+			return true
+		}
+	}
+	return false
+}

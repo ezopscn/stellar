@@ -47,3 +47,9 @@ type SystemUserMutiAddRequest struct {
 	Role         *string `form:"role" json:"role"`
 	Description  *string `form:"description" json:"description"`
 }
+
+// 修改用户状态请求
+type SystemUserStatusModifyRequest struct {
+	Ids     []uint `form:"ids" json:"ids"`
+	Operate string `form:"operate" json:"operate"`
+}
