@@ -23,7 +23,7 @@ type SystemUser struct {
 	LastLoginTime          carbon.Carbon       `gorm:"column:lastLoginTime;comment:最后一次登录时间" json:"lastLoginTime"`
 	LastChangePasswordTime carbon.Carbon       `gorm:"column:lastChangePasswordTime;comment:最后一次修改密码时间" json:"lastChangePasswordTime"`
 	Status                 *uint               `gorm:"column:status;type:tinyint(1);default:1;comment:用户状态(0=禁用,1=正常)" json:"status"`
-	Creator                string              `gorm:"column:creator;comment:创建者（由中文名，英文名，ID组成，格式：张三,ZhangSan,1）" json:"creator"`
+	Creator                string              `gorm:"column:creator;comment:创建者（由用户名，中文名，英文名，ID组成，格式：username,cnName,enName,id）" json:"creator"`
 	SystemRoleId           uint                `gorm:"column:systemRoleId;comment:角色id" json:"systemRoleId"`
 	SystemRole             *SystemRole         `gorm:"foreignKey:SystemRoleId;" json:"systemRole,omitempty"`
 }

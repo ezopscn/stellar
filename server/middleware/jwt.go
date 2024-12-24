@@ -100,6 +100,7 @@ func payloadFunc(data interface{}) jwt.MapClaims {
 		// 封装一些常用的字段，方便直接使用前端和后端都能直接使用
 		return jwt.MapClaims{
 			jwt.IdentityKey:     systemUser.Id,
+			"userId":            systemUser.Id,
 			"username":          systemUser.Username,
 			"cnName":            systemUser.CNName,
 			"enName":            systemUser.ENName,

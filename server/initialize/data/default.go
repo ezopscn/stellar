@@ -8,7 +8,7 @@ import (
 var (
 	defaultPassword = "p@ssw0rd"                   // 默认密码
 	defaultAvatar   = "/images/avatar/default.png" // 默认头像
-	defaultCreator  = "系统默认创建,System,0"
+	defaultCreator  = "default,默认,Default,0"
 )
 
 // 随机生成男头像

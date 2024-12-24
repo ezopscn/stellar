@@ -678,6 +678,7 @@ const SystemUser = () => {
   /////////////////////////////////////////////////////
   // 批量导入
   /////////////////////////////////////////////////////
+  const [mutiAddFileList, setMutiAddFileList] = useState([]);
   const [mutiAddRecordList, setMutiAddRecordList] = useState([]);
   const [mutiAddRecordBtnDisabled, setMutiAddRecordBtnDisabled] = useState(true);
 
@@ -707,6 +708,10 @@ const SystemUser = () => {
     } catch (error) {
       message.error('批量导入失败：' + error);
     }
+    // 清理上传文件
+    setMultiAddModalVisible(false);
+    setMutiAddFileList([]);
+    setMutiAddRecordList([]);
   };
 
   // 选择文件后的操作
@@ -714,6 +719,7 @@ const SystemUser = () => {
     name: 'file',
     multiple: false,
     maxCount: 1,
+    fileList: mutiAddFileList,
     beforeUpload(file) { // 阻止自动上传
       // 判断如果文件不是 xlsx 后缀，则不进行上传
       if (!file.name.endsWith('.xlsx')) {
@@ -723,16 +729,16 @@ const SystemUser = () => {
     },
     onChange(info) {
       // 获取文件列表，然后读取文件
-      const fileList = info.fileList;
-
+      setMutiAddFileList(info.fileList);
       // 如果文件列表为空，则清空列表
-      if (fileList.length === 0) {
+      if (info.fileList.length === 0) {
         setMutiAddRecordList([]);
+        setMutiAddFileList([]);
         return;
       }
 
       // 使用 xlsx 读取文件
-      const file = fileList[0]?.originFileObj;
+      const file = info.fileList[0]?.originFileObj;
       const reader = new FileReader();
       reader.readAsArrayBuffer(file);
       reader.onload = (e) => {
@@ -839,7 +845,7 @@ const SystemUser = () => {
                 const items = [
                   {
                     label: '用户创建者',
-                    children: record.creator.split(',')[0] + ' / ' + record.creator.split(',')[1]
+                    children: record.creator.split(',')[1] + ' / ' + record.creator.split(',')[2] + ' ( ' + record.creator.split(',')[0] + ' / ' + record.creator.split(',')[3] + ' )'
                   },
                   {
                     label: '个人介绍',
@@ -897,20 +903,19 @@ const SystemUser = () => {
       <Modal title={'批量导入' + pageKeyword} open={multiAddModalVisible} onCancel={() => {
         setMultiAddModalVisible(false);
         setMutiAddRecordList([]);
+        setMutiAddFileList([]);
       }} width={800} maskClosable={false} footer={null}>
-        <div>
-          <Dragger {...mutiAddRecordProps}>
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">点击或者拖拽批量导入模板文件到此区域完成创建</p>
-            <p className="ant-upload-hint">为了数据安全，只支持单个文件模板导入，严格禁止上传公司数据或者其它违规文件。</p>
-          </Dragger>
-          <div style={{ marginTop: '10px' }}>
-            <Button disabled={mutiAddRecordBtnDisabled} type="primary" htmlType="submit" block onClick={mutiAddRecordHandle}>
-              批量导入
-            </Button>
-          </div>
+        <Dragger {...mutiAddRecordProps}>
+          <p className="ant-upload-drag-icon">
+            <InboxOutlined />
+          </p>
+          <p className="ant-upload-text">点击或者拖拽批量导入模板文件到此区域完成创建</p>
+          <p className="ant-upload-hint">为了数据安全，只支持单个文件模板导入，严格禁止上传公司数据或者其它违规文件。</p>
+        </Dragger>
+        <div style={{ marginTop: '10px' }}>
+          <Button disabled={mutiAddRecordBtnDisabled} type="primary" htmlType="submit" block onClick={mutiAddRecordHandle}>
+            批量导入
+          </Button>
         </div>
       </Modal>
 
