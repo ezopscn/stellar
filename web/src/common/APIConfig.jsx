@@ -21,7 +21,9 @@ const Apis = {
   System: {
     User: {
       List: BackendURL + '/system/user/list', // 用户列表
-      Info: BackendURL + '/system/user/detail' // 当前用户详情
+      Info: BackendURL + '/system/user/detail', // 当前用户详情
+      Add: BackendURL + '/system/user/add', // 添加用户
+      MutiAdd: BackendURL + '/system/user/muti-add', // 批量添加用户
     },
     Menu: {
       Tree: BackendURL + '/system/menu/tree' // 菜单树

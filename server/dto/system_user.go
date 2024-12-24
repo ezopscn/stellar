@@ -31,3 +31,19 @@ type SystemUserAddRequest struct {
 	Role         *uint   `form:"role" json:"role"`
 	Description  *string `form:"description" json:"description"`
 }
+
+// 批量添加用户请求
+type SystemUserMutiAddRequest struct {
+	Username     *string `form:"username" json:"username"`
+	Password     *string `form:"password" json:"password"`
+	CNName       *string `form:"cnName" json:"cnName"`
+	ENName       *string `form:"enName" json:"enName"`
+	Email        *string `form:"email" json:"email"`
+	Phone        *string `form:"phone" json:"phone"`
+	HidePhone    *string `form:"hidePhone" json:"hidePhone"`
+	Gender       *string `form:"gender" json:"gender"`
+	Departments  *string `form:"departments" json:"departments"`
+	JobPositions *string `form:"jobPositions" json:"jobPositions"`
+	Role         *string `form:"role" json:"role"`
+	Description  *string `form:"description" json:"description"`
+}

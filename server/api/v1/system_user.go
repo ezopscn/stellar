@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"stellar/common"
 	"stellar/dto"
 	"stellar/pkg/response"
@@ -44,4 +45,18 @@ func SystemUserListHandler(ctx *gin.Context) {
 // 添加用户接口
 func SystemUserAddHandler(ctx *gin.Context) {
 
+}
+
+// 批量添加用户接口
+func SystemUserMutiAddHandler(ctx *gin.Context) {
+	// 获取 post 参数
+	request := []dto.SystemUserMutiAddRequest{}
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		response.FailedWithMessage(err.Error())
+		return
+	}
+
+	// 打印数据
+	fmt.Println(request)
+	response.Success()
 }

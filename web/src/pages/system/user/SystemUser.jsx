@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { Button, Col, Form, Input, Row, Space, Table, Avatar, Tag, Descriptions, TreeSelect, Select, Modal, App, Upload } from 'antd';
+import { Button, Col, Form, Input, Row, Space, Table, Avatar, Tag, Descriptions, TreeSelect, Select, Modal, App, Upload, Divider } from 'antd';
 import {
   ClearOutlined,
   DownOutlined,
@@ -20,7 +20,7 @@ import {
 } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
 import { TitleSuffix } from '@/common/Text.jsx';
-import { AxiosGet } from '@/utils/Request.jsx';
+import { AxiosGet, AxiosPost } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
 import APIRequest from '@/common/APIRequest.jsx';
 const { Dragger } = Upload;
@@ -691,8 +691,22 @@ const SystemUser = () => {
   }, [mutiAddRecordList]);
 
   // 批量添加方法
-  const mutiAddRecordHandle = () => {
-    console.log('批量导入：', mutiAddRecordList);
+  const mutiAddRecordHandle = async () => {
+    try {
+      if (mutiAddRecordList.length === 0) {
+        message.error('未获取到导入数据，请检测文件格式是否正确');
+        return;
+      }
+      console.log(mutiAddRecordList);
+      const res = await AxiosPost(Apis.System.User.MutiAdd, mutiAddRecordList);
+      if (res.code === 200) {
+        message.success('批量导入任务已创建，请稍后查看任务状态');
+      } else {
+        message.error(res.message);
+      }
+    } catch (error) {
+      message.error('批量导入失败：' + error);
+    }
   };
 
   // 选择文件后的操作
@@ -723,10 +737,14 @@ const SystemUser = () => {
       reader.readAsArrayBuffer(file);
       reader.onload = (e) => {
         const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
+        // 为了避免因为单元格格式问题导致和后端数据类型不一致的情况，所有都使用字符串
+        const workbook = XLSX.read(data, { type: 'array', raw: false });
         const sheetNameList = workbook.SheetNames;
         const json = sheetNameList.map(sheet => {
-          return XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
+          return XLSX.utils.sheet_to_json(workbook.Sheets[sheet], { 
+            raw: false,
+            defval: '' // 设置空单元格的默认值为空字符串
+          });
         });
         // 前 4 条数据都是模板数据，不需要
         const jsonData = json[0].slice(4);
@@ -897,7 +915,7 @@ const SystemUser = () => {
       </Modal>
 
       {/* 批量导入记录 */}
-      <Modal title={'批量导入记录'} open={mutiAddHistoryVisible} onCancel={() => setMutiAddHistoryVisible(false)} width={1200} maskClosable={false} footer={null}>
+      <Modal title={'批量导入任务'} open={mutiAddHistoryVisible} onCancel={() => setMutiAddHistoryVisible(false)} width={1200} maskClosable={false} footer={null}>
         <Table
           // 表格布局大小
           size="small"
