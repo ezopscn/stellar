@@ -315,6 +315,10 @@ const SystemUser = () => {
       }
     },
     {
+      title: '创建时间',
+      dataIndex: 'createdAt'
+    },
+    {
       title: '操作',
       key: 'action',
       fixed: 'right',
@@ -850,6 +854,10 @@ const SystemUser = () => {
                   {
                     label: '个人介绍',
                     children: record.description
+                  },
+                  {
+                    label: '更新时间',
+                    children: record.updatedAt
                   },
                   {
                     label: '最后登录 IP',
