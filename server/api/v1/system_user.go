@@ -292,6 +292,8 @@ func SystemUserStatusMutiModifyHandler(ctx *gin.Context) {
 		return
 	}
 
+	fmt.Println(req)
+
 	// 批量修改
 	if err := service.ModifySystemUserStatusService(ctx, req.Ids, req.Operate); err != nil {
 		response.FailedWithMessage("修改用户状态失败")

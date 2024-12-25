@@ -77,7 +77,7 @@ const Login = () => {
             {/*手机令牌方式*/}
             <Form.Item
               className="admin-login-form-item"
-              style={{ marginBottom: 15 }}
+              style={{ marginBottom: 25 }}
               name="code"
               rules={[
                 {

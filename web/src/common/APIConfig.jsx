@@ -25,6 +25,7 @@ const Apis = {
       Add: BackendURL + '/system/user/add', // 添加用户
       MutiAdd: BackendURL + '/system/user/muti-add', // 批量添加用户
       StatusModify: BackendURL + '/system/user/status-modify', // 修改用户状态
+      StatusMutiModify: BackendURL + '/system/user/status-muti-modify', // 批量修改用户状态
     },
     Menu: {
       Tree: BackendURL + '/system/menu/tree' // 菜单树

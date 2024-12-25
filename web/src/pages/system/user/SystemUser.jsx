@@ -321,9 +321,9 @@ const SystemUser = () => {
         <>
           <Button color="primary" variant="link" icon={<EditOutlined />}>编辑</Button>
           {record.status === 1 ? (
-            <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={record.id === 1}>禁用</Button>
+            <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, ''))}>禁用</Button>
           ) : (
-            <Button color="success" variant="link" icon={<RestOutlined />} disabled={record.id === 1}>启用</Button>
+            <Button color="success" variant="link" icon={<RestOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, ''))}>启用</Button>
           )}
         </>
       )
@@ -800,7 +800,7 @@ const SystemUser = () => {
           console.log(mutiOperationKey);
           console.log(key.key);
           try {
-            const res = await AxiosPost(Apis.System.User.StatusModify, req);
+            const res = await AxiosPost(Apis.System.User.StatusMutiModify, req);
             if (res.code === 200) {
               message.success('批量操作成功');
               setMutiOperationKey([]);
@@ -871,7 +871,7 @@ const SystemUser = () => {
               <Button icon={<UploadOutlined />} onClick={() => setMultiAddModalVisible(true)} disabled={!SystemRoleApis.list?.includes(Apis.System.User.MutiAdd.replace(BackendURL, ''))}>
                 批量导入
               </Button>
-              <Dropdown menu={mutiOperationMenuProps} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, ''))}>
+              <Dropdown menu={mutiOperationMenuProps} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusMutiModify.replace(BackendURL, ''))}>
                 <Button>
                   <Space>
                     <DownOutlined />
