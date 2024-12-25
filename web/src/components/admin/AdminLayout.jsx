@@ -15,14 +15,12 @@ import { SystemRoleStates } from '@/store/StoreSystemRole.jsx';
 const { Header, Content, Sider } = Layout;
 
 // 生成菜单
-const getItem = (label, key, icon, children) => {
-  return {
-    key,
-    icon,
-    children,
-    label
-  };
-}
+const getItem = (label, key, icon, children) => ({
+  key,
+  icon,
+  children,
+  label
+});
 
 // 侧边菜单
 const siderMenus = [
@@ -77,10 +75,32 @@ const AdminLayout = () => {
   const { pathname } = useLocation(); // 当前页面
   const [openKeys, setOpenKeys] = useState([pathname]); // 展开菜单，父级菜单
   const [selectedKeys, setSelectedKeys] = useState([pathname]); // 选中菜单
+  const [rememberedOpenKeys, setRememberedOpenKeys] = useState([]); // 添加一个状态来保存展开的菜单keys
   useEffect(() => {
-    setOpenKeys(TreeFindPath(RouteRules, (data) => data.path === pathname));
+    const initialPath = TreeFindPath(RouteRules, (data) => data.path === pathname);
+    setOpenKeys(initialPath);
     setSelectedKeys(pathname);
-  }, [pathname]);
+  }, []);
+
+  // 修改折叠处理函数，添加延迟恢复展开菜单的功能
+  const handleCollapse = (value) => {
+    if (value) {
+      setRememberedOpenKeys(openKeys);
+      setOpenKeys([]);
+    } else {
+      // 添加 100ms 延迟，避免动画卡顿
+      setTimeout(() => {
+        setOpenKeys(rememberedOpenKeys);
+      }, 100);
+    }
+    setCollapsed(value);
+  };
+
+  // 添加菜单点击处理函数
+  const handleMenuClick = ({ key }) => {
+    setSelectedKeys([key]);
+    navigate(key);
+  };
 
   // 用户注销
   const logoutHandler = async () => {
@@ -108,9 +128,7 @@ const AdminLayout = () => {
     {
       label: <a target="_blank">修改资料</a>,
       key: '1',
-      onClick: () => {
-        navigate('/me');
-      }
+      onClick: () => navigate('/me')
     },
     {
       type: 'divider'
@@ -138,6 +156,7 @@ const AdminLayout = () => {
     };
     getSystemRoleApis();
   }, []);
+
 
   return (
     <Layout>
@@ -170,20 +189,23 @@ const AdminLayout = () => {
         </div>
       </Header>
       <Layout className="admin-main">
-        <Sider className="admin-sider" theme="light" width={menuWidth} collapsedWidth={menuCollapsedWidth} collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+        <Sider 
+          className="admin-sider" 
+          theme="light" 
+          width={menuWidth} 
+          collapsedWidth={menuCollapsedWidth} 
+          collapsible 
+          collapsed={collapsed} 
+          onCollapse={handleCollapse}
+        >
           <Menu
             className="admin-menu"
             mode="inline"
             openKeys={openKeys}
-            onOpenChange={(key) => {
-              setOpenKeys(key); // 解决展开菜单问题
-            }}
+            onOpenChange={setOpenKeys}
             selectedKeys={selectedKeys}
             items={siderMenus}
-            onClick={({ key }) => {
-              console.log(key);
-              navigate(key);
-            }}
+            onClick={handleMenuClick}
           />
         </Sider>
         <Layout className="admin-body">
