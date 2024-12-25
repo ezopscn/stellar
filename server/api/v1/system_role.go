@@ -34,9 +34,9 @@ func SystemRoleApiListHandler(ctx *gin.Context) {
 	// 判断角色是不是管理员
 	if utils.IsStringInSlice(roleKeyword, common.SystemRoleAdminList) {
 		// 查询所有 API
-		err = common.MySQLDB.Model(&model.SystemApi{}).Find(&apis).Error
+		err = common.MySQLDB.Where("needPermission = ?", 1).Find(&apis).Error
 	} else {
-		// 查询当前角色的 API 列表
+		// 查询当前角色的 API 列表，只需要查询鉴权的
 		var role model.SystemRole
 		err = common.MySQLDB.Where("keyword = ?", roleKeyword).Preload("SystemApis").First(&role).Error
 		apis = role.SystemApis

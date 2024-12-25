@@ -868,10 +868,10 @@ const SystemUser = () => {
               <Button type="primary" icon={<UserAddOutlined />} onClick={() => setAddModalVisible(true)} disabled={!SystemRoleApis.list?.includes(Apis.System.User.Add.replace(BackendURL, ''))}>
                 添加{pageKeyword}
               </Button>
-              <Button icon={<UploadOutlined />} onClick={() => setMultiAddModalVisible(true)}>
+              <Button icon={<UploadOutlined />} onClick={() => setMultiAddModalVisible(true)} disabled={!SystemRoleApis.list?.includes(Apis.System.User.MutiAdd.replace(BackendURL, ''))}>
                 批量导入
               </Button>
-              <Dropdown menu={mutiOperationMenuProps}>
+              <Dropdown menu={mutiOperationMenuProps} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, ''))}>
                 <Button>
                   <Space>
                     <DownOutlined />
