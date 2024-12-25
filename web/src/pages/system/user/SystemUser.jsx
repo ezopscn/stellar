@@ -23,6 +23,9 @@ import { TitleSuffix } from '@/common/Text.jsx';
 import { AxiosGet, AxiosPost } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
 import APIRequest from '@/common/APIRequest.jsx';
+import { SystemRoleStates } from '@/store/StoreSystemRole.jsx';
+import { useSnapshot } from 'valtio';
+import { BackendURL } from '@/common/APIConfig.jsx';
 const { Dragger } = Upload;
 
 const SystemUser = () => {
@@ -33,6 +36,9 @@ const SystemUser = () => {
   const title = '用户管理' + TitleSuffix; // 页面标题
   const pageKeyword = '用户'; // 页面关键词
 
+  // 全局
+  const { SystemRoleApis } = useSnapshot(SystemRoleStates);
+ 
   /////////////////////////////////////////////////////
   // 搜索栏
   /////////////////////////////////////////////////////
@@ -70,7 +76,7 @@ const SystemUser = () => {
       type: 'input',
       rules: [
         {
-          message: '姓名长度��能超过30个字符',
+          message: '姓名长度不能超过30个字符',
           max: 30
         }
       ]
@@ -859,7 +865,7 @@ const SystemUser = () => {
         <div className="admin-page-list">
           <div className="admin-page-btn-group">
             <Space>
-              <Button type="primary" icon={<UserAddOutlined />} onClick={() => setAddModalVisible(true)}>
+              <Button type="primary" icon={<UserAddOutlined />} onClick={() => setAddModalVisible(true)} disabled={!SystemRoleApis.list?.includes(Apis.System.User.Add.replace(BackendURL, ''))}>
                 添加{pageKeyword}
               </Button>
               <Button icon={<UploadOutlined />} onClick={() => setMultiAddModalVisible(true)}>

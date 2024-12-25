@@ -30,7 +30,8 @@ const Apis = {
       Tree: BackendURL + '/system/menu/tree' // 菜单树
     },
     Role: {
-      List: BackendURL + '/system/role/list' // 角色列表
+      List: BackendURL + '/system/role/list', // 角色列表
+      ApiList: BackendURL + '/system/role/api/list' // 角色API列表
     },
     JobPosition: {
       List: BackendURL + '/system/job-position/list' // 岗位列表

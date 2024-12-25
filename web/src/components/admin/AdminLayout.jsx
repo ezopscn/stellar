@@ -10,6 +10,7 @@ import { DynamicIcon } from '@/utils/IconLoad.jsx';
 import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
 import { ManOutlined, WomanOutlined, QuestionOutlined } from '@ant-design/icons';
+import { SystemRoleStates } from '@/store/StoreSystemRole.jsx';
 
 const { Header, Content, Sider } = Layout;
 
@@ -120,6 +121,23 @@ const AdminLayout = () => {
       onClick: logoutHandler
     }
   ];
+
+  // 获取角色API列表
+  useEffect(() => {
+    const getSystemRoleApis = async () => {
+      try {
+        const res = await AxiosGet(Apis.System.Role.ApiList);
+        if (res.code === 200) {
+          SystemRoleStates.SystemRoleApis = res.data;
+        } else {
+          message.error(res.message);
+        }
+      } catch (error) {
+        message.error('获取角色API列表异常');
+      }
+    };
+    getSystemRoleApis();
+  }, []);
 
   return (
     <Layout>
