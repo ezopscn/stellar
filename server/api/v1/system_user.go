@@ -274,25 +274,27 @@ func SystemUserStatusModifyHandler(ctx *gin.Context) {
 		return
 	}
 
-	// 默认 ID 为 1 的用户不能修改状态，属于系统预设用户
-	if utils.IsUintInSlice(1, req.Ids) {
-		response.FailedWithMessage("系统预设用户不能修改状态")
+	// 单个修改
+	ids := []uint{req.Id}
+	if err := service.ModifySystemUserStatusService(ctx, ids, req.Operate); err != nil {
+		response.FailedWithMessage("修改用户状态失败")
+		return
+	}
+	response.Success()
+}
+
+// 批量修改用户状态
+func SystemUserStatusMutiModifyHandler(ctx *gin.Context) {
+	// 获取 post 参数
+	req := dto.SystemUserStatusMutiModifyRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		response.FailedWithMessage(err.Error())
 		return
 	}
 
-	// 判断操作类型
-	if req.Operate == "disable" {
-		if err := common.MySQLDB.Model(&model.SystemUser{}).Where("id IN (?)", req.Ids).Update("status", trans.Uint(0)).Error; err != nil {
-			response.FailedWithMessage("禁用用户失败")
-			return
-		}
-	} else if req.Operate == "enable" {
-		if err := common.MySQLDB.Model(&model.SystemUser{}).Where("id IN (?)", req.Ids).Update("status", trans.Uint(1)).Error; err != nil {
-			response.FailedWithMessage("启用用户失败")
-			return
-		}
-	} else {
-		response.FailedWithMessage("不支持的操作类型")
+	// 批量修改
+	if err := service.ModifySystemUserStatusService(ctx, req.Ids, req.Operate); err != nil {
+		response.FailedWithMessage("修改用户状态失败")
 		return
 	}
 	response.Success()

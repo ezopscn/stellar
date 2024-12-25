@@ -6,6 +6,8 @@ import (
 	"stellar/common"
 	"stellar/dto"
 	"stellar/model"
+	"stellar/pkg/trans"
+	"stellar/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -90,4 +92,21 @@ func GetSystemUserListService(ctx *gin.Context) (users []model.SystemUser, pagin
 	// 加入查询条件
 	err = query.Preload("SystemRole").Preload("SystemDepartments").Preload("SystemJobPositions").Find(&users).Error
 	return
+}
+
+// 修改用户状态
+func ModifySystemUserStatusService(ctx *gin.Context, ids []uint, operate string) error {
+	// 默认 ID 为 1 的用户不能修改状态，属于系统预设用户
+	if utils.IsUintInSlice(1, ids) {
+		return errors.New("系统预设用户不能修改状态")
+	}
+
+	// 判断操作类型
+	if operate == "disable" {
+		return common.MySQLDB.Model(&model.SystemUser{}).Where("id IN (?)", ids).Update("status", trans.Uint(0)).Error
+	} else if operate == "enable" {
+		return common.MySQLDB.Model(&model.SystemUser{}).Where("id IN (?)", ids).Update("status", trans.Uint(1)).Error
+	} else {
+		return errors.New("不支持的操作类型")
+	}
 }

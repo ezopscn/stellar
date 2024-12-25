@@ -50,6 +50,12 @@ type SystemUserMutiAddRequest struct {
 
 // 修改用户状态请求
 type SystemUserStatusModifyRequest struct {
+	Id      uint   `form:"id" json:"id"`
+	Operate string `form:"operate" json:"operate"`
+}
+
+// 批量修改用户状态请求
+type SystemUserStatusMutiModifyRequest struct {
 	Ids     []uint `form:"ids" json:"ids"`
 	Operate string `form:"operate" json:"operate"`
 }
