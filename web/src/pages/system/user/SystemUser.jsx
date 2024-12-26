@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { Button, Col, Form, Input, Row, Space, Table, Avatar, Tag, Descriptions, TreeSelect, Select, Modal, App, Upload, Dropdown } from 'antd';
+import { Button, Col, Form, Input, Row, Space, Table, Avatar, Tag, Descriptions, TreeSelect, Select, Modal, App, Upload, Dropdown, Popconfirm } from 'antd';
 import {
   ClearOutlined,
   DownOutlined,
@@ -217,6 +217,22 @@ const SystemUser = () => {
   const defaultTotal = 0; // 默认数据总数
   const isPagination = true; // 是否需要分页
 
+  // 修改用户状态
+  const modifyStatusHandle = async (recordId, operate) => {
+    try {
+      const res = await AxiosPost(Apis.System.User.StatusModify, { id: recordId, operate: operate });
+      if (res.code === 200) {
+        message.success("操作成功");
+        setPageNumber(pageNumber - 1);
+      } else {
+        message.error(res.message);
+      }
+    } catch (error) {
+      console.error('后端服务异常，修改用户状态失败');
+      message.error(error);
+    }
+  };  
+
   // 表格：列
   const tableColumns = [
     {
@@ -322,9 +338,42 @@ const SystemUser = () => {
           <Button color="primary" variant="link" icon={<EditOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.Update.replace(BackendURL, ''))}>编辑</Button>
           {record.status === 1 ? (
             // 系统内置超级管理员账户不允许禁用
-            <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, '')) || record.id === 1}>禁用</Button>
+            <Popconfirm
+              placement="topRight"
+              title="确定要禁用该用户吗？"
+              // description="禁用后该用户将无法登录系统"
+              okText="确定"
+              okButtonProps={{
+                style: {
+                  backgroundColor: '#ff4d4f',
+                  borderColor: '#ff4d4f'
+                }
+              }}
+              cancelText="取消"
+              onConfirm={() => {
+                modifyStatusHandle(record.id, "disable")
+              }}
+            >
+              <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, '')) || record.id === 1}>禁用</Button>
+            </Popconfirm>
           ) : (
+            <Popconfirm
+              placement="topRight"
+              title="确定要启用该用户吗？"
+              okText="确定"
+              okButtonProps={{
+                style: {
+                  backgroundColor: '#52c41a',
+                  borderColor: '#52c41a'
+                }
+              }}
+              cancelText="取消"
+              onConfirm={() => {
+                modifyStatusHandle(record.id, "enable")
+              }}
+            >
             <Button color="success" variant="link" icon={<RestOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, ''))}>启用</Button>
+            </Popconfirm>
           )}
         </>
       )
@@ -627,7 +676,7 @@ const SystemUser = () => {
       const res = await AxiosPost(Apis.System.User.Add, data);
       if (res.code === 200) {
         message.success('用户添加成功');
-        window.location.reload(); // 刷新页面
+        setPageNumber(pageNumber - 1); // 返回上一页，则相当于刷新页面
       } else {
         message.error(res.message);
       }
