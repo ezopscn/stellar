@@ -591,9 +591,9 @@ const SystemUser = () => {
       ]
     },
     {
-      label: '描述',
+      label: '个人介绍',
       name: 'description',
-      placeholder: '请输入描述信息',
+      placeholder: '请输入个人介绍',
       type: 'textarea',
     }
   ];
