@@ -9,6 +9,7 @@ type RedisKeyPrefix struct {
 	LeaderId        string // 领导者 ID
 	WorkerId        string // 工作者 ID
 	MetricTask      string // 指标任务
+	SystemRoleApis  string // 系统角色 API
 }
 
 // 配置 Redis Key Prefix
@@ -20,4 +21,5 @@ var RKP = RedisKeyPrefix{
 	LeaderId:        "Leader",
 	WorkerId:        "Worker",
 	MetricTask:      "MetricTask",
+	SystemRoleApis:  "SystemRoleApis",
 }
