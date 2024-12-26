@@ -70,3 +70,27 @@ func IsMacAddress(mac string) bool {
 	regex := `^([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2})$`
 	return regexp.MustCompile(regex).MatchString(mac)
 }
+
+// 验证用户名
+func IsUsername(username string) bool {
+	regex := `^[a-zA-Z][a-zA-Z0-9_]{3,30}$`
+	return regexp.MustCompile(regex).MatchString(username)
+}
+
+// 验证密码
+func IsPassword(password string) bool {
+	regex := `^[a-zA-Z0-9@$!%*?&]{8,30}$`
+	return regexp.MustCompile(regex).MatchString(password)
+}
+
+// 验证中文名
+func IsCNName(cnName string) bool {
+	re := regexp.MustCompile(`^[\p{Han}]{2,30}$`)
+	return re.MatchString(cnName)
+}
+
+// 验证英文名
+func IsENName(enName string) bool {
+	re := regexp.MustCompile(`^[a-zA-Z]{2,30}$`)
+	return re.MatchString(enName)
+}

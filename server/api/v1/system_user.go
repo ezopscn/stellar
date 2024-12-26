@@ -50,7 +50,114 @@ func SystemUserListHandler(ctx *gin.Context) {
 
 // 添加用户接口
 func SystemUserAddHandler(ctx *gin.Context) {
+	// 获取 post 参数
+	req := dto.SystemUserAddRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		response.FailedWithMessage(err.Error())
+		return
+	}
 
+	// 校验提交数据
+	errList := []string{}
+	if !utils.IsUsername(*req.Username) {
+		errList = append(errList, "用户名格式错误")
+	}
+	if !utils.IsPassword(*req.Password) {
+		errList = append(errList, "密码格式错误")
+	}
+	if !utils.IsCNName(*req.CNName) {
+		errList = append(errList, "中文名格式错误")
+	}
+	if !utils.IsENName(*req.ENName) {
+		errList = append(errList, "英文名格式错误")
+	}
+	if !utils.IsEmail(*req.Email) {
+		errList = append(errList, "邮箱格式错误")
+	}
+	if !utils.IsPhoneNumber(*req.Phone) {
+		errList = append(errList, "手机号格式错误")
+	}
+	if *req.HidePhone != 0 && *req.HidePhone != 1 {
+		errList = append(errList, "隐藏手机号格式错误，只能是 0 或 1")
+	}
+	if *req.Gender != 1 && *req.Gender != 2 && *req.Gender != 3 {
+		errList = append(errList, "性别格式错误，只能是 1 或 2 或 3")
+	}
+	if len(req.Departments) == 0 {
+		errList = append(errList, "部门不能为空")
+	}
+	if len(req.JobPositions) == 0 {
+		errList = append(errList, "职位不能为空")
+	}
+	if req.Role == nil || *req.Role == 0 {
+		errList = append(errList, "角色不能为空")
+	}
+	if req.Description != nil {
+		if len(*req.Description) > 200 {
+			errList = append(errList, "描述长度不能超过 200 个字符")
+		}
+	} else {
+		req.Description = trans.String("")
+	}
+
+	// 如果错误列表不为空，则返回错误
+	if len(errList) > 0 {
+		response.FailedWithMessage(strings.Join(errList, ","))
+		return
+	}
+	fmt.Println(1)
+
+	// 用户模型
+	user := model.SystemUser{
+		Username:  *req.Username,
+		Password:  utils.CryptoPassword(*req.Password),
+		CNName:    *req.CNName,
+		ENName:    *req.ENName,
+		Email:     *req.Email,
+		Phone:     *req.Phone,
+		HidePhone: trans.Uint(*req.HidePhone),
+		Gender:    trans.Uint(*req.Gender),
+		Avatar: func() string {
+			if *req.Gender == 1 {
+				return data.RandomMaleAvatar()
+			}
+			return data.RandomFemaleAvatar()
+		}(),
+		SystemDepartments: func() []model.SystemDepartment {
+			var result []model.SystemDepartment
+			for _, deptId := range req.Departments {
+				result = append(result, model.SystemDepartment{
+					BaseModel: model.BaseModel{Id: deptId},
+				})
+			}
+			return result
+		}(),
+		SystemJobPositions: func() []model.SystemJobPosition {
+			var result []model.SystemJobPosition
+			for _, posId := range req.JobPositions {
+				result = append(result, model.SystemJobPosition{
+					BaseModel: model.BaseModel{Id: posId},
+				})
+			}
+			return result
+		}(),
+		SystemRoleId: uint(*req.Role),
+		Description:  *req.Description,
+		Creator: func() string {
+			username, _ := utils.ExtractStringResultFromContext(ctx, "username")
+			cnName, _ := utils.ExtractStringResultFromContext(ctx, "cnName")
+			enName, _ := utils.ExtractStringResultFromContext(ctx, "enName")
+			userId, _ := utils.ExtractUintResultFromContext(ctx, "userId")
+			return fmt.Sprintf("%s,%s,%s,%d", username, cnName, enName, userId)
+		}(),
+	}
+
+	// 创建用户
+	if err := common.MySQLDB.Create(&user).Error; err != nil {
+		response.FailedWithMessage("创建用户失败，" + err.Error())
+		return
+	}
+	response.Success()
 }
 
 // 批量添加用户接口
@@ -105,67 +212,47 @@ func SystemUserMutiAddHandler(ctx *gin.Context) {
 			taskDetail.Result = "用户创建中"
 			common.MySQLDB.Save(&taskDetail)
 
-			// 错误列表
+			// 校验提交数据
 			errList := []string{}
-
-			// 用户名
-			if v.Username == nil || *v.Username == "" || len(*v.Username) > 30 || len(*v.Username) < 3 || !regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_]*$`).MatchString(*v.Username) {
+			if !utils.IsUsername(*v.Username) {
 				errList = append(errList, "用户名格式错误")
 			}
-
-			// 密码
-			if v.Password == nil || *v.Password == "" || len(*v.Password) > 30 || len(*v.Password) < 8 {
+			if !utils.IsPassword(*v.Password) {
 				errList = append(errList, "密码格式错误")
 			}
-
-			// 中文名
-			if v.CNName == nil || *v.CNName == "" || len(*v.CNName) > 30 || len(*v.CNName) < 2 {
+			if !utils.IsCNName(*v.CNName) {
 				errList = append(errList, "中文名格式错误")
 			}
-
-			// 英文名
-			if v.ENName == nil || *v.ENName == "" || len(*v.ENName) > 30 || len(*v.ENName) < 2 || !regexp.MustCompile(`^[a-zA-Z]+$`).MatchString(*v.ENName) {
+			if !utils.IsENName(*v.ENName) {
 				errList = append(errList, "英文名格式错误")
 			}
-
-			// 邮箱
-			if v.Email == nil || *v.Email == "" || !utils.IsEmail(*v.Email) {
+			if !utils.IsEmail(*v.Email) {
 				errList = append(errList, "邮箱格式错误")
 			}
-
-			// 手机号
-			if v.Phone == nil || *v.Phone == "" || !utils.IsPhoneNumber(*v.Phone) {
+			if !utils.IsPhoneNumber(*v.Phone) {
 				errList = append(errList, "手机号格式错误")
 			}
-
-			// 隐藏手机号
-			if v.HidePhone == nil || *v.HidePhone == "" || (*v.HidePhone != "0" && *v.HidePhone != "1") {
+			if *v.HidePhone != "0" && *v.HidePhone != "1" {
 				errList = append(errList, "隐藏手机号格式错误，只能是 0 或 1")
 			}
-
-			// 性别
-			if v.Gender == nil || *v.Gender == "" || (*v.Gender != "0" && *v.Gender != "1" && *v.Gender != "2") {
-				errList = append(errList, "性别格式错误，只能是 0 或 1 或 2")
+			if *v.Gender != "1" && *v.Gender != "2" && *v.Gender != "3" {
+				errList = append(errList, "性别格式错误，只能是 1 或 2 或 3")
 			}
-
-			// 部门
 			if v.Departments == nil || *v.Departments == "" || !regexp.MustCompile(`^(\d+)(,\d+)*$`).MatchString(*v.Departments) {
 				errList = append(errList, "部门格式错误")
 			}
-
-			// 职位
 			if v.JobPositions == nil || *v.JobPositions == "" || !regexp.MustCompile(`^(\d+)(,\d+)*$`).MatchString(*v.JobPositions) {
 				errList = append(errList, "职位格式错误")
 			}
-
-			// 角色
-			if v.Role == nil || *v.Role == "" || !regexp.MustCompile(`^(\d+)$`).MatchString(*v.Role) {
+			if !regexp.MustCompile(`^(\d+)$`).MatchString(*v.Role) {
 				errList = append(errList, "角色格式错误")
 			}
-
-			// 描述
-			if len(*v.Description) > 200 {
-				errList = append(errList, "描述长度不能超过 200 个字符")
+			if v.Description != nil {
+				if len(*v.Description) > 200 {
+					errList = append(errList, "描述长度不能超过 200 个字符")
+				}
+			} else {
+				v.Description = trans.String("")
 			}
 
 			// 如果错误列表不为空，则返回错误

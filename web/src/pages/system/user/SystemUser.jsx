@@ -421,6 +421,10 @@ const SystemUser = () => {
         {
           min: 8,
           message: '密码长度不能小于8个字符'
+        },
+        {
+          pattern: /^[A-Za-z0-9@$!%*?&]+$/,
+          message: '密码只能包含大小写字母、数字和特殊字符（@$!%*?&）'
         }
       ]
     },
@@ -441,6 +445,10 @@ const SystemUser = () => {
         {
           min: 2,
           message: '中文名长度不能小于2个字符'
+        },
+        {
+          pattern: /^[\u4E00-\u9FA5]+$/,
+          message: '中文名只能包含中文'
         }
       ]
     },
@@ -587,7 +595,6 @@ const SystemUser = () => {
       name: 'description',
       placeholder: '请输入描述信息',
       type: 'textarea',
-      rules: []
     }
   ];
 
@@ -615,9 +622,26 @@ const SystemUser = () => {
   };
 
   // 添加数据方法
-  const addRecordHandle = (data) => {
-    console.log('添加数据：', data);
+  const addRecordHandle = async (data) => {
+    try {
+      const res = await AxiosPost(Apis.System.User.Add, data);
+      if (res.code === 200) {
+        message.success('用户添加成功');
+        window.location.reload(); // 刷新页面
+      } else {
+        message.error(res.message);
+      }
+    } catch (error) {
+      message.error('添加失败：' + error);
+    }
   };
+
+  /////////////////////////////////////////////////////
+  // 批量导入
+  /////////////////////////////////////////////////////
+  const [mutiAddFileList, setMutiAddFileList] = useState([]);
+  const [mutiAddRecordList, setMutiAddRecordList] = useState([]);
+  const [mutiAddRecordBtnDisabled, setMutiAddRecordBtnDisabled] = useState(true);
 
   // 批量导入记录表格列
   const mutiAddHistoryColumns = [
@@ -674,13 +698,6 @@ const SystemUser = () => {
       )
     }
   ];
-
-  /////////////////////////////////////////////////////
-  // 批量导入
-  /////////////////////////////////////////////////////
-  const [mutiAddFileList, setMutiAddFileList] = useState([]);
-  const [mutiAddRecordList, setMutiAddRecordList] = useState([]);
-  const [mutiAddRecordBtnDisabled, setMutiAddRecordBtnDisabled] = useState(true);
 
   // 监听 mutiAddRecordList 的变化，如果列表不为空，则按钮可以点击
   useEffect(() => {
