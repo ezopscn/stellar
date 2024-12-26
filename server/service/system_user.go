@@ -6,6 +6,7 @@ import (
 	"stellar/common"
 	"stellar/dto"
 	"stellar/model"
+	"stellar/pkg/gedis"
 	"stellar/pkg/trans"
 	"stellar/pkg/utils"
 
@@ -103,6 +104,17 @@ func ModifySystemUserStatusService(ctx *gin.Context, ids []uint, operate string)
 
 	// 判断操作类型
 	if operate == "disable" {
+		// 禁用用户，先查询所有用户的用户名，清除用户登录的 token，然后更新用户状态
+		var usernames []string
+		err := common.MySQLDB.Model(&model.SystemUser{}).Select("username").Where("id IN (?)", ids).Find(&usernames).Error
+		if err != nil {
+			return errors.New("查询需要禁用的用户信息失败")
+		}
+		conn := gedis.NewRedisConnection()
+		for _, username := range usernames {
+			key := fmt.Sprintf("%s:%s", common.RKP.LoginToken, username)
+			conn.Del(key)
+		}
 		return common.MySQLDB.Model(&model.SystemUser{}).Where("id IN (?)", ids).Update("status", trans.Uint(0)).Error
 	} else if operate == "enable" {
 		return common.MySQLDB.Model(&model.SystemUser{}).Where("id IN (?)", ids).Update("status", trans.Uint(1)).Error

@@ -21,16 +21,13 @@ func GetSystemRoleApiListService(roleKeyword string) (apiList []string, err erro
 	// 查询 Redis 中是否存在当前角色的 API 列表
 	key := fmt.Sprintf("%s:%s", common.RKP.SystemRoleApis, roleKeyword)
 	conn := gedis.NewRedisConnection()
-	// 查询 Redis 中是否存在当前角色的 API 列表
 	result := conn.GetString(key).Unwrap()
 	if result == "" {
 		var apis []model.SystemApi
-		// 判断角色是不是管理员
+		// 判断角色是不是管理员，管理员查询所有 API，其他角色查询当前角色的 API
 		if utils.IsStringInSlice(roleKeyword, common.SystemRoleAdminList) {
-			// 查询所有 API
 			err = common.MySQLDB.Where("needPermission = ?", 1).Find(&apis).Error
 		} else {
-			// 查询当前角色的 API 列表，只需要查询鉴权的
 			var role model.SystemRole
 			err = common.MySQLDB.Where("keyword = ?", roleKeyword).Preload("SystemApis").First(&role).Error
 			apis = role.SystemApis

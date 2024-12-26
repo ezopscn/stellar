@@ -864,15 +864,12 @@ const SystemUser = () => {
             ids: mutiOperationKey,
             operate: key.key
           };
-          console.log(mutiOperationKey);
-          console.log(key.key);
           try {
             const res = await AxiosPost(Apis.System.User.StatusMutiModify, req);
             if (res.code === 200) {
               message.success('批量操作成功');
               setMutiOperationKey([]);
-              // 刷新数据
-              setPageNumber(1);
+              setPageNumber(pageNumber - 1); // 返回上一页，则相当于刷新页面
             } else {
               message.error(res.message);
             }
@@ -898,7 +895,8 @@ const SystemUser = () => {
         <div className="admin-page-desc">
           <div>用户是系统的核心资产之一，也是许多其它资源的强制依赖，所以对于用户的管理，我提供了以下的要求和建议，请知悉：</div>
           <ul>
-            <li>出于数据安全考虑，系统将强制使用禁用用户来替代删除用户，以此保证数据的可靠性和稳定性。</li>
+            <li>系统内置的超级管理员账户涉及到系统的基础逻辑判断，不允许从数据库中物理删除，用户在初始化完成之后需要对其基础信息进行修改，保障系统安全性。</li>
+            <li>为了保障数据的安全性和可靠性，系统将强制使用禁用用户来替代删除用户，禁用用户将无法登录系统，但是数据仍然保留，可以随时恢复。</li>
             <li>针对某些特殊的用户，例如老板、高管等，我们建议隐藏其联系方式，保护个人隐私。</li>
           </ul>
         </div>
