@@ -319,9 +319,10 @@ const SystemUser = () => {
       fixed: 'right',
       render: (_, record) => (
         <>
-          <Button color="primary" variant="link" icon={<EditOutlined />}>编辑</Button>
+          <Button color="primary" variant="link" icon={<EditOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.Update.replace(BackendURL, ''))}>编辑</Button>
           {record.status === 1 ? (
-            <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, ''))}>禁用</Button>
+            // 系统内置超级管理员账户不允许禁用
+            <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, '')) || record.id === 1}>禁用</Button>
           ) : (
             <Button color="success" variant="link" icon={<RestOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, ''))}>启用</Button>
           )}
@@ -769,8 +770,8 @@ const SystemUser = () => {
       setMutiOperationKey(selectedRowKeys);
     },
     getCheckboxProps: (record) => ({
-      // 默认初始化用户不能被选中
-      disabled: record.id === 1 || record.id === 2,
+      // 系统超级管理员账户不允许选择
+      disabled: record.id === 1,
     })
   };
 

@@ -33,6 +33,7 @@ var systemUserAuthAndPermissionApis = []model.SystemApi{
 	{Name: "用户列表", Path: "/system/user/list", Method: "GET", Description: "用户列表接口", NeedPermission: trans.Uint(1), CategoryId: 3, SystemRoles: []model.SystemRole{systemRoles[2]}},
 	{Name: "用户添加", Path: "/system/user/add", Method: "POST", Description: "用户添加接口", NeedPermission: trans.Uint(1), CategoryId: 3},
 	{Name: "用户批量添加", Path: "/system/user/muti-add", Method: "POST", Description: "用户批量添加接口", NeedPermission: trans.Uint(1), CategoryId: 3},
+	{Name: "用户编辑", Path: "/system/user/update", Method: "POST", Description: "用户编辑接口", NeedPermission: trans.Uint(1), CategoryId: 3},
 	{Name: "用户状态修改", Path: "/system/user/status-modify", Method: "POST", Description: "用户状态修改接口", NeedPermission: trans.Uint(1), CategoryId: 3},
 	{Name: "用户批量状态修改", Path: "/system/user/status-muti-modify", Method: "POST", Description: "用户批量状态修改接口", NeedPermission: trans.Uint(1), CategoryId: 3},
 }
