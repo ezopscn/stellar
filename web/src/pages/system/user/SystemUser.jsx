@@ -258,7 +258,7 @@ const SystemUser = () => {
         const genderIcons = {
           1: <ManOutlined style={{ color: '#165dff' }} />,
           2: <WomanOutlined style={{ color: '#ff4d4f' }} />,
-          default: <QuestionOutlined style={{ color: '#999' }} />
+          default: <QuestionOutlined style={{ color: '#999999' }} />
         };
         return genderIcons[gender] || genderIcons.default;
       }
@@ -828,12 +828,12 @@ const SystemUser = () => {
   /////////////////////////////////////////////////////
   // 批量操作菜单
   /////////////////////////////////////////////////////
-  const [mutiOperationKey, setMutiOperationKey] = useState('');
+  const [mutiOperateKey, setMutiOperateKey] = useState('');
   // 表格：行选择
   const rowSelection = {
-    selectedRowKeys: mutiOperationKey,
+    selectedRowKeys: mutiOperateKey,
     onChange: (selectedRowKeys, selectedRows) => {
-      setMutiOperationKey(selectedRowKeys);
+      setMutiOperateKey(selectedRowKeys);
     },
     getCheckboxProps: (record) => ({
       // 系统超级管理员账户不允许选择
@@ -842,33 +842,33 @@ const SystemUser = () => {
   };
 
   // 批量操作菜单
-  const mutiOperationMenuProps = {
+  const mutiOperateMenuProps = {
     items: [
       {
         label: '批量禁用',
         key: 'disable',
         danger: true,
-        disabled: mutiOperationKey.length === 0
+        disabled: mutiOperateKey.length === 0
       },
       {
         label: '批量启用',
         key: 'enable',
         danger: false,
-        disabled: mutiOperationKey.length === 0
+        disabled: mutiOperateKey.length === 0
       }
     ],
     onClick: (key) => {
-      if (mutiOperationKey.length > 0) {
-        const modifyStatus = async () => {
+      if (mutiOperateKey.length > 0) {
+        const mutiModifyStatusHandle = async () => {
           const req = {
-            ids: mutiOperationKey,
+            ids: mutiOperateKey,
             operate: key.key
           };
           try {
             const res = await AxiosPost(Apis.System.User.StatusMutiModify, req);
             if (res.code === 200) {
               message.success('批量操作成功');
-              setMutiOperationKey([]);
+              setMutiOperateKey([]);
               setPageNumber(pageNumber - 1); // 返回上一页，则相当于刷新页面
             } else {
               message.error(res.message);
@@ -877,7 +877,7 @@ const SystemUser = () => {
             message.error('批量操作失败：' + error);
           }
         };
-        modifyStatus();
+        mutiModifyStatusHandle();
       }
     }
   };
@@ -936,7 +936,7 @@ const SystemUser = () => {
               <Button icon={<UploadOutlined />} onClick={() => setMultiAddModalVisible(true)} disabled={!SystemRoleApis.list?.includes(Apis.System.User.MutiAdd.replace(BackendURL, ''))}>
                 批量导入
               </Button>
-              <Dropdown menu={mutiOperationMenuProps} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusMutiModify.replace(BackendURL, ''))}>
+              <Dropdown menu={mutiOperateMenuProps} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusMutiModify.replace(BackendURL, ''))}>
                 <Button>
                   <Space>
                     <DownOutlined />
