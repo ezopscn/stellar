@@ -128,7 +128,7 @@ const SystemUser = () => {
   const [filterRecordParams, setFilterRecordParams] = useState({}); 
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
-  // 状态：添加数据
+  // 状态：弹窗
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   // 添加数据弹窗
   const [addRecordModalVisible, setAddRecordModalVisible] = useState(false);
@@ -377,7 +377,40 @@ const SystemUser = () => {
     ...recordFormBasicFields.slice(1),
   ];
 
-
+  // 生成添加数据表单项
+  const generateAddRecordFormItems = () => {
+    return addRecordFields?.map((item) => {
+      const commonProps = {
+        allowClear: true,
+        placeholder: item.placeholder
+      };
+      const componentProps = {
+        input: {},
+        inputPassword: {},
+        textarea: {},
+        select: {
+          options: item.data,
+          showSearch: item.search,
+          optionFilterProp: 'label',
+          mode: item.multiple ? 'multiple' : 'default'
+        },
+        treeSelect: {
+          treeData: item.data,
+          showSearch: item.search,
+          treeNodeFilterProp: 'label',
+          multiple: item.multiple
+        }
+      }
+      return (
+        <Form.Item key={item.name} label={item.label} name={item.name} rules={item.rules}>
+          {FORM_ITEM_COMPONENT_MAP[item.type]?.({
+            ...commonProps,
+            ...componentProps[item.type]
+          })}
+        </Form.Item>
+      );
+    });
+  };
 
 
 
@@ -398,35 +431,8 @@ const SystemUser = () => {
     }
   };
 
-  /////////////////////////////////////////////////////
-  // 添加弹窗
-  /////////////////////////////////////////////////////
 
 
-
-
-  // 获取添加数据字段
-  const getAddRecordFields = () => {
-    const children = [];
-    addRecordFields.forEach((item) => {
-      children.push(
-        <Form.Item key={item.name} label={item.label} name={item.name} rules={item.rules}>
-          {item.type === 'input' ? (
-            <Input placeholder={item.placeholder} allowClear={true} />
-          ) : item.type === 'inputPassword' ? (
-            <Input.Password placeholder={item.placeholder} allowClear={true} />
-          ) : item.type === 'select' ? (
-            <Select mode={item.multiple ? 'multiple' : 'default'} options={item.data} showSearch={item.search} optionFilterProp="label" placeholder={item.placeholder} allowClear={true} />
-          ) : item.type === 'treeSelect' ? (
-            <TreeSelect multiple={item.multiple} placeholder={item.placeholder} treeData={item.data} showSearch={item.search} treeNodeFilterProp="label" allowClear={true} treeDefaultExpandAll />
-          ) : item.type === 'textarea' ? (
-            <Input.TextArea placeholder={item.placeholder} allowClear={true} />
-          ) : null}
-        </Form.Item>
-      );
-    });
-    return children;
-  };
 
   // 添加数据方法
   const addRecordHandle = async (data) => {

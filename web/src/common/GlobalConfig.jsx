@@ -10,6 +10,10 @@ const SYSTEM_USER_GENDER_MAP = [{ label: '男', value: 1 }, { label: '女', valu
 const FORM_ITEM_COMPONENT_MAP = {
   // 输入框
   input: (props) => <Input {...props} />, 
+  // 密码输入框
+  inputPassword: (props) => <Input.Password {...props} />,
+  // 文本域
+  textarea: (props) => <Input.TextArea {...props} />,
   // 树形选择框
   treeSelect: (props) => <TreeSelect {...props} treeDefaultExpandAll />, 
   // 下拉选择框
