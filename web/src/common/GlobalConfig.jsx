@@ -9,11 +9,11 @@ const SYSTEM_USER_GENDER_MAP = [{ label: '男', value: 1 }, { label: '女', valu
 // 组件映射
 const FORM_ITEM_COMPONENT_MAP = {
   // 输入框
-  input: (props) => <Input {...props} />, 
+  input: (props) => <Input {...props} autoComplete="off" />, 
   // 密码输入框
-  inputPassword: (props) => <Input.Password {...props} />,
+  inputPassword: (props) => <Input.Password {...props} autoComplete="off" />,
   // 文本域
-  textarea: (props) => <Input.TextArea {...props} />,
+  textarea: (props) => <Input.TextArea {...props} autoComplete="off" />,
   // 树形选择框
   treeSelect: (props) => <TreeSelect {...props} treeDefaultExpandAll />, 
   // 下拉选择框
