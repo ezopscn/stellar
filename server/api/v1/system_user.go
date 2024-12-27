@@ -161,9 +161,9 @@ func SystemUserAddHandler(ctx *gin.Context) {
 }
 
 // 批量添加用户接口
-func SystemUserMutiAddHandler(ctx *gin.Context) {
+func SystemUserMultiAddHandler(ctx *gin.Context) {
 	// 获取 post 参数
-	req := []dto.SystemUserMutiAddRequest{}
+	req := []dto.SystemUserMultiAddRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		response.FailedWithMessage(err.Error())
 		return
@@ -176,7 +176,7 @@ func SystemUserMutiAddHandler(ctx *gin.Context) {
 	}
 
 	// 创建任务
-	task := model.SystemUserMutiAddTask{
+	task := model.SystemUserMultiAddTask{
 		CreatorId: func() uint {
 			userId, _ := utils.ExtractStringResultFromContext(ctx, "userId")
 			return utils.StringToUint(userId)
@@ -192,7 +192,7 @@ func SystemUserMutiAddHandler(ctx *gin.Context) {
 	for idx, v := range req {
 		go func(i int) {
 			// 任务详情
-			taskDetail := model.SystemUserMutiAddDetail{
+			taskDetail := model.SystemUserMultiAddDetail{
 				TaskId:             task.Id,
 				Username:           *v.Username,
 				CNName:             *v.CNName,
@@ -336,9 +336,9 @@ func SystemUserMutiAddHandler(ctx *gin.Context) {
 				time.Sleep(10 * time.Second) // 避免还没有执行完成，就返回结果
 				var successCount, failCount int64
 				// 查询成功的数量
-				common.MySQLDB.Model(&model.SystemUserMutiAddDetail{}).Where("taskId = ?", task.Id).Where("status = ?", trans.Uint(2)).Count(&successCount)
+				common.MySQLDB.Model(&model.SystemUserMultiAddDetail{}).Where("taskId = ?", task.Id).Where("status = ?", trans.Uint(2)).Count(&successCount)
 				// 查询失败的数量
-				common.MySQLDB.Model(&model.SystemUserMutiAddDetail{}).Where("taskId = ?", task.Id).Where("status = ?", trans.Uint(3)).Count(&failCount)
+				common.MySQLDB.Model(&model.SystemUserMultiAddDetail{}).Where("taskId = ?", task.Id).Where("status = ?", trans.Uint(3)).Count(&failCount)
 				// 更新任务状态
 				common.MySQLDB.Model(&task).Where("id = ?", task.Id).Updates(map[string]interface{}{
 					"successNumber": uint(successCount),
@@ -353,9 +353,9 @@ func SystemUserMutiAddHandler(ctx *gin.Context) {
 }
 
 // 修改用户状态
-func SystemUserStatusModifyHandler(ctx *gin.Context) {
+func SystemUserModifyStatusHandler(ctx *gin.Context) {
 	// 获取 post 参数
-	req := dto.SystemUserStatusModifyRequest{}
+	req := dto.SystemUserModifyStatusRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		response.FailedWithMessage(err.Error())
 		return
@@ -363,7 +363,7 @@ func SystemUserStatusModifyHandler(ctx *gin.Context) {
 
 	// 单个修改
 	ids := []uint{req.Id}
-	if err := service.ModifySystemUserStatusService(ctx, ids, req.Operate); err != nil {
+	if err := service.SystemUserModifyStatusService(ctx, ids, req.Operate); err != nil {
 		response.FailedWithMessage("修改用户状态失败")
 		return
 	}
@@ -371,16 +371,16 @@ func SystemUserStatusModifyHandler(ctx *gin.Context) {
 }
 
 // 批量修改用户状态
-func SystemUserStatusMutiModifyHandler(ctx *gin.Context) {
+func SystemUserMultiModifyStatusHandler(ctx *gin.Context) {
 	// 获取 post 参数
-	req := dto.SystemUserStatusMutiModifyRequest{}
+	req := dto.SystemUserMultiModifyStatusRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		response.FailedWithMessage(err.Error())
 		return
 	}
 
 	// 批量修改
-	if err := service.ModifySystemUserStatusService(ctx, req.Ids, req.Operate); err != nil {
+	if err := service.SystemUserModifyStatusService(ctx, req.Ids, req.Operate); err != nil {
 		response.FailedWithMessage("修改用户状态失败")
 		return
 	}

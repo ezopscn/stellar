@@ -23,9 +23,9 @@ const Apis = {
       List: BackendURL + '/system/user/list', // 用户列表
       Info: BackendURL + '/system/user/detail', // 当前用户详情
       Add: BackendURL + '/system/user/add', // 添加用户
-      MutiAdd: BackendURL + '/system/user/muti-add', // 批量添加用户
-      StatusModify: BackendURL + '/system/user/status-modify', // 修改用户状态
-      StatusMutiModify: BackendURL + '/system/user/status-muti-modify', // 批量修改用户状态
+      MultiAdd: BackendURL + '/system/user/multi-add', // 批量添加用户
+      ModifyStatus: BackendURL + '/system/user/modify-status', // 修改用户状态
+      MultiModifyStatus: BackendURL + '/system/user/multi-modify-status', // 批量修改用户状态
       Update: BackendURL + '/system/user/update' // 修改用户信息
     },
     Menu: {

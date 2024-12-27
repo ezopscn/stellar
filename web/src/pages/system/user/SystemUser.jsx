@@ -26,209 +26,369 @@ import APIRequest from '@/common/APIRequest.jsx';
 import { SystemRoleStates } from '@/store/StoreSystemRole.jsx';
 import { useSnapshot } from 'valtio';
 import { BackendURL } from '@/common/APIConfig.jsx';
+import { SYSTEM_USER_STATUS_MAP, SYSTEM_USER_GENDER_MAP, FORM_ITEM_COMPONENT_MAP, TRUE_FALSE_MAP } from '@/common/GlobalConfig.jsx';
+
 const { Dragger } = Upload;
 
+// 页面常量设置
+const PageConfig = {
+  // 默认页码
+  defaultPageNumber: 1,
+  // 默认每页显示的数据量
+  defaultPageSize: 2,
+  // 默认数据总数
+  defaultTotal: 0,
+  // 默认是否需要分页
+  defaultIsPagination: true,
+  // 页面标题
+  pageTitle: '用户管理' + TitleSuffix,
+  // 页面关键词
+  pageKeyword: '用户',
+  // 默认搜索展开字段数量
+  defaultFilterExpandItemCount: 8,
+  // 表格数据接口地址
+  tableDataListAPI: Apis.System.User.List
+};
+
+// 生成性别图标
+const generateGenderIcon = (gender) => {
+  const genderIcons = {
+    1: <ManOutlined style={{ color: '#165dff' }} />,
+    2: <WomanOutlined style={{ color: '#ff4d4f' }} />,
+    default: <QuestionOutlined style={{ color: '#999999' }} />
+  };
+  return genderIcons[gender] || genderIcons.default;
+};
+
+// 生成角色标签
+const generateRoleTag = (name) => {
+  const roleColors = {
+    超级管理员: 'magenta',
+    管理员: 'volcano',
+    运维: 'green'
+  };
+  const color = roleColors[name] || '';
+  return <Tag bordered={false} color={color}>{name}</Tag>;
+};
+
+// 生成状态标签
+const generateStatusTag = (status) => {
+  const statusMap = {
+    1: { text: '启用', color: 'green' },
+    0: { text: '禁用', color: 'red' }
+  };
+  const { text, color } = statusMap[status] || {};
+  return <Tag bordered={false} color={color}>{text}</Tag>;
+};
+
+// 用户管理
 const SystemUser = () => {
-  const { message } = App.useApp(); // 消息提示
-  const [form] = Form.useForm(); // 表单
-  const [updateForm] = Form.useForm(); // 添加这行
-
-  // 页面信息
-  const title = '用户管理' + TitleSuffix; // 页面标题
-  const pageKeyword = '用户'; // 页面关键词
-
-  // 全局
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 全局配置
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 消息提示
+  const { message } = App.useApp();
+  // 修改表单
+  const [updateRecordForm] = Form.useForm();
+  // 全局数据，用于父子组件之间数据传递
   const { SystemRoleApis } = useSnapshot(SystemRoleStates);
 
-  /////////////////////////////////////////////////////
-  // 搜索栏
-  /////////////////////////////////////////////////////
-  const defaultExpandItemCount = 8; // 默认展开的搜索项数量
-  const [expand, setExpand] = useState(false); // 是否展开更多搜索
-
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 页面基础数据
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 下拉菜单的角色列表数据
+  const [systemRoleList, setSystemRoleList] = useState([]);
+  // 下拉菜单的岗位列表数据
+  const [systemJobPositionList, setSystemJobPositionList] = useState([]);
+  // 下拉菜单的部门列表数据
+  const [systemDepartmentList, setSystemDepartmentList] = useState([]);
+  
   // 页面加载的时候一次性获取依赖的异步数据
-  const [roleList, setRoleList] = useState([]); // 下拉菜单的角色列表数据
-  const [jobPositionList, setJobPositionList] = useState([]); // 下拉菜单的岗位列表数据
-  const [departmentList, setDepartmentList] = useState([]); // 下拉菜单的部门列表数据
   useEffect(() => {
-    APIRequest.GetSelectDataList(Apis.System.Role.List, setRoleList);
-    APIRequest.GetSelectDataList(Apis.System.JobPosition.List, setJobPositionList);
-    APIRequest.GetSelectDataList(Apis.System.Department.List, setDepartmentList, true);
+    // 获取角色列表
+    APIRequest.GetSelectDataList(Apis.System.Role.List, setSystemRoleList);
+    // 获取岗位列表
+    APIRequest.GetSelectDataList(Apis.System.JobPosition.List, setSystemJobPositionList);
+    // 获取部门列表（树形结构）
+    APIRequest.GetSelectDataList(Apis.System.Department.List, setSystemDepartmentList, true);
   }, []);
 
-  // 定义筛选列表和数据限制，支持类型：input、select、treeSelect
-  const filterFields = [
-    {
-      label: '用户名',
-      name: 'username',
-      placeholder: '使用用户名��行搜索',
-      type: 'input',
-      rules: [
-        {
-          message: '用户名长度不能超过30个字符',
-          max: 30
-        }
-      ]
-    },
-    {
-      label: '姓名',
-      name: 'name',
-      placeholder: '使用中文名或者英文名进行搜索',
-      type: 'input',
-      rules: [
-        {
-          message: '姓名长度不能超过30个字符',
-          max: 30
-        }
-      ]
-    },
-    {
-      label: '邮箱',
-      name: 'email',
-      placeholder: '使用邮箱地址进行搜索',
-      type: 'input',
-      rules: [
-        {
-          message: '邮箱长度不能超过30个字符',
-          max: 50
-        }
-      ]
-    },
-    {
-      label: '手机号',
-      name: 'phone',
-      placeholder: '使用手机号码进行搜索',
-      type: 'input',
-      rules: [
-        {
-          message: '手机号长度不能超过15个字符',
-          max: 15
-        }
-      ]
-    },
-    {
-      label: '状态',
-      name: 'status',
-      placeholder: '选择用户状态进行搜索',
-      type: 'select',
-      search: false,
-      tree: false,
-      multiple: false,
-      data: [
-        {
-          label: '启用',
-          value: 1
-        },
-        {
-          label: '禁用',
-          value: 0
-        }
-      ],
-      rules: []
-    },
-    {
-      label: '性别',
-      name: 'gender',
-      placeholder: '选择性别进行搜索',
-      type: 'select',
-      search: false,
-      tree: false,
-      multiple: false,
-      data: [
-        {
-          label: '男',
-          value: 1
-        },
-        {
-          label: '女',
-          value: 2
-        },
-        {
-          label: '未知',
-          value: 3
-        }
-      ],
-      rules: []
-    },
-    {
-      label: '部门',
-      name: 'department',
-      placeholder: '选择部门进行搜索',
-      type: 'treeSelect',
-      search: true,
-      tree: true,
-      multiple: false,
-      data: departmentList,
-      rules: []
-    },
-    {
-      label: '岗位',
-      name: 'jobPosition',
-      placeholder: '选择岗位进行搜索',
-      type: 'select',
-      search: true,
-      tree: false,
-      multiple: false,
-      data: jobPositionList,
-      rules: []
-    },
-    {
-      label: '角色',
-      name: 'role',
-      placeholder: '选择角色进行搜索',
-      type: 'select',
-      search: true,
-      tree: false,
-      multiple: false,
-      data: roleList,
-      rules: []
-    }
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 状态：请求和筛选列表
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 数据列表 
+  const [tableDataList, setTableDataList] = useState([]); 
+  // 每页显示的数据条数
+  const [pageSize, setPageSize] = useState(PageConfig.defaultPageSize); 
+  // 当前页码
+  const [pageNumber, setPageNumber] = useState(PageConfig.defaultPageNumber); 
+  // 数据总数
+  const [total, setTotal] = useState(PageConfig.defaultTotal); 
+  // 条件搜索参数
+  const [filterRecordParams, setFilterRecordParams] = useState({}); 
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 状态：添加数据
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 添加数据弹窗
+  const [addRecordModalVisible, setAddRecordModalVisible] = useState(false);
+  // 批量添加数据弹窗
+  const [multiAddRecordModalVisible, setMultiAddRecordModalVisible] = useState(false);
+  // 批量添加历史记录弹窗
+  const [multiAddRecordHistoryModalVisible, setMultiAddRecordHistoryModalVisible] = useState(false);
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 按钮权限控制
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 添加按钮权限控制
+  const addRecordButtonDisabled = !SystemRoleApis.list?.includes(Apis.System.User.Add.replace(BackendURL, ''));
+  // 修改按钮权限控制
+  const updateRecordButtonDisabled = !SystemRoleApis.list?.includes(Apis.System.User.Update.replace(BackendURL, ''));
+  // 状态修改按钮权限控制
+  const modifyRecordStatusButtonDisabled = !SystemRoleApis.list?.includes(Apis.System.User.ModifyStatus.replace(BackendURL, ''));
+  // 批量添加按钮权限控制
+  const multiAddRecordButtonDisabled = !SystemRoleApis.list?.includes(Apis.System.User.MultiAdd.replace(BackendURL, ''));
+  // 批量状态修改按钮权限控制
+  const multiModifyRecordStatusButtonDisabled = !SystemRoleApis.list?.includes(Apis.System.User.MultiModifyStatus.replace(BackendURL, ''));
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 默认表格数据列表和数据搜索
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 搜索表单
+  const [filterRecordForm] = Form.useForm();
+  
+  // 是否展开更多搜索
+  const [expandFilterRecordItems, setExpandFilterRecordItems] = useState(false);
+
+  // 用户操作按钮组
+  const actionButtonGroup = (record) => {
+    return (
+      <>
+        <Button color="primary" variant="link" icon={<EditOutlined />} 
+          disabled={updateRecordButtonDisabled} 
+          onClick={() => {
+            setUpdateModalVisible(true);
+            setUpdateRecord(record);
+          }}>编辑</Button>
+        {record.status === 1 ? ( // 系统内置超级管理员账户不允许禁用
+          <Popconfirm placement="topRight" title="确定要禁用该用户吗？" okText="确定" cancelText="取消" 
+            okButtonProps={{ style: { backgroundColor: '#ff4d4f', borderColor: '#ff4d4f' } }}
+            onConfirm={() => modifyStatusHandle(record.id, 'disable')}>
+            <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={modifyRecordStatusButtonDisabled || record.id === 1}>禁用</Button>
+          </Popconfirm>
+        ) : (
+          <Popconfirm placement="topRight" title="确定要启用该用户吗？" okText="确定" cancelText="取消"
+            okButtonProps={{ style: { backgroundColor: '#52c41a', borderColor: '#52c41a' } }} 
+            onConfirm={() => { modifyStatusHandle(record.id, 'enable'); }}>
+            <Button color="success" variant="link" icon={<RestOutlined />} disabled={modifyRecordStatusButtonDisabled}>启用</Button>
+          </Popconfirm>
+        )}
+      </>
+    );
+  };
+
+  // 表格列定义，字段说明：
+  // title：列标题
+  // dataIndex：数据列对应的 JSON 字段
+  // minWidth：最小宽度
+  // render：渲染函数，用于自定义列的显示内容
+  const tableColumns = [
+    { title: '头像', dataIndex: 'avatar', render: (avatar) => <Avatar src={avatar} /> },
+    { title: '中文名', dataIndex: 'cnName', minWidth: 80 },
+    { title: '英文名', dataIndex: 'enName', minWidth: 80 },
+    { title: '性别', dataIndex: 'gender', minWidth: 50, render: (gender) => generateGenderIcon(gender) },
+    { title: '用户名', dataIndex: 'username', minWidth: 80 },
+    { title: '邮箱', dataIndex: 'email' },
+    { title: '手机号', dataIndex: 'phone' },
+    { title: '部门', dataIndex: 'systemDepartments', minWidth: 100, render: (systemDepartments) => systemDepartments?.map((department) => department.name).join(',') },
+    { title: '岗位', dataIndex: 'systemJobPositions', minWidth: 120, render: (systemJobPositions) => systemJobPositions?.map((jobPosition) => jobPosition.name).join(',') },
+    { title: '角色名称', dataIndex: ['systemRole', 'name'], render: (name) => generateRoleTag(name) },
+    { title: '状态', dataIndex: 'status', render: (status) => generateStatusTag(status) },
+    { title: '创建时间', dataIndex: 'createdAt' },
+    { title: '操作', key: 'action', fixed: 'right', render: (_, record) => actionButtonGroup(record) }
   ];
 
-  // 获取搜索栏字段
-  const getFilterFields = () => {
-    const children = []; // 子元素
-
-    // 生成搜索表单
-    filterFields.slice(0, expand ? filterFields.length : defaultExpandItemCount).forEach((item, index) => {
-      children.push(
+  // 定义筛选列表和数据限制，以下是字段说明：
+  // label：页面显示名称
+  // name：表单字段名称
+  // placeholder：字段输入提示
+  // type：字段类型，支持 input、select、treeSelect
+  // rules：字段验证规则
+  // search：是否允许搜索
+  // tree：是否展示树形结构
+  // multiple：是否允许多选
+  // data：数据列表
+  const filterRecordFields = [
+    { label: '用户名', name: 'username', placeholder: '使用用户名进行搜索', type: 'input', rules: [{ message: '用户名长度不能超过30个字符', max: 30 }] },
+    { label: '姓名', name: 'name', placeholder: '使用中文名或者英文名进行搜索', type: 'input', rules: [{ message: '姓名长度不能超过30个字符', max: 30 }] },
+    { label: '邮箱', name: 'email', placeholder: '使用邮箱地址进行搜索', type: 'input', rules: [{ message: '邮箱长度不能超过30个字符', max: 30 }] },
+    { label: '手机号', name: 'phone', placeholder: '使用手机号码进行搜索', type: 'input', rules: [{ message: '手机号长度不能超过15个字符', max: 15 }] },
+    { label: '状态', name: 'status', placeholder: '选择用户状态进行搜索', type: 'select', search: false, tree: false, multiple: false, data: SYSTEM_USER_STATUS_MAP, rules: [] },
+    { label: '性别', name: 'gender', placeholder: '选择性别进行搜索', type: 'select', search: false, tree: false, multiple: false, data: SYSTEM_USER_GENDER_MAP, rules: [] },
+    { label: '部门', name: 'systemDepartment', placeholder: '选择部门进行搜索', type: 'treeSelect', search: true, tree: true, multiple: false, data: systemDepartmentList, rules: [] },
+    { label: '岗位', name: 'systemJobPosition', placeholder: '选择岗位进行搜索', type: 'select', search: true, tree: false, multiple: false, data: systemJobPositionList, rules: [] },
+    { label: '角色', name: 'systemRole', placeholder: '选择角色进行搜索', type: 'select', search: true, tree: false, multiple: false, data: systemRoleList, rules: [] }
+  ];
+  
+  // 生成搜索栏表单项
+  const generateFilterRecordFormItems = () => {
+    return filterRecordFields.slice(0, expandFilterRecordItems ? filterRecordFields.length : PageConfig.defaultFilterExpandItemCount).map((item) => {
+      const commonProps = {
+        allowClear: true,
+        placeholder: item.placeholder
+      };
+      const componentProps = {
+        input: {},
+        treeSelect: {
+          treeData: item.data,
+          showSearch: item.search,
+          treeNodeFilterProp: 'label',
+          multiple: item.multiple
+        },
+        select: {
+          options: item.data,
+          showSearch: item.search,
+          optionFilterProp: 'label',
+          mode: item.multiple ? 'multiple' : 'default'
+        }
+      };
+      return (
         <Col span={6} key={item.label}>
           <Form.Item name={item.name} label={item.label} rules={item.rules}>
-            {item.type === 'input' ? (
-              <Input placeholder={item.placeholder} allowClear={true} />
-            ) : item.type === 'treeSelect' ? (
-              <TreeSelect multiple={item.multiple} placeholder={item.placeholder} treeData={item.data} showSearch={item.search} treeNodeFilterProp="label" allowClear={true} treeDefaultExpandAll />
-            ) : item.type === 'select' ? (
-              <Select mode={item.multiple ? 'multiple' : 'default'} placeholder={item.placeholder} options={item.data} showSearch={item.search} optionFilterProp="label" allowClear={true} />
-            ) : null}
+            {FORM_ITEM_COMPONENT_MAP[item.type]?.({
+              ...commonProps,
+              ...componentProps[item.type]
+            })}
           </Form.Item>
         </Col>
       );
     });
-    return children;
+  };
+  
+  // 条件搜索请求封装，默认请求其实也属于搜索的一种类型
+  const filterRecordListRequest = async (params) => {
+    try {
+      const res = await AxiosGet(PageConfig.tableDataListAPI, params);
+      if (res?.code === 200) {
+        setTableDataList(res?.data?.list);
+        setPageSize(res?.data?.pagination?.pageSize);
+        setPageNumber(res?.data?.pagination?.pageNumber);
+        setTotal(res?.data?.pagination?.total);
+      } else {
+        message.error(res?.message);
+      }
+    } catch (error) {
+      message.error('后端服务异常，获取表格数据列表失败');
+      console.log(error);
+    }
   };
 
-  /////////////////////////////////////////////////////
-  // 表格数据
-  /////////////////////////////////////////////////////
-  // 默认设置
-  const tableDataListAPI = Apis.System.User.List; // 数据列表接口
-  const defaultPageSize = 2; // 默认每页显示的数据量
-  const defaultPageNumber = 1; // 默认页码
-  const defaultTotal = 0; // 默认数据总数
-  const isPagination = true; // 是否需要分页
+  // 手动搜索方法，需要先初始化页码，避免在搜索结果溢出搜索数据的页码的时候，导致请求参数中带了页码，无法请求到数据
+  // 比如在第三页的时候搜索，但是结果只有两页，则会因为页码问题，显示没有数据
+  const filterRecordListHandle = (params) => {
+    setPageNumber(PageConfig.defaultPageNumber);
+    setPageSize(PageConfig.defaultPageSize);
+    setTotal(PageConfig.defaultTotal);
+    setFilterRecordParams(params);
+  };
 
-  // 修改用户状态
+  // 刷新当前页面数据，而不是刷新整个页面
+  const refreshCurrentPage = () => {
+    const params = { ...filterRecordParams, pageSize, pageNumber, isPagination };
+    filterRecordListRequest(params);
+  };
+
+  // 监听展示条件变化，然后请求数据
+  useEffect(() => {
+    const params = { ...filterRecordParams, pageSize, pageNumber, isPagination };
+    filterRecordListRequest(params);
+  }, [pageSize, pageNumber, filterRecordParams]);
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 添加数据
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 添加表单
+  const [addRecordForm] = Form.useForm();
+
+  // 表单基础字段
+  const recordFormBasicFields = [
+    { label: '用户名', name: 'username', placeholder: '请输入用户名', type: 'input', rules: [
+      {required: true,message: '用户名不能为空'},
+      {pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,message: '用户名只能以字母开头，且只能包含字母、数字和下划线'},
+      {max: 30,message: '用户名长度不能超过30个字符'},
+      {min: 3,message: '用户名长度不能小于3个字符'}
+    ]},
+    { label: '中文名', name: 'cnName', placeholder: '请输入中文名', type: 'input', rules: [
+      {required: true,message: '中文名不能为空'},
+      {max: 30,message: '中文名长度不能超过30个字符'},
+      {min: 2,message: '中文名长度不能小于2个字符'},
+      {pattern: /^[\u4E00-\u9FA5]+$/,message: '中文名只能包含中文'}
+    ]},
+    { label: '英文名', name: 'enName', placeholder: '请输入英文名', type: 'input', rules: [
+      {required: true,message: '英文名不能为空'},
+      {pattern: /^[a-zA-Z]+$/,message: '英文名只能包含字母'},
+      {max: 30,message: '英文名长度不能超过30个字符'},
+      {min: 2,message: '英文名长度不能小于2个字符'}
+    ]},
+    { label: '邮箱', name: 'email', placeholder: '请输入邮箱', type: 'input', rules: [
+      {required: true,message: '邮箱不能为空'},
+      {type: 'email',message: '邮箱格式不正确'}
+    ]},
+    { label: '手机号', name: 'phone', placeholder: '请输入手机号', type: 'input', rules: [
+      {required: true,message: '手机号不能为空'},
+      {pattern: /^1[3-9]\d{9}$/,message: '手机号格式不正确'}
+    ]},
+    { label: '隐藏手机号', name: 'hidePhone', type: 'select', search: false, tree: false, multiple: false, data: TRUE_FALSE_MAP, rules: [
+      { required: true, message: '隐藏手机号不能为空' }
+    ]},
+    { label: '性别', name: 'gender', type: 'select', search: false, tree: false, multiple: false, data: SYSTEM_USER_GENDER_MAP, rules: [
+      { required: true, message: '性别不能为空' }
+    ]},
+    { label: '部门', name: 'systemDepartments', type: 'treeSelect', search: true, tree: true, multiple: true, data: systemDepartmentList, rules: [
+      { required: true, message: '部门不能为空' }
+    ]},
+    { label: '岗位', name: 'systemJobPositions', type: 'select', search: true, tree: false, multiple: true, data: systemJobPositionList, rules: [
+      { required: true, message: '岗位不能为空' }
+    ]},
+    { label: '角色', name: 'systemRole', type: 'select', search: true, tree: false, multiple: false, data: systemRoleList, rules: [
+      { required: true, message: '角色不能为空' }
+    ]},
+    { label: '个人介绍', name: 'description', placeholder: '请输入个人介绍', type: 'textarea' }
+  ];
+
+  // 定义添加数据的字段，字段说明：
+  // label：页面显示名称
+  // name：表单字段名称
+  // placeholder：字段输入提示
+  // type：字段类型，支持 input、inputPassword、select、treeSelect、textarea
+  // rules：字段验证规则
+  // tree：是否展示树形结构
+  // multiple：是否允许多选
+  // data：选择数据列表
+  const addRecordFields = [
+    // 将密码字段往前放
+    ...recordFormBasicFields.slice(0, 1),
+    { label: '密码', name: 'password', placeholder: '请输入密码', type: 'inputPassword', rules: [
+      {required: true,message: '密码不能为空'},
+      {max: 30,message: '密码长度不能超过30个字符'},
+      {min: 8,message: '密码长度不能小于8个字符'},
+      {pattern: /^[A-Za-z0-9@$!%*?&]+$/,message: '密码只能包含大小写字母、数字和特殊字符（@$!%*?&）'}
+    ]},
+    ...recordFormBasicFields.slice(1),
+  ];
+
+
+
+
+
+
+  // 修改用户状态的方法
   const modifyStatusHandle = async (recordId, operate) => {
     try {
       const res = await AxiosPost(Apis.System.User.StatusModify, { id: recordId, operate: operate });
       if (res.code === 200) {
         message.success('操作成功');
-        if (pageNumber > 1) {
-          setPageNumber(pageNumber - 1);
-        } else {
-          window.location.reload();
-        }
+        refreshCurrentPage(); // 直接刷新当前页面
       } else {
         message.error(res.message);
       }
@@ -238,434 +398,12 @@ const SystemUser = () => {
     }
   };
 
-  // 表格：列
-  const tableColumns = [
-    {
-      title: '头像',
-      dataIndex: 'avatar',
-      render: (avatar) => <Avatar src={avatar} />
-    },
-    {
-      title: '中文名',
-      dataIndex: 'cnName',
-      minWidth: 80
-    },
-    {
-      title: '英文名',
-      dataIndex: 'enName',
-      minWidth: 80
-    },
-    {
-      title: '性别',
-      dataIndex: 'gender',
-      minWidth: 50,
-      render: (gender) => {
-        const genderIcons = {
-          1: <ManOutlined style={{ color: '#165dff' }} />,
-          2: <WomanOutlined style={{ color: '#ff4d4f' }} />,
-          default: <QuestionOutlined style={{ color: '#999999' }} />
-        };
-        return genderIcons[gender] || genderIcons.default;
-      }
-    },
-    {
-      title: '用户名',
-      dataIndex: 'username',
-      minWidth: 80
-    },
-    {
-      title: '邮箱',
-      dataIndex: 'email'
-    },
-    {
-      title: '手机号',
-      dataIndex: 'phone'
-    },
-    {
-      title: '部门',
-      dataIndex: 'systemDepartments',
-      minWidth: 100,
-      render: (systemDepartments) => {
-        return systemDepartments?.map((department) => department.name).join(',');
-      }
-    },
-    {
-      title: '岗位',
-      dataIndex: 'systemJobPositions',
-      minWidth: 120,
-      render: (systemJobPositions) => {
-        return systemJobPositions?.map((jobPosition) => jobPosition.name).join(',');
-      }
-    },
-    {
-      title: '角色名称',
-      dataIndex: ['systemRole', 'name'],
-      render: (name) => {
-        const roleColors = {
-          超级管理员: 'magenta',
-          管理员: 'volcano',
-          运维: 'green'
-        };
-        const color = roleColors[name] || '';
-        return (
-          <Tag bordered={false} color={color}>
-            {name}
-          </Tag>
-        );
-      }
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      render: (status) => {
-        const statusMap = {
-          1: { text: '启用', color: 'green' },
-          0: { text: '禁用', color: 'red' }
-        };
-        const { text, color } = statusMap[status] || {};
-        return (
-          <Tag bordered={false} color={color}>
-            {text}
-          </Tag>
-        );
-      }
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createdAt'
-    },
-    {
-      title: '操作',
-      key: 'action',
-      fixed: 'right',
-      render: (_, record) => (
-        <>
-          <Button
-            color="primary"
-            variant="link"
-            icon={<EditOutlined />}
-            disabled={!SystemRoleApis.list?.includes(Apis.System.User.Update.replace(BackendURL, ''))}
-            onClick={() => {
-              setUpdateModalVisible(true);
-              setUpdateRecord(record);
-            }}
-          >
-            编辑
-          </Button>
-          {record.status === 1 ? (
-            // 系统内置超级管理员账户不允许禁用
-            <Popconfirm
-              placement="topRight"
-              title="确定要禁用该用户吗？"
-              // description="禁用后该用户将无法登录系统"
-              okText="确定"
-              okButtonProps={{
-                style: {
-                  backgroundColor: '#ff4d4f',
-                  borderColor: '#ff4d4f'
-                }
-              }}
-              cancelText="取消"
-              onConfirm={() => {
-                modifyStatusHandle(record.id, 'disable');
-              }}
-            >
-              <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, '')) || record.id === 1}>
-                禁用
-              </Button>
-            </Popconfirm>
-          ) : (
-            <Popconfirm
-              placement="topRight"
-              title="确定要启用该用户吗？"
-              okText="确定"
-              okButtonProps={{
-                style: {
-                  backgroundColor: '#52c41a',
-                  borderColor: '#52c41a'
-                }
-              }}
-              cancelText="取消"
-              onConfirm={() => {
-                modifyStatusHandle(record.id, 'enable');
-              }}
-            >
-              <Button color="success" variant="link" icon={<RestOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, ''))}>
-                启用
-              </Button>
-            </Popconfirm>
-          )}
-        </>
-      )
-    }
-  ];
-
-  // 状态数据
-  const [tableDataList, setTableDataList] = useState([]); // 数据列表
-  const [pageSize, setPageSize] = useState(defaultPageSize); // 每页显示的条数
-  const [pageNumber, setPageNumber] = useState(defaultPageNumber); // 当前页码
-  const [total, setTotal] = useState(defaultTotal); // 数据总数
-  const [filterParams, setFilterParams] = useState({}); // 条件搜索
-
-  // 默认列表加载和监听所有页码变化事件（包括搜索）
-  useEffect(() => {
-    const params = { ...filterParams, pageSize, pageNumber, isPagination };
-    filterDataList(params);
-  }, [pageSize, pageNumber, filterParams]);
-
-  // 条件搜索方法
-  const filterDataListHandle = (data) => {
-    // 初始化页码，避免在搜索结果溢出搜索数据的页码的时候，导致请求参数中带了页码，无法请求到数据
-    setPageNumber(defaultPageNumber);
-    setPageSize(defaultPageSize);
-    setTotal(defaultTotal);
-    setFilterParams(data);
-  };
-
-  // 条件搜索
-  const filterDataList = async (params) => {
-    try {
-      const res = await AxiosGet(tableDataListAPI, params);
-      if (res.code === 200) {
-        setTableDataList(res.data.list);
-        setPageSize(res.data.pagination.pageSize);
-        setPageNumber(res.data.pagination.pageNumber);
-        setTotal(res.data.pagination.total);
-      } else {
-        message.error(res.message);
-      }
-    } catch (error) {
-      console.error('后端服务异常，获取表格数据列表失败');
-      message.error(error);
-    }
-  };
-
   /////////////////////////////////////////////////////
   // 添加弹窗
   /////////////////////////////////////////////////////
-  const [addModalVisible, setAddModalVisible] = useState(false);
-  const [multiAddModalVisible, setMultiAddModalVisible] = useState(false);
-  const [mutiAddHistoryVisible, setMutiAddHistoryVisible] = useState(false);
 
-  // 定义添加数据的字段
-  const addRecordFields = [
-    {
-      label: '用���名',
-      name: 'username',
-      placeholder: '请输入用户名',
-      type: 'input',
-      rules: [
-        {
-          required: true,
-          message: '用户名不能为空'
-        },
-        {
-          pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,
-          message: '用户名只能以字母开头，且只能包含字母、数字和下划线'
-        },
-        {
-          max: 30,
-          message: '用户名长度不能超过30个字符'
-        },
-        {
-          min: 3,
-          message: '用户名长度不能小于3个字符'
-        }
-      ]
-    },
-    {
-      label: '密码',
-      name: 'password',
-      placeholder: '请输入密码',
-      type: 'inputPassword',
-      rules: [
-        {
-          required: true,
-          message: '密码不能为空'
-        },
-        {
-          max: 30,
-          message: '密码长度不能超过30个字符'
-        },
-        {
-          min: 8,
-          message: '密码长度不能小于8个字符'
-        },
-        {
-          pattern: /^[A-Za-z0-9@$!%*?&]+$/,
-          message: '密码只能包含大小写字母、数字和特殊字符（@$!%*?&）'
-        }
-      ]
-    },
-    {
-      label: '中文名',
-      name: 'cnName',
-      placeholder: '请输入中文名',
-      type: 'input',
-      rules: [
-        {
-          required: true,
-          message: '中文名不能为空'
-        },
-        {
-          max: 30,
-          message: '中文名长度不能超过30个字符'
-        },
-        {
-          min: 2,
-          message: '中文名长度不能小于2个字符'
-        },
-        {
-          pattern: /^[\u4E00-\u9FA5]+$/,
-          message: '中文名只能包含中文'
-        }
-      ]
-    },
-    {
-      label: '英文名',
-      name: 'enName',
-      placeholder: '请输入英文名',
-      type: 'input',
-      rules: [
-        {
-          required: true,
-          message: '英文名不能为空'
-        },
-        {
-          pattern: /^[a-zA-Z]+$/,
-          message: '英文名只能包含字母'
-        },
-        {
-          max: 30,
-          message: '英文名长度不能超过30个字符'
-        },
-        {
-          min: 2,
-          message: '英文名长度不能小于2个字符'
-        }
-      ]
-    },
-    {
-      label: '邮箱',
-      name: 'email',
-      placeholder: '请输入邮箱',
-      type: 'input',
-      rules: [
-        {
-          required: true,
-          message: '邮箱不能为空'
-        },
-        {
-          type: 'email',
-          message: '邮箱格式不正确'
-        }
-      ]
-    },
-    {
-      label: '手机号',
-      name: 'phone',
-      placeholder: '请输入手机号',
-      type: 'input',
-      rules: [
-        {
-          required: true,
-          message: '手机号不能为空'
-        },
-        {
-          pattern: /^1[3-9]\d{9}$/,
-          message: '手机号格式不正确'
-        }
-      ]
-    },
-    {
-      label: '隐藏手机号',
-      name: 'hidePhone',
-      type: 'select',
-      search: false,
-      tree: false,
-      multiple: false,
-      data: [
-        { label: '是', value: 1 },
-        { label: '否', value: 0 }
-      ],
-      rules: [
-        {
-          required: true,
-          message: '隐藏手机号不能为空'
-        }
-      ]
-    },
-    {
-      label: '性别',
-      name: 'gender',
-      type: 'select',
-      search: false,
-      tree: false,
-      multiple: false,
-      data: [
-        { label: '男', value: 1 },
-        { label: '女', value: 2 },
-        { label: '未知', value: 3 }
-      ],
-      rules: [
-        {
-          required: true,
-          message: '性别不能为空'
-        }
-      ]
-    },
-    {
-      label: '部门',
-      name: 'systemDepartments',
-      type: 'treeSelect',
-      search: true,
-      tree: true,
-      multiple: true,
-      data: departmentList,
-      rules: [
-        {
-          required: true,
-          message: '部门不能为空'
-        }
-      ]
-    },
-    {
-      label: '岗位',
-      name: 'systemJobPositions',
-      type: 'select',
-      search: true,
-      tree: false,
-      multiple: true,
-      data: jobPositionList,
-      rules: [
-        {
-          required: true,
-          message: '岗位不能为空'
-        }
-      ]
-    },
-    {
-      label: '角色',
-      name: 'systemRole',
-      type: 'select',
-      search: true,
-      tree: false,
-      multiple: false,
-      data: roleList,
-      rules: [
-        {
-          required: true,
-          message: '角色不能为空'
-        }
-      ]
-    },
-    {
-      label: '个人介绍',
-      name: 'description',
-      placeholder: '请输入个人介绍',
-      type: 'textarea'
-    }
-  ];
+
+
 
   // 获取添加数据字段
   const getAddRecordFields = () => {
@@ -696,11 +434,7 @@ const SystemUser = () => {
       const res = await AxiosPost(Apis.System.User.Add, data);
       if (res.code === 200) {
         message.success('用户添加成功');
-        if (pageNumber > 1) {
-          setPageNumber(pageNumber - 1); // 返回上一页，则相当于刷新页面
-        } else {
-          window.location.reload();
-        }
+        refreshCurrentPage(); // 直接刷新当前页面
       } else {
         message.error(res.message);
       }
@@ -1020,7 +754,7 @@ const SystemUser = () => {
       search: true,
       tree: true,
       multiple: true,
-      data: departmentList,
+      data: systemDepartmentList,
       // 遍历数据，获取 Id 列表
       value: updateRecord?.systemDepartments?.map((item) => item.id),
       rules: [
@@ -1037,7 +771,7 @@ const SystemUser = () => {
       search: true,
       tree: false,
       multiple: true,
-      data: jobPositionList,
+      data: systemJobPositionList,
       // 遍历数据，获取 Id 列表
       value: updateRecord?.systemJobPositions?.map((item) => item.id),
       rules: [
@@ -1054,7 +788,7 @@ const SystemUser = () => {
       search: true,
       tree: false,
       multiple: false,
-      data: roleList,
+      data: systemRoleList,
       // 遍历数据，获取 Id 列表
       value: updateRecord?.systemRole?.id,
       rules: [
@@ -1119,11 +853,7 @@ const SystemUser = () => {
       const res = await AxiosPost(Apis.System.User.Edit, data);
       if (res.code === 200) {
         message.success('用户编辑成功');
-        if (pageNumber > 1) {
-          setPageNumber(pageNumber - 1); // 返回上一页，则相当于刷新页面
-        } else {
-          window.location.reload();
-        }
+        refreshCurrentPage(); // 直接刷新当前页面
       } else {
         message.error(res.message);
       }
@@ -1196,11 +926,7 @@ const SystemUser = () => {
             if (res.code === 200) {
               message.success('批量操作成功');
               setMutiOperateKey([]);
-              if (pageNumber > 1) {
-                setPageNumber(pageNumber - 1); // 返回上一页，则相当于刷新页面
-              } else {
-                window.location.reload();
-              }
+              refreshCurrentPage(); // 直接刷新当前页面
             } else {
               message.error(res.message);
             }
@@ -1217,8 +943,8 @@ const SystemUser = () => {
     <>
       {/* 页面 header */}
       <Helmet>
-        <title>{title}</title>
-        <meta name="description" content={title} />
+        <title>{PageConfig.pageTitle}</title>
+        <meta name="description" content={PageConfig.pageDesc} />
       </Helmet>
       {/* 页面头部介绍 */}
       <div className="admin-page-header">
@@ -1236,9 +962,9 @@ const SystemUser = () => {
       <div className="admin-page-main">
         {/* 搜索栏 */}
         <div className="admin-page-search">
-          <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="filterForm" onFinish={filterDataListHandle} autoComplete="off">
+          <Form form={filterRecordForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="filterRecordForm" onFinish={filterDataListHandle} autoComplete="off">
             <Row gutter={24}>
-              {getFilterFields()}
+              {generateFilterRecordFormItems()}
               <Col span={24} key="x" style={{ marginTop: '10px', textAlign: 'right' }}>
                 <Space>
                   <Button icon={<SearchOutlined />} htmlType="submit">
@@ -1247,9 +973,9 @@ const SystemUser = () => {
                   <Button icon={<ClearOutlined />} onClick={() => form.resetFields()}>
                     清理条件
                   </Button>
-                  {filterFields.length > defaultExpandItemCount && (
-                    <a onClick={() => setExpand(!expand)}>
-                      <DownOutlined rotate={expand ? 180 : 0} /> {expand ? '收起条件' : '展开更多'}
+                  {filterRecordFields.length > PageConfig.defaultFilterExpandItemCount && (
+                    <a onClick={() => setExpandFilterRecordItems(!expandFilterRecordItems)}>
+                      <DownOutlined rotate={expandFilterRecordItems ? 180 : 0} /> {expandFilterRecordItems ? '收起条件' : '展开更多'}
                     </a>
                   )}
                 </Space>
@@ -1261,13 +987,13 @@ const SystemUser = () => {
         <div className="admin-page-list">
           <div className="admin-page-btn-group">
             <Space>
-              <Button type="primary" icon={<UserAddOutlined />} onClick={() => setAddModalVisible(true)} disabled={!SystemRoleApis.list?.includes(Apis.System.User.Add.replace(BackendURL, ''))}>
-                添加{pageKeyword}
+              <Button type="primary" icon={<UserAddOutlined />} onClick={() => setAddModalVisible(true)} disabled={addRecordButtonDisabled}>
+                添加{PageConfig.pageKeyword}
               </Button>
-              <Button icon={<UploadOutlined />} onClick={() => setMultiAddModalVisible(true)} disabled={!SystemRoleApis.list?.includes(Apis.System.User.MutiAdd.replace(BackendURL, ''))}>
+              <Button icon={<UploadOutlined />} onClick={() => setMultiAddModalVisible(true)} disabled={multiAddRecordButtonDisabled}>
                 批量导入
               </Button>
-              <Dropdown menu={mutiOperateMenuProps} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusMutiModify.replace(BackendURL, ''))}>
+              <Dropdown menu={mutiOperateMenuProps} disabled={multiModifyRecordStatusButtonDisabled}>
                 <Button>
                   <Space>
                     <DownOutlined />
@@ -1355,12 +1081,12 @@ const SystemUser = () => {
       </div>
 
       {/* 用户添加弹窗 */}
-      <Modal title={'添加' + pageKeyword} open={addModalVisible} onOk={addRecordHandle} onCancel={() => setAddModalVisible(false)} width={400} maskClosable={false} footer={null}>
-        <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="addRecordForm" onFinish={addRecordHandle} autoComplete="off">
+      <Modal title={'添加' + PageConfig.pageKeyword} open={addModalVisible} onOk={addRecordHandle} onCancel={() => setAddModalVisible(false)} width={400} maskClosable={false} footer={null}>
+        <Form form={addRecordForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="addRecordForm" onFinish={addRecordHandle} autoComplete="off">
           {getAddRecordFields()}
           <Form.Item wrapperCol={{ span: 24 }}>
             <Button type="primary" htmlType="submit" block>
-              添加{pageKeyword}
+              添加{PageConfig.pageKeyword}
             </Button>
           </Form.Item>
         </Form>
@@ -1368,17 +1094,17 @@ const SystemUser = () => {
 
       {/* 用户编辑弹窗 */}
       <Modal
-        title={'编辑' + pageKeyword}
+        title={'编辑' + PageConfig.pageKeyword}
         open={updateModalVisible}
         onCancel={() => {
           setUpdateModalVisible(false);
-          updateForm.resetFields(); // 关闭时重置表单，避免数据不更新
+          updateRecordForm.resetFields(); // 关闭时重置表单，避免数据不更新
         }}
         width={400}
         maskClosable={false}
         footer={null}
       >
-        <Form form={updateForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="updateRecordForm" onFinish={updateRecordHandle} autoComplete="off">
+        <Form form={updateRecordForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="updateRecordForm" onFinish={updateRecordHandle} autoComplete="off">
           {getUpdateRecordFields()}
           <Form.Item wrapperCol={{ span: 24 }}>
             <Button type="primary" htmlType="submit" block>
@@ -1390,7 +1116,7 @@ const SystemUser = () => {
 
       {/* 批量导入弹窗 */}
       <Modal
-        title={'批量导入' + pageKeyword}
+        title={'批量导入' + PageConfig.pageKeyword}
         open={multiAddModalVisible}
         onCancel={() => {
           setMultiAddModalVisible(false);

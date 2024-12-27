@@ -33,7 +33,7 @@ type SystemUserAddRequest struct {
 }
 
 // 批量添加用户请求
-type SystemUserMutiAddRequest struct {
+type SystemUserMultiAddRequest struct {
 	Username           *string `form:"username" json:"username"`
 	Password           *string `form:"password" json:"password"`
 	CNName             *string `form:"cnName" json:"cnName"`
@@ -49,13 +49,13 @@ type SystemUserMutiAddRequest struct {
 }
 
 // 修改用户状态请求
-type SystemUserStatusModifyRequest struct {
+type SystemUserModifyStatusRequest struct {
 	Id      uint   `form:"id" json:"id"`
 	Operate string `form:"operate" json:"operate"`
 }
 
 // 批量修改用户状态请求
-type SystemUserStatusMutiModifyRequest struct {
+type SystemUserMultiModifyStatusRequest struct {
 	Ids     []uint `form:"ids" json:"ids"`
 	Operate string `form:"operate" json:"operate"`
 }

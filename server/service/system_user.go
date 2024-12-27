@@ -96,7 +96,7 @@ func GetSystemUserListService(ctx *gin.Context) (users []model.SystemUser, pagin
 }
 
 // 修改用户状态
-func ModifySystemUserStatusService(ctx *gin.Context, ids []uint, operate string) error {
+func SystemUserModifyStatusService(ctx *gin.Context, ids []uint, operate string) error {
 	// 默认 ID 为 1 的用户不能修改状态，属于系统预设用户
 	if utils.IsUintInSlice(1, ids) {
 		return errors.New("系统预设用户不能修改状态")
