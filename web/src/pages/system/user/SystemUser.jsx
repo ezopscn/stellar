@@ -31,6 +31,7 @@ const { Dragger } = Upload;
 const SystemUser = () => {
   const { message } = App.useApp(); // 消息提示
   const [form] = Form.useForm(); // 表单
+  const [updateForm] = Form.useForm(); // 添加这行
 
   // 页面信息
   const title = '用户管理' + TitleSuffix; // 页面标题
@@ -38,7 +39,7 @@ const SystemUser = () => {
 
   // 全局
   const { SystemRoleApis } = useSnapshot(SystemRoleStates);
- 
+
   /////////////////////////////////////////////////////
   // 搜索栏
   /////////////////////////////////////////////////////
@@ -60,7 +61,7 @@ const SystemUser = () => {
     {
       label: '用户名',
       name: 'username',
-      placeholder: '使用用户名进行搜索',
+      placeholder: '使用用户名��行搜索',
       type: 'input',
       rules: [
         {
@@ -222,8 +223,12 @@ const SystemUser = () => {
     try {
       const res = await AxiosPost(Apis.System.User.StatusModify, { id: recordId, operate: operate });
       if (res.code === 200) {
-        message.success("操作成功");
-        setPageNumber(pageNumber - 1);
+        message.success('操作成功');
+        if (pageNumber > 1) {
+          setPageNumber(pageNumber - 1);
+        } else {
+          window.location.reload();
+        }
       } else {
         message.error(res.message);
       }
@@ -231,7 +236,7 @@ const SystemUser = () => {
       console.error('后端服务异常，修改用户状态失败');
       message.error(error);
     }
-  };  
+  };
 
   // 表格：列
   const tableColumns = [
@@ -335,7 +340,18 @@ const SystemUser = () => {
       fixed: 'right',
       render: (_, record) => (
         <>
-          <Button color="primary" variant="link" icon={<EditOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.Update.replace(BackendURL, ''))}>编辑</Button>
+          <Button
+            color="primary"
+            variant="link"
+            icon={<EditOutlined />}
+            disabled={!SystemRoleApis.list?.includes(Apis.System.User.Update.replace(BackendURL, ''))}
+            onClick={() => {
+              setUpdateModalVisible(true);
+              setUpdateRecord(record);
+            }}
+          >
+            编辑
+          </Button>
           {record.status === 1 ? (
             // 系统内置超级管理员账户不允许禁用
             <Popconfirm
@@ -351,10 +367,12 @@ const SystemUser = () => {
               }}
               cancelText="取消"
               onConfirm={() => {
-                modifyStatusHandle(record.id, "disable")
+                modifyStatusHandle(record.id, 'disable');
               }}
             >
-              <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, '')) || record.id === 1}>禁用</Button>
+              <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, '')) || record.id === 1}>
+                禁用
+              </Button>
             </Popconfirm>
           ) : (
             <Popconfirm
@@ -369,10 +387,12 @@ const SystemUser = () => {
               }}
               cancelText="取消"
               onConfirm={() => {
-                modifyStatusHandle(record.id, "enable")
+                modifyStatusHandle(record.id, 'enable');
               }}
             >
-            <Button color="success" variant="link" icon={<RestOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, ''))}>启用</Button>
+              <Button color="success" variant="link" icon={<RestOutlined />} disabled={!SystemRoleApis.list?.includes(Apis.System.User.StatusModify.replace(BackendURL, ''))}>
+                启用
+              </Button>
             </Popconfirm>
           )}
         </>
@@ -430,7 +450,7 @@ const SystemUser = () => {
   // 定义添加数据的字段
   const addRecordFields = [
     {
-      label: '用户名',
+      label: '用���名',
       name: 'username',
       placeholder: '请输入用户名',
       type: 'input',
@@ -596,7 +616,7 @@ const SystemUser = () => {
     },
     {
       label: '部门',
-      name: 'departments',
+      name: 'systemDepartments',
       type: 'treeSelect',
       search: true,
       tree: true,
@@ -611,7 +631,7 @@ const SystemUser = () => {
     },
     {
       label: '岗位',
-      name: 'jobPositions',
+      name: 'systemJobPositions',
       type: 'select',
       search: true,
       tree: false,
@@ -626,7 +646,7 @@ const SystemUser = () => {
     },
     {
       label: '角色',
-      name: 'role',
+      name: 'systemRole',
       type: 'select',
       search: true,
       tree: false,
@@ -643,7 +663,7 @@ const SystemUser = () => {
       label: '个人介绍',
       name: 'description',
       placeholder: '请输入个人介绍',
-      type: 'textarea',
+      type: 'textarea'
     }
   ];
 
@@ -676,7 +696,11 @@ const SystemUser = () => {
       const res = await AxiosPost(Apis.System.User.Add, data);
       if (res.code === 200) {
         message.success('用户添加成功');
-        setPageNumber(pageNumber - 1); // 返回上一页，则相当于刷新页面
+        if (pageNumber > 1) {
+          setPageNumber(pageNumber - 1); // 返回上一页，则相当于刷新页面
+        } else {
+          window.location.reload();
+        }
       } else {
         message.error(res.message);
       }
@@ -716,7 +740,7 @@ const SystemUser = () => {
     },
     {
       title: '任务状态',
-      dataIndex: 'taskStatus',
+      dataIndex: 'status',
       render: (_, record) => {
         const statusMap = {
           1: { text: '执行中', color: 'gray' },
@@ -786,7 +810,8 @@ const SystemUser = () => {
     multiple: false,
     maxCount: 1,
     fileList: mutiAddFileList,
-    beforeUpload(file) { // 阻止自动上传
+    beforeUpload(file) {
+      // 阻止自动上传
       // 判断如果文件不是 xlsx 后缀，则不进行上传
       if (!file.name.endsWith('.xlsx')) {
         message.error('请根据用户批量添加模板上传 Excel 文件');
@@ -812,8 +837,8 @@ const SystemUser = () => {
         // 为了避免因为单元格格式问题导致和后端数据类型不一致的情况，所有都使用字符串
         const workbook = XLSX.read(data, { type: 'array', raw: false });
         const sheetNameList = workbook.SheetNames;
-        const json = sheetNameList.map(sheet => {
-          return XLSX.utils.sheet_to_json(workbook.Sheets[sheet], { 
+        const json = sheetNameList.map((sheet) => {
+          return XLSX.utils.sheet_to_json(workbook.Sheets[sheet], {
             raw: false,
             defval: '' // 设置空单元格的默认值为空字符串
           });
@@ -824,6 +849,308 @@ const SystemUser = () => {
       };
     } // 单文件不需要再定义 drop，删除也是 change 的一种
   };
+
+  /////////////////////////////////////////////////////
+  // 编辑弹窗
+  /////////////////////////////////////////////////////
+  const [updateModalVisible, setUpdateModalVisible] = useState(false);
+  const [updateRecord, setUpdateRecord] = useState(null);
+
+  // 定义编辑数据的字段
+  const updateRecordFields = [
+    {
+      label: 'ID',
+      name: 'id',
+      type: 'input',
+      value: updateRecord?.id,
+      hidden: true
+    },
+    {
+      label: '用户名',
+      name: 'username',
+      placeholder: '请输入用户名',
+      type: 'input',
+      value: updateRecord?.username,
+      rules: [
+        {
+          required: true,
+          message: '用户名不能为空'
+        },
+        {
+          pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,
+          message: '用户名只能以字母开头，且只能包含字母、数字和下划线'
+        },
+        {
+          max: 30,
+          message: '用户名长度不能超过30个字符'
+        },
+        {
+          min: 3,
+          message: '用户名长度不能小于3个字符'
+        }
+      ]
+    },
+    {
+      label: '中文名',
+      name: 'cnName',
+      placeholder: '请输入中文名',
+      type: 'input',
+      value: updateRecord?.cnName,
+      rules: [
+        {
+          required: true,
+          message: '中文名不能为空'
+        },
+        {
+          max: 30,
+          message: '中文名长度不能超过30个字符'
+        },
+        {
+          min: 2,
+          message: '中文名长度不能小于2个字符'
+        },
+        {
+          pattern: /^[\u4E00-\u9FA5]+$/,
+          message: '中文名只能包含中文'
+        }
+      ]
+    },
+    {
+      label: '英文名',
+      name: 'enName',
+      placeholder: '请输入英文名',
+      type: 'input',
+      value: updateRecord?.enName,
+      rules: [
+        {
+          required: true,
+          message: '英文名不能为空'
+        },
+        {
+          pattern: /^[a-zA-Z]+$/,
+          message: '英文名只能包含字母'
+        },
+        {
+          max: 30,
+          message: '英文名长度不能超过30个字符'
+        },
+        {
+          min: 2,
+          message: '英文名长度不能小于2个字符'
+        }
+      ]
+    },
+    {
+      label: '邮箱',
+      name: 'email',
+      placeholder: '请输入邮箱',
+      type: 'input',
+      value: updateRecord?.email,
+      rules: [
+        {
+          required: true,
+          message: '邮箱不能为空'
+        },
+        {
+          type: 'email',
+          message: '邮箱格式不正确'
+        }
+      ]
+    },
+    {
+      label: '手机号',
+      name: 'phone',
+      placeholder: '请输入手机号',
+      type: 'input',
+      value: updateRecord?.phone,
+      rules: [
+        {
+          required: true,
+          message: '手机号不能为空'
+        },
+        {
+          pattern: /^1[3-9]\d{9}$/,
+          message: '手机号格式不正确'
+        }
+      ]
+    },
+    {
+      label: '隐藏手机号',
+      name: 'hidePhone',
+      type: 'select',
+      search: false,
+      tree: false,
+      multiple: false,
+      value: updateRecord?.hidePhone,
+      data: [
+        { label: '是', value: 1 },
+        { label: '否', value: 0 }
+      ],
+      rules: [
+        {
+          required: true,
+          message: '隐藏手机号不能为空'
+        }
+      ]
+    },
+    {
+      label: '性别',
+      name: 'gender',
+      type: 'select',
+      search: false,
+      tree: false,
+      multiple: false,
+      value: updateRecord?.gender,
+      data: [
+        { label: '男', value: 1 },
+        { label: '女', value: 2 },
+        { label: '未知', value: 3 }
+      ],
+      rules: [
+        {
+          required: true,
+          message: '性别不能为空'
+        }
+      ]
+    },
+    {
+      label: '部门',
+      name: 'systemDepartments',
+      type: 'treeSelect',
+      search: true,
+      tree: true,
+      multiple: true,
+      data: departmentList,
+      // 遍历数据，获取 Id 列表
+      value: updateRecord?.systemDepartments?.map((item) => item.id),
+      rules: [
+        {
+          required: true,
+          message: '部门不能为空'
+        }
+      ]
+    },
+    {
+      label: '岗位',
+      name: 'systemJobPositions',
+      type: 'select',
+      search: true,
+      tree: false,
+      multiple: true,
+      data: jobPositionList,
+      // 遍历数据，获取 Id 列表
+      value: updateRecord?.systemJobPositions?.map((item) => item.id),
+      rules: [
+        {
+          required: true,
+          message: '岗位不能为空'
+        }
+      ]
+    },
+    {
+      label: '角色',
+      name: 'systemRole',
+      type: 'select',
+      search: true,
+      tree: false,
+      multiple: false,
+      data: roleList,
+      // 遍历数据，获取 Id 列表
+      value: updateRecord?.systemRole?.id,
+      rules: [
+        {
+          required: true,
+          message: '角色不能为空'
+        }
+      ]
+    },
+    {
+      label: '个人介绍',
+      name: 'description',
+      placeholder: '请输入个人介绍',
+      type: 'textarea',
+      value: updateRecord?.description
+    }
+  ];
+
+  // 获取编辑数据字段
+  const getUpdateRecordFields = () => {
+    const children = [];
+    updateRecordFields.forEach((item) => {
+      children.push(
+        <Form.Item key={item.name} label={item.label} name={item.name} rules={item.rules} hidden={item.hidden} initialValue={item.value}>
+          {item.type === 'input' ? (
+            <Input placeholder={item.placeholder} allowClear={true} disabled={item.disabled} />
+          ) : item.type === 'inputPassword' ? (
+            <Input.Password placeholder={item.placeholder} allowClear={true} disabled={item.disabled} />
+          ) : item.type === 'select' ? (
+            <Select
+              mode={item.multiple ? 'multiple' : 'default'}
+              options={item.data}
+              showSearch={item.search}
+              optionFilterProp="label"
+              placeholder={item.placeholder}
+              allowClear={true}
+              disabled={item.disabled}
+            />
+          ) : item.type === 'treeSelect' ? (
+            <TreeSelect
+              multiple={item.multiple}
+              placeholder={item.placeholder}
+              treeData={item.data}
+              showSearch={item.search}
+              treeNodeFilterProp="label"
+              allowClear={true}
+              treeDefaultExpandAll
+              disabled={item.disabled}
+            />
+          ) : item.type === 'textarea' ? (
+            <Input.TextArea placeholder={item.placeholder} allowClear={true} disabled={item.disabled} />
+          ) : null}
+        </Form.Item>
+      );
+    });
+    return children;
+  };
+
+  // 编辑数据方法
+  const updateRecordHandle = async (data) => {
+    try {
+      const res = await AxiosPost(Apis.System.User.Edit, data);
+      if (res.code === 200) {
+        message.success('用户编辑成功');
+        if (pageNumber > 1) {
+          setPageNumber(pageNumber - 1); // 返回上一页，则相当于刷新页面
+        } else {
+          window.location.reload();
+        }
+      } else {
+        message.error(res.message);
+      }
+    } catch (error) {
+      message.error('添加失败：' + error);
+    }
+  };
+
+  // 监听 updateRecord 的变化，并在变化时重置表单
+  useEffect(() => {
+    if (updateRecord && updateModalVisible) {
+      updateForm.setFieldsValue({
+        id: updateRecord.id,
+        username: updateRecord.username,
+        cnName: updateRecord.cnName,
+        enName: updateRecord.enName,
+        email: updateRecord.email,
+        phone: updateRecord.phone,
+        hidePhone: updateRecord.hidePhone,
+        gender: updateRecord.gender,
+        systemDepartments: updateRecord.systemDepartments?.map((item) => item.id),
+        systemJobPositions: updateRecord.systemJobPositions?.map((item) => item.id),
+        systemRole: updateRecord.systemRole?.id,
+        description: updateRecord.description
+      });
+    }
+  }, [updateRecord, updateModalVisible]);
 
   /////////////////////////////////////////////////////
   // 批量操作菜单
@@ -837,7 +1164,7 @@ const SystemUser = () => {
     },
     getCheckboxProps: (record) => ({
       // 系统超级管理员账户不允许选择
-      disabled: record.id === 1,
+      disabled: record.id === 1
     })
   };
 
@@ -869,7 +1196,11 @@ const SystemUser = () => {
             if (res.code === 200) {
               message.success('批量操作成功');
               setMutiOperateKey([]);
-              setPageNumber(pageNumber - 1); // 返回上一页，则相当于刷新页面
+              if (pageNumber > 1) {
+                setPageNumber(pageNumber - 1); // 返回上一页，则相当于刷新页面
+              } else {
+                window.location.reload();
+              }
             } else {
               message.error(res.message);
             }
@@ -1035,12 +1366,41 @@ const SystemUser = () => {
         </Form>
       </Modal>
 
+      {/* 用户编辑弹窗 */}
+      <Modal
+        title={'编辑' + pageKeyword}
+        open={updateModalVisible}
+        onCancel={() => {
+          setUpdateModalVisible(false);
+          updateForm.resetFields(); // 关闭时重置表单，避免数据不更新
+        }}
+        width={400}
+        maskClosable={false}
+        footer={null}
+      >
+        <Form form={updateForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="updateRecordForm" onFinish={updateRecordHandle} autoComplete="off">
+          {getUpdateRecordFields()}
+          <Form.Item wrapperCol={{ span: 24 }}>
+            <Button type="primary" htmlType="submit" block>
+              保存编辑
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
       {/* 批量导入弹窗 */}
-      <Modal title={'批量导入' + pageKeyword} open={multiAddModalVisible} onCancel={() => {
-        setMultiAddModalVisible(false);
-        setMutiAddRecordList([]);
-        setMutiAddFileList([]);
-      }} width={800} maskClosable={false} footer={null}>
+      <Modal
+        title={'批量导入' + pageKeyword}
+        open={multiAddModalVisible}
+        onCancel={() => {
+          setMultiAddModalVisible(false);
+          setMutiAddRecordList([]);
+          setMutiAddFileList([]);
+        }}
+        width={800}
+        maskClosable={false}
+        footer={null}
+      >
         <Dragger {...mutiAddRecordProps}>
           <p className="ant-upload-drag-icon">
             <InboxOutlined />

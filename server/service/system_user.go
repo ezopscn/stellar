@@ -55,20 +55,20 @@ func GetSystemUserListService(ctx *gin.Context) (users []model.SystemUser, pagin
 	}
 
 	// 部门
-	if filter.Department != nil {
+	if filter.SystemDepartment != nil {
 		query = query.Joins("JOIN system_user_department_relation ON system_user_department_relation.system_user_id = system_user.id").
-			Where("system_user_department_relation.system_department_id = ?", *filter.Department)
+			Where("system_user_department_relation.system_department_id = ?", *filter.SystemDepartment)
 	}
 
 	// 岗位
-	if filter.JobPosition != nil {
+	if filter.SystemJobPosition != nil {
 		query = query.Joins("JOIN system_user_job_position_relation ON system_user_job_position_relation.system_user_id = system_user.id").
-			Where("system_user_job_position_relation.system_job_position_id = ?", *filter.JobPosition)
+			Where("system_user_job_position_relation.system_job_position_id = ?", *filter.SystemJobPosition)
 	}
 
 	// 角色
-	if filter.Role != nil {
-		query = query.Where("systemRoleId = ?", *filter.Role)
+	if filter.SystemRole != nil {
+		query = query.Where("systemRoleId = ?", *filter.SystemRole)
 	}
 
 	// 统计记录数量

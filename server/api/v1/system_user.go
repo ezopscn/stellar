@@ -83,13 +83,13 @@ func SystemUserAddHandler(ctx *gin.Context) {
 	if *req.Gender != 1 && *req.Gender != 2 && *req.Gender != 3 {
 		errList = append(errList, "性别格式错误，只能是 1 或 2 或 3")
 	}
-	if len(req.Departments) == 0 {
+	if len(req.SystemDepartments) == 0 {
 		errList = append(errList, "部门不能为空")
 	}
-	if len(req.JobPositions) == 0 {
+	if len(req.SystemJobPositions) == 0 {
 		errList = append(errList, "职位不能为空")
 	}
-	if req.Role == nil || *req.Role == 0 {
+	if req.SystemRole == nil || *req.SystemRole == 0 {
 		errList = append(errList, "角色不能为空")
 	}
 	if req.Description != nil {
@@ -125,7 +125,7 @@ func SystemUserAddHandler(ctx *gin.Context) {
 		}(),
 		SystemDepartments: func() []model.SystemDepartment {
 			var result []model.SystemDepartment
-			for _, deptId := range req.Departments {
+			for _, deptId := range req.SystemDepartments {
 				result = append(result, model.SystemDepartment{
 					BaseModel: model.BaseModel{Id: deptId},
 				})
@@ -134,14 +134,14 @@ func SystemUserAddHandler(ctx *gin.Context) {
 		}(),
 		SystemJobPositions: func() []model.SystemJobPosition {
 			var result []model.SystemJobPosition
-			for _, posId := range req.JobPositions {
+			for _, posId := range req.SystemJobPositions {
 				result = append(result, model.SystemJobPosition{
 					BaseModel: model.BaseModel{Id: posId},
 				})
 			}
 			return result
 		}(),
-		SystemRoleId: uint(*req.Role),
+		SystemRoleId: uint(*req.SystemRole),
 		Description:  *req.Description,
 		Creator: func() string {
 			username, _ := utils.ExtractStringResultFromContext(ctx, "username")
@@ -193,18 +193,18 @@ func SystemUserMutiAddHandler(ctx *gin.Context) {
 		go func(i int) {
 			// 任务详情
 			taskDetail := model.SystemUserMutiAddDetail{
-				TaskId:       task.Id,
-				Username:     *v.Username,
-				CNName:       *v.CNName,
-				ENName:       *v.ENName,
-				Email:        *v.Email,
-				Phone:        *v.Phone,
-				HidePhone:    *v.HidePhone,
-				Gender:       *v.Gender,
-				Departments:  *v.Departments,
-				JobPositions: *v.JobPositions,
-				Role:         *v.Role,
-				Description:  *v.Description,
+				TaskId:             task.Id,
+				Username:           *v.Username,
+				CNName:             *v.CNName,
+				ENName:             *v.ENName,
+				Email:              *v.Email,
+				Phone:              *v.Phone,
+				HidePhone:          *v.HidePhone,
+				Gender:             *v.Gender,
+				SystemDepartments:  *v.SystemDepartments,
+				SystemJobPositions: *v.SystemJobPositions,
+				SystemRole:         *v.SystemRole,
+				Description:        *v.Description,
 			}
 
 			// 设置状态为进行中
@@ -238,13 +238,13 @@ func SystemUserMutiAddHandler(ctx *gin.Context) {
 			if *v.Gender != "1" && *v.Gender != "2" && *v.Gender != "3" {
 				errList = append(errList, "性别格式错误，只能是 1 或 2 或 3")
 			}
-			if v.Departments == nil || *v.Departments == "" || !regexp.MustCompile(`^(\d+)(,\d+)*$`).MatchString(*v.Departments) {
+			if v.SystemDepartments == nil || *v.SystemDepartments == "" || !regexp.MustCompile(`^(\d+)(,\d+)*$`).MatchString(*v.SystemDepartments) {
 				errList = append(errList, "部门格式错误")
 			}
-			if v.JobPositions == nil || *v.JobPositions == "" || !regexp.MustCompile(`^(\d+)(,\d+)*$`).MatchString(*v.JobPositions) {
+			if v.SystemJobPositions == nil || *v.SystemJobPositions == "" || !regexp.MustCompile(`^(\d+)(,\d+)*$`).MatchString(*v.SystemJobPositions) {
 				errList = append(errList, "职位格式错误")
 			}
-			if !regexp.MustCompile(`^(\d+)$`).MatchString(*v.Role) {
+			if !regexp.MustCompile(`^(\d+)$`).MatchString(*v.SystemRole) {
 				errList = append(errList, "角色格式错误")
 			}
 			if v.Description != nil {
@@ -280,7 +280,7 @@ func SystemUserMutiAddHandler(ctx *gin.Context) {
 						return data.RandomFemaleAvatar()
 					}(),
 					SystemDepartments: func() []model.SystemDepartment {
-						departments := strings.Split(*v.Departments, ",")
+						departments := strings.Split(*v.SystemDepartments, ",")
 						var result []model.SystemDepartment
 						for _, deptId := range departments {
 							result = append(result, model.SystemDepartment{
@@ -292,7 +292,7 @@ func SystemUserMutiAddHandler(ctx *gin.Context) {
 						return result
 					}(),
 					SystemJobPositions: func() []model.SystemJobPosition {
-						jobPositions := strings.Split(*v.JobPositions, ",")
+						jobPositions := strings.Split(*v.SystemJobPositions, ",")
 						var result []model.SystemJobPosition
 						for _, posId := range jobPositions {
 							result = append(result, model.SystemJobPosition{
@@ -303,7 +303,7 @@ func SystemUserMutiAddHandler(ctx *gin.Context) {
 						}
 						return result
 					}(),
-					SystemRoleId: utils.StringToUint(*v.Role),
+					SystemRoleId: utils.StringToUint(*v.SystemRole),
 					Description:  *v.Description,
 					Creator: func() string {
 						username, _ := utils.ExtractStringResultFromContext(ctx, "username")
