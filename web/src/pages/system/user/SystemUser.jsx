@@ -459,7 +459,7 @@ const SystemUser = () => {
   // 批量导入按钮是否禁用，没数据时候不能导入
   const [multiAddRecordSubmitButtonDisabled, setMultiAddRecordSubmitButtonDisabled] = useState(true);
 
-  // 监听 mutiAddRecordList 的变化，如果列表不为空，则按钮可以点击
+  // 监听 multiAddRecordList 的变化，如果列表不为空，则按钮可以点击
   useEffect(() => {
     setMultiAddRecordSubmitButtonDisabled(multiAddRecordList.length === 0);
   }, [multiAddRecordList]);
