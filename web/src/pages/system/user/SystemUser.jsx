@@ -26,7 +26,7 @@ import APIRequest from '@/common/APIRequest.jsx';
 import { SystemRoleStates } from '@/store/StoreSystemRole.jsx';
 import { useSnapshot } from 'valtio';
 import { BackendURL } from '@/common/APIConfig.jsx';
-import { SYSTEM_USER_STATUS_MAP, SYSTEM_USER_GENDER_MAP, FORM_ITEM_COMPONENT_MAP, TRUE_FALSE_MAP } from '@/common/GlobalConfig.jsx';
+import { DATA_STATUS_MAP, GENDER_MAP, FORM_ITEM_COMPONENT_MAP, TRUE_FALSE_MAP } from '@/common/GlobalConfig.jsx';
 
 const { Dragger } = Upload;
 
@@ -284,8 +284,8 @@ const SystemUser = () => {
     { label: '姓名', name: 'name', placeholder: '使用中文名或者英文名进行搜索', type: 'input', rules: [{ message: '姓名长度不能超过30个字符', max: 30 }] },
     { label: '邮箱', name: 'email', placeholder: '使用邮箱地址进行搜索', type: 'input', rules: [{ message: '邮箱长度不能超过30个字符', max: 30 }] },
     { label: '手机号', name: 'phone', placeholder: '使用手机号码进行搜索', type: 'input', rules: [{ message: '手机号长度不能超过15个字符', max: 15 }] },
-    { label: '状态', name: 'status', placeholder: '选择用户状态进行搜索', type: 'select', search: false, tree: false, multiple: false, data: SYSTEM_USER_STATUS_MAP, rules: [] },
-    { label: '性别', name: 'gender', placeholder: '选择性别进行搜索', type: 'select', search: false, tree: false, multiple: false, data: SYSTEM_USER_GENDER_MAP, rules: [] },
+    { label: '状态', name: 'status', placeholder: '选择用户状态进行搜索', type: 'select', search: false, tree: false, multiple: false, data: DATA_STATUS_MAP, rules: [] },
+    { label: '性别', name: 'gender', placeholder: '选择性别进行搜索', type: 'select', search: false, tree: false, multiple: false, data: GENDER_MAP, rules: [] },
     { label: '部门', name: 'systemDepartment', placeholder: '选择部门进行搜索', type: 'treeSelect', search: true, tree: true, multiple: false, data: systemDepartmentList, rules: [] },
     { label: '岗位', name: 'systemJobPosition', placeholder: '选择岗位进行搜索', type: 'select', search: true, tree: false, multiple: false, data: systemJobPositionList, rules: [] },
     { label: '角色', name: 'systemRole', placeholder: '选择角色进行搜索', type: 'select', search: true, tree: false, multiple: false, data: systemRoleList, rules: [] }
@@ -375,7 +375,7 @@ const SystemUser = () => {
     { label: '隐藏手机号', name: 'hidePhone', type: 'select', search: false, tree: false, multiple: false, data: TRUE_FALSE_MAP, rules: [
       { required: true, message: '隐藏手机号不能为空' }
     ]},
-    { label: '性别', name: 'gender', type: 'select', search: false, tree: false, multiple: false, data: SYSTEM_USER_GENDER_MAP, rules: [
+    { label: '性别', name: 'gender', type: 'select', search: false, tree: false, multiple: false, data: GENDER_MAP, rules: [
       { required: true, message: '性别不能为空' }
     ]},
     { label: '部门', name: 'systemDepartments', type: 'treeSelect', search: true, tree: true, multiple: true, data: systemDepartmentList, rules: [
