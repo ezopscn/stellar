@@ -23,6 +23,4 @@ const FORM_ITEM_COMPONENT_MAP = {
   select: (props) => <Select {...props} />,
 };
 
-
-
 export { DATA_STATUS_MAP, GENDER_MAP, FORM_ITEM_COMPONENT_MAP, TRUE_FALSE_MAP };
