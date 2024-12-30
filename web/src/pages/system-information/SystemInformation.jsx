@@ -124,7 +124,7 @@ const SystemInformation = () => {
     { title: '启动时间', dataIndex: 'startTime', key: 'startTime', width: '200px' },
     { title: '运行时间', dataIndex: 'startTime', key: 'runningTime', width: '150px', render: (startTime) => <span>{formatTime(new Date().getTime() - new Date(startTime).getTime())}</span> },
     { title: '节点角色信息', dataIndex: 'roles', key: 'roles', render: (roles) => {
-        return roles.map((role, idx) => <Tag key={role + idx} color={NODE_ROLE_MAP[role]?.color}>{NODE_ROLE_MAP[role]?.text}</Tag>);
+        return roles.map((role, idx) => <Tag key={role + idx} bordered={false} color={NODE_ROLE_MAP[role]?.color}>{NODE_ROLE_MAP[role]?.text}</Tag>);
       }
     }
   ];
