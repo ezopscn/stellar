@@ -5,6 +5,7 @@ import { RouteRules } from '@/routes/RouteRules.jsx';
 import { GetToken } from '@/utils/Token.jsx';
 import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
+import { App } from 'antd';
 
 // 路由匹配
 const RouteMatch = (path, routes) => {
@@ -24,6 +25,7 @@ const RouteMatch = (path, routes) => {
 
 // 路由守卫，认证拦截
 const RouteGuard = ({ children }) => {
+  const { message } = App.useApp();
   const location = useLocation();
   const navigator = useNavigate();
 
@@ -34,11 +36,13 @@ const RouteGuard = ({ children }) => {
     } else {
       if (matchRoute.auth && !GetToken()) {
         // 需要登录但是未登录
+        message.error('Token 验证失败，请重新登录');
         navigator('/login');
       } else if (matchRoute.auth) {
         // 需要登录且已登录，则校验 Token 是否过期
         AxiosGet(Apis.Public.TokenVerification).then((res) => {
           if (res.code !== 200) {
+            message.error('Token 过期，请重新登录');
             navigator('/login');
           }
         });
