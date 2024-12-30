@@ -10,7 +10,8 @@ import {
   ClusterOutlined,
   AlertOutlined,
   MailOutlined,
-  ProjectOutlined
+  ProjectOutlined,
+  DeploymentUnitOutlined
 } from '@ant-design/icons';
 
 // 图标字符串映射
@@ -27,7 +28,8 @@ export const IconMap = {
   ClusterOutlined: ClusterOutlined,
   AlertOutlined: AlertOutlined,
   MailOutlined: MailOutlined,
-  ProjectOutlined: ProjectOutlined
+  ProjectOutlined: ProjectOutlined,
+  DeploymentUnitOutlined: DeploymentUnitOutlined
 };
 
 // 生成 Icon

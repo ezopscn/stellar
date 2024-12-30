@@ -11,3 +11,9 @@ type LoginResponse struct {
 	Token  string `json:"token"`
 	Expire string `json:"expire"`
 }
+
+// 节点信息
+type NodeInfoResponse struct {
+	Name  string   `json:"name"`
+	Roles []string `json:"roles"`
+}

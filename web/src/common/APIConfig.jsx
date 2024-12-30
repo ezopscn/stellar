@@ -7,7 +7,9 @@ const Apis = {
   BackendURL: BackendURL, // 后端基础接口
   Public: {
     Version: BackendURL + '/version', // 版本信息
+    Information: BackendURL + '/information', // 系统信息
     Login: BackendURL + '/login', // 用户登录
+    NodeInformation: BackendURL + '/node/information', // 节点信息
     Logout: BackendURL + '/logout', // 注销登录
     TokenVerification: BackendURL + '/token/verification' // Token 校验
   },

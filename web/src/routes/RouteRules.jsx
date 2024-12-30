@@ -193,6 +193,12 @@ export const RouteRules = [
             element: RouteLazyLoad(React.lazy(() => import('../pages/securityaudit/operation/SecurityauditOperation.jsx')))
           }
         ]
+      },
+      {
+        path: '/system-information',
+        name: '系统信息',
+        auth: true,
+        element: RouteLazyLoad(React.lazy(() => import('../pages/system-information/SystemInformation.jsx')))
       }
     ]
   },

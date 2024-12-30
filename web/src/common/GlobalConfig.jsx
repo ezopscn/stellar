@@ -23,4 +23,11 @@ const FORM_ITEM_COMPONENT_MAP = {
   select: (props) => <Select {...props} />,
 };
 
-export { DATA_STATUS_MAP, GENDER_MAP, FORM_ITEM_COMPONENT_MAP, TRUE_FALSE_MAP };
+// 节点角色映射
+const NODE_ROLE_MAP = {
+  'Leader': { text: 'Leader', color: 'red' },
+  'Worker': { text: 'Worker', color: 'blue' },
+  'WebServer': { text: 'WebServer', color: 'green' }
+};
+
+export { DATA_STATUS_MAP, GENDER_MAP, FORM_ITEM_COMPONENT_MAP, TRUE_FALSE_MAP, NODE_ROLE_MAP };

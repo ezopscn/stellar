@@ -234,13 +234,13 @@ const SystemUser = () => {
         {record.status === 1 ? ( // 系统内置超级管理员账户不允许禁用
           <Popconfirm placement="topRight" title="确定要禁用该用户吗？" okText="确定" cancelText="取消"
             okButtonProps={{ style: { backgroundColor: '#ff4d4f', borderColor: '#ff4d4f' } }}
-            onConfirm={() => modifyRecordStatusHandle(record.id, 'disable')}>
+            onConfirm={() => modifyRecordStatusHandler(record.id, 'disable')}>
             <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={modifyRecordStatusButtonDisabled || record.id === 1}>禁用</Button>
           </Popconfirm>
         ) : (
           <Popconfirm placement="topRight" title="确定要启用该用户吗？" okText="确定" cancelText="取消"
             okButtonProps={{ style: { backgroundColor: '#52c41a', borderColor: '#52c41a' } }}
-            onConfirm={() => { modifyRecordStatusHandle(record.id, 'enable'); }}>
+            onConfirm={() => { modifyRecordStatusHandler(record.id, 'enable'); }}>
             <Button color="success" variant="link" icon={<RestOutlined />} disabled={modifyRecordStatusButtonDisabled}>启用</Button>
           </Popconfirm>
         )}
@@ -322,7 +322,7 @@ const SystemUser = () => {
 
   // 手动搜索方法，需要先初始化页码，避免在搜索结果溢出搜索数据的页码的时候，导致请求参数中带了页码，无法请求到数据
   // 比如在第三页的时候搜索，但是结果只有两页，则会因为页码问题，显示没有数据
-  const filterRecordListHandle = (params) => {
+  const filterRecordListHandler = (params) => {
     setPageNumber(PageConfig.defaultPageNumber);
     setPageSize(PageConfig.defaultPageSize);
     setTotal(PageConfig.defaultTotal);
@@ -431,7 +431,7 @@ const SystemUser = () => {
   };
 
   // 添加数据方法
-  const addRecordHandle = async (data) => {
+  const addRecordHandler = async (data) => {
     try {
       const res = await AxiosPost(Apis.System.User.Add, data);
       if (res.code === 200) {
@@ -507,7 +507,7 @@ const SystemUser = () => {
   };
 
   // 批量添加方法
-  const multiAddRecordHandle = async () => {
+  const multiAddRecordHandler = async () => {
     try {
       if (multiAddRecordList.length === 0) {
         message.error('未获取到导入数据，请检测文件格式是否正确');
@@ -566,7 +566,7 @@ const SystemUser = () => {
   };
 
   // 批量操作的方法
-  const multiModifyRecordHandle = async (data) => {
+  const multiModifyRecordHandler = async (data) => {
     try {
       const res = await AxiosPost(Apis.System.User.MultiModifyStatus, data);
       if (res.code === 200) {
@@ -594,7 +594,7 @@ const SystemUser = () => {
           ids: multiModifyRecordIds,
           operate: key.key
         };
-        multiModifyRecordHandle(data);
+        multiModifyRecordHandler(data);
       }
     }
   };
@@ -638,7 +638,7 @@ const SystemUser = () => {
   };
 
   // 编辑用户方法
-  const updateRecordHandle = async (data) => {
+  const updateRecordHandler = async (data) => {
     try {
       const res = await AxiosPost(Apis.System.User.Update, data);
       if (res.code === 200) {
@@ -678,7 +678,7 @@ const SystemUser = () => {
   // 修改用户状态
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   // 修改状态的方法
-  const modifyRecordStatusHandle = async (recordId, operate) => {
+  const modifyRecordStatusHandler = async (recordId, operate) => {
     try {
       const res = await AxiosPost(Apis.System.User.ModifyStatus, { id: recordId, operate: operate });
       if (res.code === 200) {
@@ -711,7 +711,7 @@ const SystemUser = () => {
       <div className="admin-page-main">
         {/* 搜索栏 */}
         <div className="admin-page-search">
-          <Form form={filterRecordForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="filterRecordForm" onFinish={filterRecordListHandle} autoComplete="off">
+          <Form form={filterRecordForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="filterRecordForm" onFinish={filterRecordListHandler} autoComplete="off">
             <Row gutter={24}>
               {generateFilterRecordFormItems()}
               <Col span={24} key="x" style={{ marginTop: '10px', textAlign: 'right' }}>
@@ -797,7 +797,7 @@ const SystemUser = () => {
 
       {/* 用户添加弹窗 */}
       <Modal title={'添加' + PageConfig.pageKeyword} open={addRecordModalVisible} onCancel={() => setAddRecordModalVisible(false)} width={400} maskClosable={false} footer={null}>
-        <Form form={addRecordForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="addRecordForm" onFinish={addRecordHandle} autoComplete="off">
+        <Form form={addRecordForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="addRecordForm" onFinish={addRecordHandler} autoComplete="off">
           {generateAddRecordFormItems()}
           <Form.Item wrapperCol={{ span: 24 }}>
             <Button type="primary" htmlType="submit" block>添加{PageConfig.pageKeyword}</Button>
@@ -810,7 +810,7 @@ const SystemUser = () => {
         setUpdateRecordModalVisible(false);
         updateRecordForm.resetFields(); // 关闭时重置表单，避免数据不更新
       }} width={400} maskClosable={false} footer={null}>
-        <Form form={updateRecordForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="updateRecordForm" onFinish={updateRecordHandle} autoComplete="off">
+        <Form form={updateRecordForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="updateRecordForm" onFinish={updateRecordHandler} autoComplete="off">
           {generateUpdateRecordFormItems()}
           <Form.Item wrapperCol={{ span: 24 }}>
             <Button type="primary" htmlType="submit" block>保存编辑</Button>
@@ -830,7 +830,7 @@ const SystemUser = () => {
           <p className="ant-upload-hint">为了数据安全，只支持单个文件模板导入，严格禁止上传公司数据或者其它违规文件。</p>
         </Dragger>
         <div style={{ marginTop: '10px' }}>
-          <Button disabled={multiAddRecordSubmitButtonDisabled} type="primary" htmlType="submit" block onClick={multiAddRecordHandle}>批量导入</Button>
+          <Button disabled={multiAddRecordSubmitButtonDisabled} type="primary" htmlType="submit" block onClick={multiAddRecordHandler}>批量导入</Button>
         </div>
       </Modal>
 

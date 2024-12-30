@@ -57,7 +57,8 @@ const siderMenus = [
   getItem('安全审计', '/security-audit', <DynamicIcon iconName={'FileProtectOutlined'} />, [
     getItem('登录日志', '/security-audit/login'), 
     getItem('操作日志', '/security-audit/operation'),
-  ])
+  ]),
+  getItem('系统信息', '/system-information', <DynamicIcon iconName={'DeploymentUnitOutlined'} />)
 ];
 
 const AdminLayout = () => {
