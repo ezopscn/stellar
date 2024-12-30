@@ -189,7 +189,8 @@ const SystemUser = () => {
       allowClear: true,
       placeholder: item.placeholder,
       hidden: item.hidden,
-      value: item.value
+      value: item.value,
+      disabled: item.disabled
     };
     const componentProps = {
       input: {},
@@ -728,8 +729,8 @@ const SystemUser = () => {
             : field.name === 'systemRole'
               ? updateRecord?.systemRole?.id
               : updateRecord?.[field.name],
-      // 如果角色是系统超级管理员，则隐藏该选择框
-      hidden: field.name === 'systemRole' && DISABLED_ROLE_IDS.includes(updateRecord?.systemRole?.id)
+      // 如果角色是系统超级管理员，则禁用该选择框
+      disabled: field.name === 'systemRole' && DISABLED_ROLE_IDS.includes(updateRecord?.systemRole?.id)
     }))
   ];
 
