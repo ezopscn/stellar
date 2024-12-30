@@ -30,4 +30,14 @@ const NODE_ROLE_MAP = {
   'WebServer': { text: 'WebServer', color: 'green' }
 };
 
-export { DATA_STATUS_MAP, GENDER_MAP, FORM_ITEM_COMPONENT_MAP, TRUE_FALSE_MAP, NODE_ROLE_MAP };
+// 需要禁止选择的角色 ID 列表
+const DISABLED_ROLE_IDS = [1];
+
+export { 
+  DATA_STATUS_MAP, 
+  GENDER_MAP, 
+  FORM_ITEM_COMPONENT_MAP, 
+  TRUE_FALSE_MAP, 
+  NODE_ROLE_MAP, 
+  DISABLED_ROLE_IDS 
+};

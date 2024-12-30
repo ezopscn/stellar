@@ -26,7 +26,7 @@ import APIRequest from '@/common/APIRequest.jsx';
 import { SystemRoleStates } from '@/store/StoreSystemRole.jsx';
 import { useSnapshot } from 'valtio';
 import { BackendURL } from '@/common/APIConfig.jsx';
-import { DATA_STATUS_MAP, GENDER_MAP, FORM_ITEM_COMPONENT_MAP, TRUE_FALSE_MAP } from '@/common/GlobalConfig.jsx';
+import { DATA_STATUS_MAP, GENDER_MAP, FORM_ITEM_COMPONENT_MAP, TRUE_FALSE_MAP, DISABLED_ROLE_IDS } from '@/common/GlobalConfig.jsx';
 
 const { Dragger } = Upload;
 
@@ -84,7 +84,11 @@ const generateRoleTag = (name) => {
     运维: 'green'
   };
   const color = roleColors[name] || '';
-  return <Tag bordered={false} color={color}>{name}</Tag>;
+  return (
+    <Tag bordered={false} color={color}>
+      {name}
+    </Tag>
+  );
 };
 
 // 生成状态标签
@@ -94,7 +98,11 @@ const generateStatusTag = (status) => {
     0: { text: '禁用', color: 'red' }
   };
   const { text, color } = statusMap[status] || {};
-  return <Tag bordered={false} color={color}>{text}</Tag>;
+  return (
+    <Tag bordered={false} color={color}>
+      {text}
+    </Tag>
+  );
 };
 
 // 生成任务状态标签
@@ -105,7 +113,11 @@ const generateTaskStatusTag = (status) => {
     3: { text: '执行失败', color: 'red' }
   };
   const { text, color } = statusMap[status] || {};
-  return <Tag bordered={false} color={color}>{text}</Tag>;
+  return (
+    <Tag bordered={false} color={color}>
+      {text}
+    </Tag>
+  );
 };
 
 // 用户管理
@@ -141,7 +153,7 @@ const SystemUser = () => {
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   // 状态：请求和筛选列表
   /////////////////////////////////////////////////////////////////////////////////////////////////////
-  // 数据列表 
+  // 数据列表
   const [tableRecordList, setTableRecordList] = useState([]);
   // 每页显示的数据条数
   const [pageSize, setPageSize] = useState(PageConfig.defaultPageSize);
@@ -187,13 +199,13 @@ const SystemUser = () => {
         treeData: item.data,
         showSearch: item.search,
         treeNodeFilterProp: 'label',
-        multiple: item.multiple
+        multiple: item.multiple,
       },
       select: {
         options: item.data,
         showSearch: item.search,
         optionFilterProp: 'label',
-        mode: item.multiple ? 'multiple' : 'default'
+        mode: item.multiple ? 'multiple' : 'default',
       }
     };
     return (
@@ -225,23 +237,45 @@ const SystemUser = () => {
   const actionButtonGroup = (record) => {
     return (
       <>
-        <Button color="primary" variant="link" icon={<EditOutlined />}
+        <Button
+          color="primary"
+          variant="link"
+          icon={<EditOutlined />}
           disabled={updateRecordButtonDisabled}
           onClick={() => {
             setUpdateRecordModalVisible(true);
             setUpdateRecord(record);
-          }}>编辑</Button>
-        {record.status === 1 ? ( // 系统内置超级管理员账户不允许禁用
-          <Popconfirm placement="topRight" title="确定要禁用该用户吗？" okText="确定" cancelText="取消"
+          }}
+        >
+          编辑
+        </Button>
+        {record.status === 1 ? ( // 超级管理员账户不允许禁用
+          <Popconfirm
+            placement="topRight"
+            title="确定要禁用该用户吗？"
+            okText="确定"
+            cancelText="取消"
             okButtonProps={{ style: { backgroundColor: '#ff4d4f', borderColor: '#ff4d4f' } }}
-            onConfirm={() => modifyRecordStatusHandler(record.id, 'disable')}>
-            <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={modifyRecordStatusButtonDisabled || record.id === 1}>禁用</Button>
+            onConfirm={() => modifyRecordStatusHandler(record.id, 'disable')}
+          >
+            <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={modifyRecordStatusButtonDisabled || DISABLED_ROLE_IDS.includes(record.id)}>
+              禁用
+            </Button>
           </Popconfirm>
         ) : (
-          <Popconfirm placement="topRight" title="确定要启用该用户吗？" okText="确定" cancelText="取消"
+          <Popconfirm
+            placement="topRight"
+            title="确定要启用该用户吗？"
+            okText="确定"
+            cancelText="取消"
             okButtonProps={{ style: { backgroundColor: '#52c41a', borderColor: '#52c41a' } }}
-            onConfirm={() => { modifyRecordStatusHandler(record.id, 'enable'); }}>
-            <Button color="success" variant="link" icon={<RestOutlined />} disabled={modifyRecordStatusButtonDisabled}>启用</Button>
+            onConfirm={() => {
+              modifyRecordStatusHandler(record.id, 'enable');
+            }}
+          >
+            <Button color="success" variant="link" icon={<RestOutlined />} disabled={modifyRecordStatusButtonDisabled}>
+              启用
+            </Button>
           </Popconfirm>
         )}
       </>
@@ -279,6 +313,7 @@ const SystemUser = () => {
   // tree：是否展示树形结构
   // multiple：是否允许多选
   // data：数据列表
+  // disabledValues：禁用值
   const filterRecordFields = [
     { label: '用户名', name: 'username', placeholder: '使用用户名进行搜索', type: 'input', rules: [{ message: '用户名长度不能超过30个字符', max: 30 }] },
     { label: '姓名', name: 'name', placeholder: '使用中文名或者英文名进行搜索', type: 'input', rules: [{ message: '姓名长度不能超过30个字符', max: 30 }] },
@@ -293,13 +328,11 @@ const SystemUser = () => {
 
   // 生成搜索栏表单项
   const generateFilterRecordFormItems = () => {
-    return filterRecordFields
-      .slice(0, expandFilterRecordItems ? filterRecordFields.length : PageConfig.defaultFilterExpandItemCount)
-      .map(item => (
-        <Col span={6} key={item.name}>
-          {generateRecordFormItem(item)}
-        </Col>
-      ));
+    return filterRecordFields.slice(0, expandFilterRecordItems ? filterRecordFields.length : PageConfig.defaultFilterExpandItemCount).map((item) => (
+      <Col span={6} key={item.name}>
+        {generateRecordFormItem(item)}
+      </Col>
+    ));
   };
 
   // 条件搜索请求封装，默认请求其实也属于搜索的一种类型
@@ -347,7 +380,11 @@ const SystemUser = () => {
   // 表单基础字段
   const recordFormBasicFields = [
     {
-      label: '用户名', name: 'username', placeholder: '请输入用户名', type: 'input', rules: [
+      label: '用户名',
+      name: 'username',
+      placeholder: '请输入用户名',
+      type: 'input',
+      rules: [
         { required: true, message: '用户名不能为空' },
         { pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: '用户名只能以字母开头，且只能包含字母、数字和下划线' },
         { max: 30, message: '用户名长度不能超过30个字符' },
@@ -355,7 +392,11 @@ const SystemUser = () => {
       ]
     },
     {
-      label: '中文名', name: 'cnName', placeholder: '请输入中文名', type: 'input', rules: [
+      label: '中文名',
+      name: 'cnName',
+      placeholder: '请输入中文名',
+      type: 'input',
+      rules: [
         { required: true, message: '中文名不能为空' },
         { max: 30, message: '中文名长度不能超过30个字符' },
         { min: 2, message: '中文名长度不能小于2个字符' },
@@ -363,7 +404,11 @@ const SystemUser = () => {
       ]
     },
     {
-      label: '英文名', name: 'enName', placeholder: '请输入英文名', type: 'input', rules: [
+      label: '英文名',
+      name: 'enName',
+      placeholder: '请输入英文名',
+      type: 'input',
+      rules: [
         { required: true, message: '英文名不能为空' },
         { pattern: /^[a-zA-Z]+$/, message: '英文名只能包含字母' },
         { max: 30, message: '英文名长度不能超过30个字符' },
@@ -371,41 +416,78 @@ const SystemUser = () => {
       ]
     },
     {
-      label: '邮箱', name: 'email', placeholder: '请输入邮箱', type: 'input', rules: [
+      label: '邮箱',
+      name: 'email',
+      placeholder: '请输入邮箱',
+      type: 'input',
+      rules: [
         { required: true, message: '邮箱不能为空' },
         { type: 'email', message: '邮箱格式不正确' }
       ]
     },
     {
-      label: '手机号', name: 'phone', placeholder: '请输入手机号', type: 'input', rules: [
+      label: '手机号',
+      name: 'phone',
+      placeholder: '请输入手机号',
+      type: 'input',
+      rules: [
         { required: true, message: '手机号不能为空' },
         { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确' }
       ]
     },
     {
-      label: '隐藏手机号', name: 'hidePhone', type: 'select', search: false, tree: false, multiple: false, data: TRUE_FALSE_MAP, rules: [
-        { required: true, message: '隐藏手机号不能为空' }
-      ]
+      label: '隐藏手机号',
+      name: 'hidePhone',
+      type: 'select',
+      search: false,
+      tree: false,
+      multiple: false,
+      data: TRUE_FALSE_MAP,
+      rules: [{ required: true, message: '隐藏手机号不能为空' }]
     },
     {
-      label: '性别', name: 'gender', type: 'select', search: false, tree: false, multiple: false, data: GENDER_MAP, rules: [
-        { required: true, message: '性别不能为空' }
-      ]
+      label: '性别',
+      name: 'gender',
+      type: 'select',
+      search: false,
+      tree: false,
+      multiple: false,
+      data: GENDER_MAP,
+      rules: [{ required: true, message: '性别不能为空' }]
     },
     {
-      label: '部门', name: 'systemDepartments', type: 'treeSelect', search: true, tree: true, multiple: true, data: systemDepartmentList, rules: [
-        { required: true, message: '部门不能为空' }
-      ]
+      label: '部门',
+      name: 'systemDepartments',
+      type: 'treeSelect',
+      search: true,
+      tree: true,
+      multiple: true,
+      data: systemDepartmentList,
+      rules: [{ required: true, message: '部门不能为空' }]
     },
     {
-      label: '岗位', name: 'systemJobPositions', type: 'select', search: true, tree: false, multiple: true, data: systemJobPositionList, rules: [
-        { required: true, message: '岗位不能为空' }
-      ]
+      label: '岗位',
+      name: 'systemJobPositions',
+      type: 'select',
+      search: true,
+      tree: false,
+      multiple: true,
+      data: systemJobPositionList,
+      rules: [{ required: true, message: '岗位不能为空' }]
     },
     {
-      label: '角色', name: 'systemRole', type: 'select', search: true, tree: false, multiple: false, data: systemRoleList, rules: [
-        { required: true, message: '角色不能为空' }
-      ]
+      label: '角色',
+      name: 'systemRole',
+      type: 'select',
+      search: true,
+      tree: false,
+      multiple: false,
+      data: systemRoleList.map((role) => ({
+        ...role,
+        // 禁止选择超级管理员角色
+        disabled: DISABLED_ROLE_IDS.includes(role.value)
+      })),
+      rules: [{ required: true, message: '角色不能为空' }]
     },
     { label: '个人介绍', name: 'description', placeholder: '请输入个人介绍', type: 'textarea' }
   ];
@@ -415,19 +497,23 @@ const SystemUser = () => {
     // 将密码字段往前放
     ...recordFormBasicFields.slice(0, 1),
     {
-      label: '密码', name: 'password', placeholder: '请输入密码', type: 'inputPassword', rules: [
+      label: '密码',
+      name: 'password',
+      placeholder: '请输入密码',
+      type: 'inputPassword',
+      rules: [
         { required: true, message: '密码不能为空' },
         { max: 30, message: '密码长度不能超过30个字符' },
         { min: 8, message: '密码长度不能小于8个字符' },
         { pattern: /^[A-Za-z0-9@$!%*?&]+$/, message: '密码只能包含大小写字母、数字和特殊字符（@$!%*?&）' }
       ]
     },
-    ...recordFormBasicFields.slice(1),
+    ...recordFormBasicFields.slice(1)
   ];
 
   // 生成添加数据表单项
   const generateAddRecordFormItems = () => {
-    return addRecordFields?.map(item => generateRecordFormItem(item));
+    return addRecordFields?.map((item) => generateRecordFormItem(item));
   };
 
   // 添加数据方法
@@ -546,7 +632,18 @@ const SystemUser = () => {
     { title: '任务状态', dataIndex: 'status', render: (_, record) => generateTaskStatusTag(record.taskStatus) },
     { title: '任务开始时间', dataIndex: 'taskStartTime' },
     { title: '任务结束时间', dataIndex: 'taskEndTime' },
-    { title: '操作', key: 'action', fixed: 'right', render: (_, record) => (<Space size="middle"><a><UnorderedListOutlined /> 查看明细</a></Space>) }
+    {
+      title: '操作',
+      key: 'action',
+      fixed: 'right',
+      render: (_, record) => (
+        <Space size="middle">
+          <a>
+            <UnorderedListOutlined /> 查看明细
+          </a>
+        </Space>
+      )
+    }
   ];
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -562,7 +659,7 @@ const SystemUser = () => {
       setMultiModifyRecordIds(selectedRowKeys);
     },
     // 获取行选择框的属性，系统超级管理员账户不允许选择
-    getCheckboxProps: (record) => ({ disabled: record.id === 1 })
+    getCheckboxProps: (record) => ({ disabled: DISABLED_ROLE_IDS.includes(record.id) })
   };
 
   // 批量操作的方法
@@ -620,26 +717,31 @@ const SystemUser = () => {
       hidden: true
     },
     // 复用并扩展 recordFormBasicFields 的字段，增加回填数据
-    ...recordFormBasicFields.map(field => ({
+    // 如果角色是系统超级管理员，则隐藏该字段
+    ...recordFormBasicFields.map((field) => ({
       ...field,
-      value: field.name === 'systemDepartments' ?
-        updateRecord?.systemDepartments?.map(item => item.id) :
-        field.name === 'systemJobPositions' ?
-          updateRecord?.systemJobPositions?.map(item => item.id) :
-          field.name === 'systemRole' ?
-            updateRecord?.systemRole?.id :
-            updateRecord?.[field.name]
+      value:
+        field.name === 'systemDepartments'
+          ? updateRecord?.systemDepartments?.map((item) => item.id)
+          : field.name === 'systemJobPositions'
+            ? updateRecord?.systemJobPositions?.map((item) => item.id)
+            : field.name === 'systemRole'
+              ? updateRecord?.systemRole?.id
+              : updateRecord?.[field.name],
+      // 如果角色是系统超级管理员，则隐藏该选择框
+      hidden: field.name === 'systemRole' && DISABLED_ROLE_IDS.includes(updateRecord?.systemRole?.id)
     }))
   ];
 
   // 生成用户编辑表单
   const generateUpdateRecordFormItems = () => {
-    return updateRecordFields?.map(item => generateRecordFormItem(item));
+    return updateRecordFields?.map((item) => generateRecordFormItem(item));
   };
 
   // 编辑用户方法
   const updateRecordHandler = async (data) => {
     try {
+      console.log(data);
       const res = await AxiosPost(Apis.System.User.Update, data);
       if (res.code === 200) {
         message.success('编辑成功');
@@ -716,8 +818,12 @@ const SystemUser = () => {
               {generateFilterRecordFormItems()}
               <Col span={24} key="x" style={{ marginTop: '10px', textAlign: 'right' }}>
                 <Space>
-                  <Button icon={<SearchOutlined />} htmlType="submit">条件搜索</Button>
-                  <Button icon={<ClearOutlined />} onClick={() => filterRecordForm.resetFields()}>清理条件</Button>
+                  <Button icon={<SearchOutlined />} htmlType="submit">
+                    条件搜索
+                  </Button>
+                  <Button icon={<ClearOutlined />} onClick={() => filterRecordForm.resetFields()}>
+                    清理条件
+                  </Button>
                   {filterRecordFields.length > PageConfig.defaultFilterExpandItemCount && (
                     <a onClick={() => setExpandFilterRecordItems(!expandFilterRecordItems)}>
                       <DownOutlined rotate={expandFilterRecordItems ? 180 : 0} /> {expandFilterRecordItems ? '收起条件' : '展开更多'}
@@ -732,15 +838,32 @@ const SystemUser = () => {
         <div className="admin-page-list">
           <div className="admin-page-btn-group">
             <Space>
-              <Button type="primary" icon={<UserAddOutlined />} onClick={() => setAddRecordModalVisible(true)} disabled={addRecordButtonDisabled}>添加{PageConfig.pageKeyword}</Button>
-              <Button icon={<UploadOutlined />} onClick={() => setMultiAddRecordModalVisible(true)} disabled={multiAddRecordButtonDisabled}>批量导入</Button>
+              <Button type="primary" icon={<UserAddOutlined />} onClick={() => setAddRecordModalVisible(true)} disabled={addRecordButtonDisabled}>
+                添加{PageConfig.pageKeyword}
+              </Button>
+              <Button icon={<UploadOutlined />} onClick={() => setMultiAddRecordModalVisible(true)} disabled={multiAddRecordButtonDisabled}>
+                批量导入
+              </Button>
               <Dropdown menu={multiModifyRecordMenuProps} disabled={multiModifyRecordStatusButtonDisabled}>
-                <Button><Space><DownOutlined /> 批量操作</Space></Button>
+                <Button>
+                  <Space>
+                    <DownOutlined /> 批量操作
+                  </Space>
+                </Button>
               </Dropdown>
             </Space>
             <Space style={{ float: 'right' }}>
-              <Button icon={<DownloadOutlined />} onClick={() => { window.open('/template/用户批量添加模板.xlsx'); }}>模板下载</Button>
-              <Button icon={<ClockCircleOutlined />} onClick={() => setMultiAddRecordTaskHistoryModalVisible(true)}>导入记录</Button>
+              <Button
+                icon={<DownloadOutlined />}
+                onClick={() => {
+                  window.open('/template/用户批量添加模板.xlsx');
+                }}
+              >
+                模板下载
+              </Button>
+              <Button icon={<ClockCircleOutlined />} onClick={() => setMultiAddRecordTaskHistoryModalVisible(true)}>
+                导入记录
+              </Button>
             </Space>
           </div>
           <Table
@@ -800,37 +923,59 @@ const SystemUser = () => {
         <Form form={addRecordForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="addRecordForm" onFinish={addRecordHandler} autoComplete="off">
           {generateAddRecordFormItems()}
           <Form.Item wrapperCol={{ span: 24 }}>
-            <Button type="primary" htmlType="submit" block>添加{PageConfig.pageKeyword}</Button>
+            <Button type="primary" htmlType="submit" block>
+              添加{PageConfig.pageKeyword}
+            </Button>
           </Form.Item>
         </Form>
       </Modal>
 
       {/* 用户编辑弹窗 */}
-      <Modal title={'编辑' + PageConfig.pageKeyword} open={updateRecordModalVisible} onCancel={() => {
-        setUpdateRecordModalVisible(false);
-        updateRecordForm.resetFields(); // 关闭时重置表单，避免数据不更新
-      }} width={400} maskClosable={false} footer={null}>
+      <Modal
+        title={'编辑' + PageConfig.pageKeyword}
+        open={updateRecordModalVisible}
+        onCancel={() => {
+          setUpdateRecordModalVisible(false);
+          updateRecordForm.resetFields(); // 关闭时重置表单，避免数据不更新
+        }}
+        width={400}
+        maskClosable={false}
+        footer={null}
+      >
         <Form form={updateRecordForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="updateRecordForm" onFinish={updateRecordHandler} autoComplete="off">
           {generateUpdateRecordFormItems()}
           <Form.Item wrapperCol={{ span: 24 }}>
-            <Button type="primary" htmlType="submit" block>保存编辑</Button>
+            <Button type="primary" htmlType="submit" block>
+              保存编辑
+            </Button>
           </Form.Item>
         </Form>
       </Modal>
 
       {/* 批量导入弹窗 */}
-      <Modal title={'批量导入' + PageConfig.pageKeyword} open={multiAddRecordModalVisible} onCancel={() => {
-        setMultiAddRecordModalVisible(false);
-        setMultiAddRecordList([]);
-        setMultiAddFileList([]);
-      }} width={800} maskClosable={false} footer={null}>
+      <Modal
+        title={'批量导入' + PageConfig.pageKeyword}
+        open={multiAddRecordModalVisible}
+        onCancel={() => {
+          setMultiAddRecordModalVisible(false);
+          setMultiAddRecordList([]);
+          setMultiAddFileList([]);
+        }}
+        width={800}
+        maskClosable={false}
+        footer={null}
+      >
         <Dragger {...multiAddRecordProps}>
-          <p className="ant-upload-drag-icon"><InboxOutlined /></p>
+          <p className="ant-upload-drag-icon">
+            <InboxOutlined />
+          </p>
           <p className="ant-upload-text">点击或者拖拽批量导入模板文件到此区域完成创建</p>
           <p className="ant-upload-hint">为了数据安全，只支持单个文件模板导入，严格禁止上传公司数据或者其它违规文件。</p>
         </Dragger>
         <div style={{ marginTop: '10px' }}>
-          <Button disabled={multiAddRecordSubmitButtonDisabled} type="primary" htmlType="submit" block onClick={multiAddRecordHandler}>批量导入</Button>
+          <Button disabled={multiAddRecordSubmitButtonDisabled} type="primary" htmlType="submit" block onClick={multiAddRecordHandler}>
+            批量导入
+          </Button>
         </div>
       </Modal>
 
