@@ -63,21 +63,13 @@ func NodeInformationHandler(ctx *gin.Context) {
 		nodes = append(nodes, dto.NodeInfoResponse{Name: name, StartTime: startTime})
 	}
 
-	// 获取 Leader 节点信息
-	keys, err = conn.Redis.Keys(ctx, common.RKP.LeaderId+":*").Result()
-	if err != nil {
-		response.FailedWithMessage("查询 Leader 节点信息失败")
-		return
-	}
+	// 获取 Leader 节点信息，Leader 只有一个，直接查询
+	leaderId := conn.GetString(common.RKP.LeaderId).Unwrap()
 
-	// 遍历键，获取 Leader 节点信息
-	for _, key := range keys {
-		name := strings.TrimPrefix(key, common.RKP.LeaderId+":")
-		// 修改指定节点的 Roles 信息
-		for i, node := range nodes {
-			if node.Name == name {
-				nodes[i].Roles = append(nodes[i].Roles, "Leader")
-			}
+	// 遍历节点，处理 Leader 节点信息
+	for i, node := range nodes {
+		if node.Name == leaderId {
+			nodes[i].Roles = append(nodes[i].Roles, "Leader")
 		}
 	}
 

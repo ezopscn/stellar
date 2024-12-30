@@ -7,6 +7,7 @@ import { Apis } from '@/common/APIConfig.jsx';
 import { GithubOutlined } from '@ant-design/icons';
 import { Table } from 'antd';
 import { NODE_ROLE_MAP } from '@/common/GlobalConfig.jsx';
+
 // 页面常量设置
 const PageConfig = {
   // 页面标题
@@ -30,15 +31,23 @@ const PageDescriptionComponent = () => {
   );
 };
 
-// 添加时间格式化函数
+// 将 formatTime 函数优化为更简洁的实现
 const formatTime = (ms) => {
-  const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-  const hours = Math.floor((ms % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-  const minutes = Math.floor((ms % (60 * 60 * 1000)) / (60 * 1000));
-  const parts = [];
-  if (days > 0) parts.push(`${days}天`);
-  if (hours > 0) parts.push(`${hours}小时`);
-  if (minutes > 0) parts.push(`${minutes}分钟`);
+  const units = [
+    { value: 24 * 60 * 60 * 1000, label: '天' },
+    { value: 60 * 60 * 1000, label: '小时' },
+    { value: 60 * 1000, label: '分钟' }
+  ];
+
+  const parts = units.reduce((acc, { value, label }) => {
+    const count = Math.floor(ms / value);
+    if (count > 0) {
+      ms %= value;
+      acc.push(`${count}${label}`);
+    }
+    return acc;
+  }, []);
+
   return parts.length > 0 ? parts.join(' ') : '刚刚启动';
 };
 
@@ -49,7 +58,9 @@ const SystemInformation = () => {
   // 消息提示
   const { message } = App.useApp();
 
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
   // 获取系统信息
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
   const [systemInformation, setSystemInformation] = useState({});
   useEffect(() => {
     const getSystemInformationHandler = async () => {
@@ -69,30 +80,11 @@ const SystemInformation = () => {
   }, []);
 
   const systemBasicInformation = [
-    {
-      key: '0',
-      label: '系统名称',
-      children: systemInformation?.systemProjectName
-    },
-    {
-      key: '1',
-      label: '开发者信息',
-      children: `${systemInformation?.systemDeveloperName} <${systemInformation?.systemDeveloperEmail}>`
-    },
-    {
-      key: '2',
-      label: 'Go 版本',
-      children: systemInformation?.systemGoVersion
-    },
-    {
-      key: '3',
-      label: '系统版本',
-      children: systemInformation?.systemVersion
-    },
-    {
-      key: '4',
-      label: '项目地址',
-      children: (
+    { key: '0', label: '系统名称', children: systemInformation?.systemProjectName },
+    { key: '1', label: '开发者信息', children: `${systemInformation?.systemDeveloperName} <${systemInformation?.systemDeveloperEmail}>` },
+    { key: '2', label: 'Go 版本', children: systemInformation?.systemGoVersion },
+    { key: '3', label: '系统版本', children: systemInformation?.systemVersion },
+    { key: '4', label: '项目地址', children: (
         <a href="https://github.com/ezopscn/stellar" target="_blank">
           <GithubOutlined /> https://github.com/ezopscn/stellar
         </a>
@@ -100,7 +92,9 @@ const SystemInformation = () => {
     }
   ];
 
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
   // 获取节点信息
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
   const [nodeInformation, setNodeInformation] = useState([]);
   useEffect(() => {
     const getNodeInformationHandler = async () => {
@@ -119,65 +113,18 @@ const SystemInformation = () => {
     getNodeInformationHandler();
   }, []);
 
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
   // 节点信息表格列
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
   const columns = [
-    {
-      title: '节点名称',
-      dataIndex: 'name',
-      key: 'name',
-      width: '300px'
-    },
-    {
-      title: '监听地址',
-      dataIndex: 'name',
-      key: 'listenAddress',
-      width: '200px',
-      render: (name) => {
-        // name 按照 - 切割的第二个元素
-        const listenAddress = name.split('-')[1];
-        return <span>{listenAddress}</span>;
-      }
-    },
-    {
-      title: '监听端口',
-      dataIndex: 'name',
-      key: 'listenPort',
-      width: '100px',
-      render: (name) => {
-        // name 按照 - 切割的第三个元素
-        const listenPort = name.split('-')[2];
-        return <span>{listenPort}</span>;
-      }
-    },
-    {
-      title: '启动时间',
-      dataIndex: 'startTime',
-      key: 'startTime',
-      width: '200px'
-    },
-    {
-      title: '运行时间',
-      dataIndex: 'startTime',
-      key: 'runningTime',
-      width: '100px',
-      render: (startTime) => {
-        const now = new Date();
-        const startTimeDate = new Date(startTime);
-        const diffTime = now.getTime() - startTimeDate.getTime();
-        const diffTimeString = formatTime(diffTime);
-        return <span>{diffTimeString}</span>;
-      }
-    },
-    {
-      title: '节点角色信息',
-      dataIndex: 'roles',
-      key: 'roles',
-      render: (roles) => {
-        return roles.map((role, idx) => {
-          const text = NODE_ROLE_MAP[role]?.text;
-          const color = NODE_ROLE_MAP[role]?.color;
-          return text ? <Tag key={role + idx} color={color}>{text}</Tag> : null;
-        });
+    { title: '序号', render: (text, record, index) => `${index + 1}`, width: '50px' },   
+    { title: '节点名称', dataIndex: 'name', key: 'name', width: '300px' },
+    { title: '监听地址', dataIndex: 'name', key: 'listenAddress', width: '150px', render: (name) => <span>{name.split('-')[1]}</span> },
+    { title: '监听端口', dataIndex: 'name', key: 'listenPort', width: '100px', render: (name) => <span>{name.split('-')[2]}</span> },
+    { title: '启动时间', dataIndex: 'startTime', key: 'startTime', width: '200px' },
+    { title: '运行时间', dataIndex: 'startTime', key: 'runningTime', width: '150px', render: (startTime) => <span>{formatTime(new Date().getTime() - new Date(startTime).getTime())}</span> },
+    { title: '节点角色信息', dataIndex: 'roles', key: 'roles', render: (roles) => {
+        return roles.map((role, idx) => <Tag key={role + idx} color={NODE_ROLE_MAP[role]?.color}>{NODE_ROLE_MAP[role]?.text}</Tag>);
       }
     }
   ];
