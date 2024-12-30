@@ -11,7 +11,6 @@ import (
 
 // 全局变量，build 或者 run 的时候会通过参数替换
 var (
-	SystemStartTime             = ""                                              // 系统启动时间
 	SystemVersion               = "unknown"                                       // 系统版本
 	SystemGoVersion             = "unknown"                                       // 系统 Go 版本
 	SystemConfigType            = "yaml"                                          // 配置文件类型
@@ -27,7 +26,8 @@ var (
 
 // 全局状态
 var (
-	ClientId *string // 客户端 ID
+	ClientId        *string // 客户端 ID
+	ClientStartTime *string // 客户端启动时间
 )
 
 // 系统常量

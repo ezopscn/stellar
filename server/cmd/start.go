@@ -31,7 +31,8 @@ var startCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Print(common.LOGO) // 打印 logo
 		// 记录启动时间
-		common.SystemStartTime = time.Now().Format(common.TimeMillisecondFormat)
+		startTimeStr := time.Now().Format(common.TimeMillisecondFormat)
+		common.ClientStartTime = &startTimeStr
 		// 初始化配置
 		initialize.Config()
 
