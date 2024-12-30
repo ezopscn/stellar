@@ -14,6 +14,7 @@ type LoginResponse struct {
 
 // 节点信息
 type NodeInfoResponse struct {
-	Name  string   `json:"name"`
-	Roles []string `json:"roles"`
+	Name      string   `json:"name"`
+	StartTime string   `json:"startTime"`
+	Roles     []string `json:"roles"`
 }

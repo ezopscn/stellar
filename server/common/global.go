@@ -11,6 +11,7 @@ import (
 
 // 全局变量，build 或者 run 的时候会通过参数替换
 var (
+	SystemStartTime             = ""                                              // 系统启动时间
 	SystemVersion               = "unknown"                                       // 系统版本
 	SystemGoVersion             = "unknown"                                       // 系统 Go 版本
 	SystemConfigType            = "yaml"                                          // 配置文件类型

@@ -30,7 +30,10 @@ var startCmd = &cobra.Command{
 	Short: "Run the server",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Print(common.LOGO) // 打印 logo
-		initialize.Config()    // 初始化配置
+		// 记录启动时间
+		common.SystemStartTime = time.Now().Format(common.TimeMillisecondFormat)
+		// 初始化配置
+		initialize.Config()
 
 		// 如果所有角色都没有设置，则直接退出
 		if !common.Config.System.LeaderElection && !common.Config.System.Worker && !common.Config.System.WebServer {

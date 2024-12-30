@@ -15,7 +15,7 @@ func ReportHeartbeatTask() {
 	key := fmt.Sprintf("%s:%s", common.RKP.HeartbeatId, *common.ClientId)
 	for {
 		common.SystemLog.Infof("Start heartbeat check, client id: %s", *common.ClientId)
-		cache.Set(key, time.Now().Unix(), gedis.WithExpire(time.Second*15))
+		cache.Set(key, common.SystemStartTime, gedis.WithExpire(time.Second*15))
 		time.Sleep(10 * time.Second)
 	}
 }

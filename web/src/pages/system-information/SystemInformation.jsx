@@ -30,6 +30,18 @@ const PageDescriptionComponent = () => {
   );
 };
 
+// 添加时间格式化函数
+const formatTime = (ms) => {
+  const days = Math.floor(ms / (24 * 60 * 60 * 1000));
+  const hours = Math.floor((ms % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+  const minutes = Math.floor((ms % (60 * 60 * 1000)) / (60 * 1000));
+  const parts = [];
+  if (days > 0) parts.push(`${days}天`);
+  if (hours > 0) parts.push(`${hours}小时`);
+  if (minutes > 0) parts.push(`${minutes}分钟`);
+  return parts.length > 0 ? parts.join(' ') : '刚刚启动';
+};
+
 const SystemInformation = () => {
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   // 全局配置
@@ -116,7 +128,48 @@ const SystemInformation = () => {
       width: '300px'
     },
     {
-      title: '角色列表',
+      title: '监听地址',
+      dataIndex: 'name',
+      key: 'listenAddress',
+      width: '200px',
+      render: (name) => {
+        // name 按照 - 切割的第二个元素
+        const listenAddress = name.split('-')[1];
+        return <span>{listenAddress}</span>;
+      }
+    },
+    {
+      title: '监听端口',
+      dataIndex: 'name',
+      key: 'listenPort',
+      width: '100px',
+      render: (name) => {
+        // name 按照 - 切割的第三个元素
+        const listenPort = name.split('-')[2];
+        return <span>{listenPort}</span>;
+      }
+    },
+    {
+      title: '启动时间',
+      dataIndex: 'startTime',
+      key: 'startTime',
+      width: '200px'
+    },
+    {
+      title: '运行时间',
+      dataIndex: 'startTime',
+      key: 'runningTime',
+      width: '100px',
+      render: (startTime) => {
+        const now = new Date();
+        const startTimeDate = new Date(startTime);
+        const diffTime = now.getTime() - startTimeDate.getTime();
+        const diffTimeString = formatTime(diffTime);
+        return <span>{diffTimeString}</span>;
+      }
+    },
+    {
+      title: '节点角色信息',
       dataIndex: 'roles',
       key: 'roles',
       render: (roles) => {

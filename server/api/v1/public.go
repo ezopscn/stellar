@@ -57,8 +57,10 @@ func NodeInformationHandler(ctx *gin.Context) {
 
 	// 遍历键，先获取所有节点信息
 	for _, key := range keys {
+		// 查询键的值
+		startTime := conn.GetString(key).Unwrap()
 		name := strings.TrimPrefix(key, common.RKP.HeartbeatId+":")
-		nodes = append(nodes, dto.NodeInfoResponse{Name: name})
+		nodes = append(nodes, dto.NodeInfoResponse{Name: name, StartTime: startTime})
 	}
 
 	// 获取 Leader 节点信息
