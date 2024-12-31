@@ -26,7 +26,9 @@ import APIRequest from '@/common/APIRequest.jsx';
 import { SystemRoleStates } from '@/store/StoreSystemRole.jsx';
 import { useSnapshot } from 'valtio';
 import { BackendURL } from '@/common/APIConfig.jsx';
-import { DATA_STATUS_MAP, GENDER_MAP, FORM_ITEM_COMPONENT_MAP, TRUE_FALSE_MAP, DISABLED_ROLE_IDS } from '@/common/GlobalConfig.jsx';
+import { GenerateRecordFormItem } from '@/utils/Form.jsx';
+import { DATA_STATUS_MAP, GENDER_MAP, TRUE_FALSE_MAP, DISABLED_ROLE_IDS } from '@/common/GlobalConfig.jsx';
+import { GenerateGenderIcon, GenerateRoleTag, GenerateStatusTag, GenerateTaskStatusTag } from '@/utils/GenerateTag.jsx';
 
 const { Dragger } = Upload;
 
@@ -63,60 +65,6 @@ const PageDescriptionComponent = () => {
         <li>针对某些特殊的用户，例如老板、高管等，我们建议隐藏其联系方式，保护个人隐私。</li>
       </ul>
     </>
-  );
-};
-
-// 生成性别图标
-const generateGenderIcon = (gender) => {
-  const genderIcons = {
-    1: <ManOutlined style={{ color: '#165dff' }} />,
-    2: <WomanOutlined style={{ color: '#ff4d4f' }} />,
-    default: <QuestionOutlined style={{ color: '#999999' }} />
-  };
-  return genderIcons[gender] || genderIcons.default;
-};
-
-// 生成角色标签
-const generateRoleTag = (name) => {
-  const roleColors = {
-    超级管理员: 'magenta',
-    管理员: 'volcano',
-    运维: 'green'
-  };
-  const color = roleColors[name] || '';
-  return (
-    <Tag bordered={false} color={color}>
-      {name}
-    </Tag>
-  );
-};
-
-// 生成状态标签
-const generateStatusTag = (status) => {
-  const statusMap = {
-    1: { text: '启用', color: 'green' },
-    0: { text: '禁用', color: 'red' }
-  };
-  const { text, color } = statusMap[status] || {};
-  return (
-    <Tag bordered={false} color={color}>
-      {text}
-    </Tag>
-  );
-};
-
-// 生成任务状态标签
-const generateTaskStatusTag = (status) => {
-  const statusMap = {
-    1: { text: '执行中', color: 'gray' },
-    2: { text: '执行成功', color: 'green' },
-    3: { text: '执行失败', color: 'red' }
-  };
-  const { text, color } = statusMap[status] || {};
-  return (
-    <Tag bordered={false} color={color}>
-      {text}
-    </Tag>
   );
 };
 
@@ -183,42 +131,6 @@ const SystemUser = () => {
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   // 公共方法
   /////////////////////////////////////////////////////////////////////////////////////////////////////
-  // 传入元素，生成表单项通用方法
-  const generateRecordFormItem = (item) => {
-    const commonProps = {
-      allowClear: true,
-      placeholder: item.placeholder,
-      hidden: item.hidden,
-      value: item.value,
-      disabled: item.disabled
-    };
-    const componentProps = {
-      input: {},
-      inputPassword: {},
-      textarea: {},
-      treeSelect: {
-        treeData: item.data,
-        showSearch: item.search,
-        treeNodeFilterProp: 'label',
-        multiple: item.multiple,
-      },
-      select: {
-        options: item.data,
-        showSearch: item.search,
-        optionFilterProp: 'label',
-        mode: item.multiple ? 'multiple' : 'default',
-      }
-    };
-    return (
-      <Form.Item key={item.name} name={item.name} label={item.label} rules={item.rules} hidden={item.hidden}>
-        {FORM_ITEM_COMPONENT_MAP[item.type]?.({
-          ...commonProps,
-          ...componentProps[item.type]
-        })}
-      </Form.Item>
-    );
-  };
-
   // 刷新当前页面数据，而不是刷新整个页面
   const refreshCurrentPage = () => {
     const params = { ...filterRecordParams, pageSize, pageNumber, isPagination };
@@ -292,14 +204,14 @@ const SystemUser = () => {
     { title: '头像', dataIndex: 'avatar', render: (avatar) => <Avatar src={avatar} /> },
     { title: '中文名', dataIndex: 'cnName', minWidth: 80 },
     { title: '英文名', dataIndex: 'enName', minWidth: 80 },
-    { title: '性别', dataIndex: 'gender', minWidth: 50, render: (gender) => generateGenderIcon(gender) },
+    { title: '性别', dataIndex: 'gender', minWidth: 50, render: (gender) => GenerateGenderIcon(gender) },
     { title: '用户名', dataIndex: 'username', minWidth: 80 },
     { title: '邮箱', dataIndex: 'email' },
     { title: '手机号', dataIndex: 'phone' },
     { title: '部门', dataIndex: 'systemDepartments', minWidth: 100, render: (systemDepartments) => systemDepartments?.map((department) => department.name).join(',') },
     { title: '岗位', dataIndex: 'systemJobPositions', minWidth: 120, render: (systemJobPositions) => systemJobPositions?.map((jobPosition) => jobPosition.name).join(',') },
-    { title: '角色名称', dataIndex: ['systemRole', 'name'], render: (name) => generateRoleTag(name) },
-    { title: '状态', dataIndex: 'status', render: (status) => generateStatusTag(status) },
+    { title: '角色名称', dataIndex: ['systemRole', 'name'], render: (name) => GenerateRoleTag(name) },
+    { title: '状态', dataIndex: 'status', render: (status) => GenerateStatusTag(status) },
     { title: '创建时间', dataIndex: 'createdAt' },
     { title: '操作', key: 'action', fixed: 'right', render: (_, record) => actionButtonGroup(record) }
   ];
@@ -331,7 +243,7 @@ const SystemUser = () => {
   const generateFilterRecordFormItems = () => {
     return filterRecordFields.slice(0, expandFilterRecordItems ? filterRecordFields.length : PageConfig.defaultFilterExpandItemCount).map((item) => (
       <Col span={6} key={item.name}>
-        {generateRecordFormItem(item)}
+        {GenerateRecordFormItem(item)}
       </Col>
     ));
   };
@@ -514,7 +426,7 @@ const SystemUser = () => {
 
   // 生成添加数据表单项
   const generateAddRecordFormItems = () => {
-    return addRecordFields?.map((item) => generateRecordFormItem(item));
+    return addRecordFields?.map((item) => GenerateRecordFormItem(item));
   };
 
   // 添加数据方法
@@ -630,7 +542,7 @@ const SystemUser = () => {
     { title: '记录数', dataIndex: 'recordCount' },
     { title: '成功数', dataIndex: 'successCount' },
     { title: '失败数', dataIndex: 'failCount' },
-    { title: '任务状态', dataIndex: 'status', render: (_, record) => generateTaskStatusTag(record.taskStatus) },
+    { title: '任务状态', dataIndex: 'status', render: (_, record) => GenerateTaskStatusTag(record.taskStatus) },
     { title: '任务开始时间', dataIndex: 'taskStartTime' },
     { title: '任务结束时间', dataIndex: 'taskEndTime' },
     {
@@ -736,7 +648,7 @@ const SystemUser = () => {
 
   // 生成用户编辑表单
   const generateUpdateRecordFormItems = () => {
-    return updateRecordFields?.map((item) => generateRecordFormItem(item));
+    return updateRecordFields?.map((item) => GenerateRecordFormItem(item));
   };
 
   // 编辑用户方法

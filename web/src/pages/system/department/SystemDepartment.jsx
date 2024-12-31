@@ -1,7 +1,8 @@
 import { Helmet } from 'react-helmet';
 import { TitleSuffix } from '@/common/Text.jsx';
 import { App } from 'antd';
-import { Card, Row, Col, Tree } from 'antd';
+import { Card, Row, Col, Tree, Button, Alert } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 
 // 页面常量设置
 const PageConfig = {
@@ -94,6 +95,7 @@ const SystemDepartment = () => {
         <Row>
           <Col span={6} style={{ padding: '10px' }}>
             <Card title="部门列表">
+              <Button type="primary" block style={{ marginBottom: '15px' }} icon={<PlusOutlined />}>新增部门</Button>
               <Tree
                 defaultExpandAll
                 showLine={true}
@@ -103,7 +105,7 @@ const SystemDepartment = () => {
           </Col>
           <Col span={18} style={{ padding: '10px', paddingLeft: '0' }}>
             <Card title="部门详情">
-              2
+              <Alert message="从菜单树列表任意选择一项后，即可进行编辑修改。" type="error" />
             </Card>
           </Col>
         </Row>
