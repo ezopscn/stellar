@@ -39,4 +39,24 @@ const GenerateTreeNode = (dataList, parentId) => {
   return tree;
 }
 
-export { GenerateSelectTree, GenerateTreeNode };
+// 递归生成部门树
+const GenerateDepartmentTree = (dataList = [], parentId = null) => {
+  return dataList
+    .filter(item => item.parentId === parentId)
+    .map(item => {
+      const node = {
+        ...item,
+        title: item.name,
+        key: item.id.toString()
+      };
+      
+      const children = GenerateDepartmentTree(dataList, item.id);
+      if (children.length > 0) {
+        node.children = children;
+      }
+      
+      return node;
+    });
+};
+
+export { GenerateSelectTree, GenerateTreeNode, GenerateDepartmentTree };

@@ -1,8 +1,12 @@
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { TitleSuffix } from '@/common/Text.jsx';
 import { App } from 'antd';
 import { Card, Row, Col, Tree, Button, Alert } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { AxiosGet } from '@/utils/Request.jsx';
+import { Apis } from '@/common/APIConfig.jsx';
+import { GenerateDepartmentTree } from '@/utils/Tree.jsx';
 
 // 页面常量设置
 const PageConfig = {
@@ -34,47 +38,51 @@ const SystemDepartment = () => {
   // 消息提示
   const { message } = App.useApp();
 
-  // 部门数据
-  const departmentTreeData = [
-    {
-      title: '某科技公司',
-      key: '1',
-      children: [
-        {
-          title: '研发中心',
-          key: '1-1',
-          children: [
-            {
-              title: '后台开发部',
-              key: '1-1-1',
-            },
-            {
-              title: '前端开发部',
-              key: '1-1-2',
-            },
-            {
-              title: '测试部',
-              key: '1-1-3',
-            },
-            {
-              title: '运维部',
-              key: '1-1-4',
-            },
-          ],
-        },
-        {
-          title: '产品中心',
-          key: '1-2',
-          children: [
-            {
-              title: '产品部',
-              key: '1-2-1',
-            },
-          ],
-        },
-      ],
-    },
-  ];
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 部门列表
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 部门树数据
+  const [departmentTreeData, setDepartmentTreeData] = useState([]);
+  // 展开的部门节点
+  const [expandedDepartmentKeys, setExpandedDepartmentKeys] = useState([]);
+
+  // 获取树形结构所有节点的 key
+  const getAllTreeKeys = (data) => {
+    let keys = [];
+    if (!Array.isArray(data)) return keys;
+    data.forEach(item => {
+      if (item?.key) keys.push(item.key);
+      if (item?.children?.length > 0) {
+        keys = keys.concat(getAllTreeKeys(item.children));
+      }
+    });
+    return keys;
+  };
+
+  // 获取部门树数据
+  const getDepartmentTreeData = async () => {
+    try {
+      const res = await AxiosGet(Apis.System.Department.List);
+      if (res?.code === 200 && Array.isArray(res.data)) {
+        const treeData = GenerateDepartmentTree(res.data, 0);
+        setDepartmentTreeData(treeData);
+        setExpandedDepartmentKeys(getAllTreeKeys(treeData));
+      } else {
+        message.error(res?.message || '获取部门数据失败');
+      }
+    } catch (error) {
+      console.error('获取部门列表错误:', error);
+      message.error('服务异常，获取部门列表失败');
+    }
+  };
+  useEffect(() => {
+    getDepartmentTreeData();
+  }, []);
+
+  // 处理展开/收起操作
+  const onExpandDepartmentTree = (newExpandedKeys) => {
+    setExpandedDepartmentKeys(newExpandedKeys);
+  };
 
   return (
     <>
@@ -97,8 +105,10 @@ const SystemDepartment = () => {
             <Card title="部门列表">
               <Button type="primary" block style={{ marginBottom: '15px' }} icon={<PlusOutlined />}>新增部门</Button>
               <Tree
-                defaultExpandAll
+                defaultExpandAll={true}
                 showLine={true}
+                expandedKeys={expandedDepartmentKeys}
+                onExpand={onExpandDepartmentTree}
                 treeData={departmentTreeData}
               />
             </Card>

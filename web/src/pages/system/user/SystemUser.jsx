@@ -433,12 +433,13 @@ const SystemUser = () => {
   const addRecordHandler = async (data) => {
     try {
       const res = await AxiosPost(Apis.System.User.Add, data);
-      if (res.code === 200) {
+      if (res?.code === 200) {
         message.success('添加成功');
+        addRecordForm.resetFields();
         setAddRecordModalVisible(false);
         refreshCurrentPage();
       } else {
-        message.error(res.message);
+        message.error(res?.message);
       }
     } catch (error) {
       message.error('服务异常，添加数据失败');
@@ -579,12 +580,12 @@ const SystemUser = () => {
   const multiModifyRecordHandler = async (data) => {
     try {
       const res = await AxiosPost(Apis.System.User.MultiModifyStatus, data);
-      if (res.code === 200) {
+      if (res?.code === 200) {
         message.success('批量操作成功');
         setMultiModifyRecordIds([]);
         refreshCurrentPage();
       } else {
-        message.error(res.message);
+        message.error(res?.message);
       }
     } catch (error) {
       message.error('服务异常，批量操作失败');
@@ -656,12 +657,13 @@ const SystemUser = () => {
     try {
       console.log(data);
       const res = await AxiosPost(Apis.System.User.Update, data);
-      if (res.code === 200) {
+      if (res?.code === 200) {
         message.success('编辑成功');
+        updateRecordForm.resetFields();
         setUpdateRecordModalVisible(false);
         refreshCurrentPage();
       } else {
-        message.error(res.message);
+        message.error(res?.message);
       }
     } catch (error) {
       message.error('服务异常，编辑失败');
