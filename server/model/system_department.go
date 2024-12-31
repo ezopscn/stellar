@@ -7,7 +7,7 @@ type SystemDepartment struct {
 	Description string             `gorm:"column:description;comment:部门描述" json:"description"`
 	LeaderId    uint               `gorm:"column:leaderId;comment:部门领导id" json:"leaderId"`
 	Leader      *SystemUser        `gorm:"foreignKey:LeaderId" json:"leader,omitempty"`
-	Creator     string             `gorm:"column:creator;comment:创建者（由中文名，英文名，ID组成，格式：张三,ZhangSan,1）" json:"creator"`
+	Creator     string             `gorm:"column:creator;comment:创建者（由用户名，中文名，英文名，ID组成，格式：username,cnName,enName,id）" json:"creator"`
 	ParentId    uint               `gorm:"column:parentId;comment:父id" json:"parentId"`
 	Children    []SystemDepartment `gorm:"-" json:"children"`
 	SystemUsers []SystemUser       `gorm:"many2many:system_user_department_relation" json:"SystemUsers,omitempty"`

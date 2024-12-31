@@ -24,7 +24,7 @@ const PageDescriptionComponent = () => {
     <>
       <div>欢迎来到系统信息页面，在这里您可以查看到系统的一些基础运行信息，主要包括：</div>
       <ul>
-        <li>Stellar 系统前后端版本，构建相关信息。</li>
+        <li>Stellar 系统后端版本，构建相关信息。</li>
         <li>Stellar 各个角色运行的实例相关信息。</li>
       </ul>
     </>
