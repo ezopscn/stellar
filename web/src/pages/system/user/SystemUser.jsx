@@ -698,11 +698,11 @@ const SystemUser = () => {
   const modifyRecordStatusHandler = async (recordId, operate) => {
     try {
       const res = await AxiosPost(Apis.System.User.ModifyStatus, { id: recordId, operate: operate });
-      if (res.code === 200) {
+      if (res?.code === 200) {
         message.success('操作成功');
         refreshCurrentPage();
       } else {
-        message.error(res.message);
+        message.error(res?.message);
       }
     } catch (error) {
       message.error('服务异常，修改状态失败');
@@ -760,11 +760,7 @@ const SystemUser = () => {
                 批量导入
               </Button>
               <Dropdown menu={multiModifyRecordMenuProps} disabled={multiModifyRecordStatusButtonDisabled}>
-                <Button>
-                  <Space>
-                    <DownOutlined /> 批量操作
-                  </Space>
-                </Button>
+                <Button icon={<DownOutlined />}>批量操作</Button>
               </Dropdown>
             </Space>
             <Space style={{ float: 'right' }}>

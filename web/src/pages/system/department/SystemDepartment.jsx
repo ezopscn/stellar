@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { TitleSuffix } from '@/common/Text.jsx';
 import { App } from 'antd';
-import { Card, Row, Col, Tree, Button, Alert } from 'antd';
+import { Card, Row, Col, Tree, Button, Alert, Form } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
 import { GenerateDepartmentTree } from '@/utils/Tree.jsx';
+import { GenerateRecordFormItem } from '@/utils/Form.jsx';
 
 // 页面常量设置
 const PageConfig = {
@@ -50,7 +51,7 @@ const SystemDepartment = () => {
   const getAllTreeKeys = (data) => {
     let keys = [];
     if (!Array.isArray(data)) return keys;
-    data.forEach(item => {
+    data.forEach((item) => {
       if (item?.key) keys.push(item.key);
       if (item?.children?.length > 0) {
         keys = keys.concat(getAllTreeKeys(item.children));
@@ -63,8 +64,8 @@ const SystemDepartment = () => {
   const getDepartmentTreeData = async () => {
     try {
       const res = await AxiosGet(Apis.System.Department.List);
-      if (res?.code === 200 && Array.isArray(res.data)) {
-        const treeData = GenerateDepartmentTree(res.data, 0);
+      if (res?.code === 200 && Array.isArray(res?.data)) {
+        const treeData = GenerateDepartmentTree(res?.data, 0);
         setDepartmentTreeData(treeData);
         setExpandedDepartmentKeys(getAllTreeKeys(treeData));
       } else {
@@ -82,6 +83,72 @@ const SystemDepartment = () => {
   // 处理展开/收起操作
   const onExpandDepartmentTree = (newExpandedKeys) => {
     setExpandedDepartmentKeys(newExpandedKeys);
+  };
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 编辑部门
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 编辑表单
+  const [updateDepartmentForm] = Form.useForm();
+  // 编辑数据
+  const [updateDepartment, setUpdateDepartment] = useState(null);
+
+  // 下拉菜单的部门列表数据
+  const [systemDepartmentList, setSystemDepartmentList] = useState([]);
+
+  // 页面加载的时候一次性获取依赖的异步数据
+  useEffect(() => {
+    // 获取部门列表（树形结构）
+    APIRequest.GetSelectDataList(Apis.System.Department.List, setSystemDepartmentList, true);
+  }, []);
+
+
+  // 定义编辑数据的字段
+  const updateDepartmentFields = [
+    {
+      label: 'ID',
+      name: 'id',
+      type: 'input',
+      value: updateDepartment?.id,
+      hidden: true
+    },
+    {
+      label: '部门名称',
+      name: 'name',
+      type: 'input',
+      value: updateDepartment?.name,
+      rules: [
+        { required: true, message: '部门名称不能为空' },
+        { max: 30, message: '部门名称长度不能超过30个字符' },
+        { min: 3, message: '部门名称长度不能小于3个字符' }
+      ]
+    },
+    {
+      label: '部门描述',
+      name: 'description',
+      type: 'input',
+      value: updateDepartment?.description,
+      rules: [
+        { required: true, message: '部门描述不能为空' },
+        { max: 100, message: '部门描述长度不能超过100个字符' },
+        { min: 5, message: '部门描述长度不能小于5个字符' }
+      ]
+    },
+    {
+      label: '部门领导',
+      name: 'leader',
+      type: 'select'
+    },
+    {
+      label: '父部门',
+      name: 'parentId',
+      type: 'select'
+    }
+  ];
+
+  // 生成编辑表单项
+  const generateUpdateDepartmentFormItems = () => {
+    return updateDepartmentFields?.map((item) => GenerateRecordFormItem(item));
   };
 
   return (
@@ -103,19 +170,23 @@ const SystemDepartment = () => {
         <Row>
           <Col span={6} style={{ padding: '10px' }}>
             <Card title="部门列表">
-              <Button type="primary" block style={{ marginBottom: '15px' }} icon={<PlusOutlined />}>新增部门</Button>
-              <Tree
-                defaultExpandAll={true}
-                showLine={true}
-                expandedKeys={expandedDepartmentKeys}
-                onExpand={onExpandDepartmentTree}
-                treeData={departmentTreeData}
-              />
+              <Button type="primary" block style={{ marginBottom: '15px' }} icon={<PlusOutlined />}>
+                新增部门
+              </Button>
+              <Tree defaultExpandAll={true} showLine={true} expandedKeys={expandedDepartmentKeys} onExpand={onExpandDepartmentTree} treeData={departmentTreeData} />
             </Card>
           </Col>
           <Col span={18} style={{ padding: '10px', paddingLeft: '0' }}>
             <Card title="部门详情">
               <Alert message="从菜单树列表任意选择一项后，即可进行编辑修改。" type="error" />
+              <div className="admin-tree-edit-form">
+                <Form form={updateDepartmentForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="updateDepartmentForm" onFinish={() => {}} autoComplete="off">
+                  {generateUpdateDepartmentFormItems()}
+                  <Form.Item wrapperCol={{ span: 24 }} style={{ textAlign: 'right' }}>
+                    <Button type="primary" htmlType="submit">保存编辑</Button>
+                  </Form.Item>
+                </Form>
+              </div>
             </Card>
           </Col>
         </Row>
