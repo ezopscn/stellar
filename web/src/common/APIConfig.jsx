@@ -41,7 +41,8 @@ const Apis = {
       List: BackendURL + '/system/job-position/list' // 岗位列表
     },
     Department: {
-      List: BackendURL + '/system/department/list' // 部门列表
+      List: BackendURL + '/system/department/list', // 部门列表
+      Detail: BackendURL + '/system/department/detail' // 部门详情
     }
   }
 };

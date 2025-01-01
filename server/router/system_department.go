@@ -14,5 +14,6 @@ func SystemDepartmentAuthRoutes(rg *gin.RouterGroup) gin.IRoutes {
 // 系统部门路由，需要权限校验
 func SystemDepartmentAuthAndPermissionRoutes(rg *gin.RouterGroup) gin.IRoutes {
 	rg.GET("/list", v1.SystemDepartmentListHandler)
+	rg.GET("/detail", v1.SystemDepartmentDetailHandler)
 	return rg
 }

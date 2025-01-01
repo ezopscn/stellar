@@ -16,6 +16,7 @@ var publicApis = []model.SystemApi{
 
 // 开放 API，需要登录
 var publicAuthApis = []model.SystemApi{
+	{Name: "节点信息", Path: "/node/information", Method: "GET", Description: "节点信息接口", NeedPermission: trans.Uint(0), CategoryId: 1},
 	{Name: "Token校验", Path: "/token/verification", Method: "GET", Description: "Token校验接口", NeedPermission: trans.Uint(0), CategoryId: 1},
 	{Name: "用户注销", Path: "/logout", Method: "GET", Description: "用户注销接口", NeedPermission: trans.Uint(0), CategoryId: 1},
 }
@@ -59,6 +60,7 @@ var systemDepartmentAuthApis = []model.SystemApi{}
 // 部门 API，需要鉴权
 var systemDepartmentAuthAndPermissionApis = []model.SystemApi{
 	{Name: "部门列表", Path: "/system/department/list", Method: "GET", Description: "部门列表接口", NeedPermission: trans.Uint(1), CategoryId: 6, SystemRoles: []model.SystemRole{systemRoles[2]}},
+	{Name: "部门详情", Path: "/system/department/detail", Method: "GET", Description: "部门详情接口", NeedPermission: trans.Uint(1), CategoryId: 6},
 }
 
 // 职位 API，无需鉴权
