@@ -31,64 +31,38 @@ const PageDescriptionComponent = () => (
 
 // 编辑表单字段配置
 const getUpdateSystemDepartmentFields = (updateSystemDepartment, systemDepartmentSelectTreeData) => [
-  {
-    label: '部门 ID',
-    name: 'id',
-    type: 'input',
-    disabled: true
-  },
-  {
-    label: '部门名称',
-    name: 'name',
-    type: 'input',
-    rules: [
-      { required: true, message: '部门名称不能为空' },
-      { max: 30, message: '部门名称长度不能超过30个字符' },
-      { min: 3, message: '部门名称长度不能小于3个字符' }
-    ],
+  { label: '部门 ID', name: 'id', type: 'input', disabled: true },
+  { label: '部门名称', name: 'name', type: 'input', rules: [
+    { required: true, message: '部门名称不能为空' },
+    { max: 30, message: '部门名称长度不能超过30个字符' },
+    { min: 3, message: '部门名称长度不能小于3个字符' }
+  ],
     disabled: updateSystemDepartment?.id === 2
   },
-  {
-    label: '父部门',
-    name: 'parentId',
-    type: 'treeSelect',
-    search: true,
-    tree: true,
-    multiple: false,
-    data: systemDepartmentSelectTreeData,
+  { label: '父部门', name: 'parentId', type: 'treeSelect', search: true, tree: true, multiple: false, data: systemDepartmentSelectTreeData, 
     rules: [{ required: true, message: '父部门不能为空' }],
     disabled: updateSystemDepartment?.id === 1 || updateSystemDepartment?.id === 2
   },
-  {
-    label: '创建人',
-    name: 'creator',
-    type: 'input',
-    disabled: true,
-  },
-  {
-    label: '创建时间',
-    name: 'createdAt',
-    type: 'input',
-    disabled: true,
-  },
-  {
-    label: '更新时间',
-    name: 'updatedAt',
-    type: 'input',
-    disabled: true,
-  }
+  { label: '创建人', name: 'creator', type: 'input', disabled: true },
+  { label: '创建时间', name: 'createdAt', type: 'input', disabled: true },
+  { label: '更新时间', name: 'updatedAt', type: 'input', disabled: true }
 ];
 
 const SystemDepartment = () => {
   const { message } = App.useApp();
   const [updateSystemDepartmentForm] = Form.useForm();
 
-  // 状态管理
+  // 左侧部门树数据
   const [systemDepartmentTreeData, setSystemDepartmentTreeData] = useState([]);
+  // 展开的部门树节点
   const [expandedSystemDepartmentKeys, setExpandedSystemDepartmentKeys] = useState([]);
+  // 部门选择树数据
   const [systemDepartmentSelectTreeData, setSystemDepartmentSelectTreeData] = useState([]);
+  // 当前编辑的部门数据
   const [updateSystemDepartment, setUpdateSystemDepartment] = useState(null);
+  // 删除部门按钮状态
   const [deleteSystemDepartmentButtonDisabled, setDeleteSystemDepartmentButtonDisabled] = useState(false);
+  // 保存部门按钮状态
   const [saveSystemDepartmentButtonDisabled, setSaveSystemDepartmentButtonDisabled] = useState(false);
 
   // 获取部门列表数据
@@ -126,18 +100,20 @@ const SystemDepartment = () => {
           creator: `${creatorCnName} / ${creatorEnName} (${creatorUsername} / ${creatorEmail})`
         });
 
-        // 设置按钮状态
+        // 是否是根部门
         const isRootDepartment = data.id === 1;
+        // 是否是未分配部门
         const isUnassignedDepartment = data.id === 2;
+        // 是否存在子部门
         const hasChildDepartments = HasChildren(systemDepartmentTreeData, data.id);
-
+        // 设置按钮状态
         setDeleteSystemDepartmentButtonDisabled(isRootDepartment || isUnassignedDepartment || hasChildDepartments);
         setSaveSystemDepartmentButtonDisabled(isUnassignedDepartment);
       } else {
         message.error(res?.message || '获取部门详情失败');
       }
     } catch (error) {
-      console.error('获取部门详情错误:', error);
+      console.error(error);
       message.error('服务异常，获取部门详情失败');
     }
   };
@@ -172,9 +148,7 @@ const SystemDepartment = () => {
         <Row>
           <Col span={6} style={{ padding: '10px' }}>
             <Card title="部门列表">
-              <Button type="primary" block style={{ marginBottom: '15px' }} icon={<PlusOutlined />}>
-                新增部门
-              </Button>
+              <Button type="primary" block style={{ marginBottom: '15px' }} icon={<PlusOutlined />}>新增部门</Button>
               <Tree
                 defaultExpandAll={true}
                 defaultSelectedKeys={['1']}
@@ -193,7 +167,7 @@ const SystemDepartment = () => {
 
           <Col span={14} style={{ padding: '10px' }}>
             <Card title="部门详情">
-              <Alert message="从菜单树列表任意选择一项后，即可进行编辑修改。" type="error" />
+              <Alert message="从菜单树列表任意选择一项后，即可进行编辑修改。" type="info" />
               <div className="admin-tree-edit-form">
                 <Form
                   form={updateSystemDepartmentForm}
@@ -210,12 +184,8 @@ const SystemDepartment = () => {
                     <Row>
                       <Col offset={6} span={18}>
                         <Space>
-                          <Button color="danger" variant="outlined" disabled={deleteSystemDepartmentButtonDisabled}>
-                            删除部门
-                          </Button>
-                          <Button type="primary" htmlType="submit" disabled={saveSystemDepartmentButtonDisabled}>
-                            保存编辑
-                          </Button>
+                          <Button color="danger" variant="outlined" disabled={deleteSystemDepartmentButtonDisabled}>删除部门</Button>
+                          <Button type="primary" htmlType="submit" disabled={saveSystemDepartmentButtonDisabled}>保存编辑</Button>
                         </Space>
                       </Col>
                     </Row>
