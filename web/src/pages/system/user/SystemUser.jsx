@@ -6,9 +6,6 @@ import {
   DownOutlined,
   SearchOutlined,
   UserAddOutlined,
-  ManOutlined,
-  WomanOutlined,
-  QuestionOutlined,
   DownloadOutlined,
   UploadOutlined,
   InboxOutlined,
@@ -16,6 +13,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   RestOutlined,
+  LockOutlined,
   UnorderedListOutlined
 } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
@@ -150,47 +148,60 @@ const SystemUser = () => {
   const actionButtonGroup = (record) => {
     return (
       <>
-        <Button
-          color="primary"
-          variant="link"
-          icon={<EditOutlined />}
-          disabled={updateRecordButtonDisabled}
-          onClick={() => {
-            setUpdateRecordModalVisible(true);
-            setUpdateRecord(record);
-          }}
-        >
-          编辑
-        </Button>
-        {record.status === 1 ? ( // 超级管理员账户不允许禁用
-          <Popconfirm
-            placement="topRight"
-            title="确定要禁用该用户吗？"
-            okText="确定"
-            cancelText="取消"
-            okButtonProps={{ style: { backgroundColor: '#ff4d4f', borderColor: '#ff4d4f' } }}
-            onConfirm={() => modifyRecordStatusHandler(record.id, 'disable')}
-          >
-            <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={modifyRecordStatusButtonDisabled || DISABLED_ROLE_IDS.includes(record.id)}>
-              禁用
-            </Button>
-          </Popconfirm>
-        ) : (
-          <Popconfirm
-            placement="topRight"
-            title="确定要启用该用户吗？"
-            okText="确定"
-            cancelText="取消"
-            okButtonProps={{ style: { backgroundColor: '#52c41a', borderColor: '#52c41a' } }}
-            onConfirm={() => {
-              modifyRecordStatusHandler(record.id, 'enable');
+        <Space>
+          <Button
+            color="primary"
+            variant="link"
+            icon={<EditOutlined />}
+            disabled={updateRecordButtonDisabled}
+            onClick={() => {
+              setUpdateRecordModalVisible(true);
+              setUpdateRecord(record);
             }}
           >
-            <Button color="success" variant="link" icon={<RestOutlined />} disabled={modifyRecordStatusButtonDisabled}>
-              启用
-            </Button>
-          </Popconfirm>
-        )}
+            编辑
+          </Button>
+          {record.status === 1 ? ( // 超级管理员账户不允许禁用
+            <Popconfirm
+              placement="topRight"
+              title="确定要禁用该用户吗？"
+              okText="确定"
+              cancelText="取消"
+              okButtonProps={{ style: { backgroundColor: '#ff4d4f', borderColor: '#ff4d4f' } }}
+              onConfirm={() => modifyRecordStatusHandler(record.id, 'disable')}
+            >
+              <Button color="danger" variant="link" icon={<DeleteOutlined />} disabled={modifyRecordStatusButtonDisabled || DISABLED_ROLE_IDS.includes(record.id)}>
+                禁用
+              </Button>
+            </Popconfirm>
+          ) : (
+            <Popconfirm
+              placement="topRight"
+              title="确定要启用该用户吗？"
+              okText="确定"
+              cancelText="取消"
+              okButtonProps={{ style: { backgroundColor: '#52c41a', borderColor: '#52c41a' } }}
+              onConfirm={() => {
+                modifyRecordStatusHandler(record.id, 'enable');
+              }}
+            >
+              <Button color="success" variant="link" icon={<RestOutlined />} disabled={modifyRecordStatusButtonDisabled}>
+                启用
+              </Button>
+            </Popconfirm>
+          )}
+          <Button
+            color="primary"
+            variant="link"
+            icon={<LockOutlined />}
+            disabled={true}
+            onClick={() => {
+              console.log(record);
+            }}
+          >
+            重置
+          </Button>
+        </Space>
       </>
     );
   };
@@ -596,8 +607,12 @@ const SystemUser = () => {
   // 批量操作菜单
   const multiModifyRecordMenuProps = {
     items: [
-      { label: '批量禁用', key: 'disable', danger: true, disabled: multiModifyRecordIds.length === 0 },
-      { label: '批量启用', key: 'enable', danger: false, disabled: multiModifyRecordIds.length === 0 }
+      { label: '批量禁用用户', key: 'disable', danger: true, disabled: multiModifyRecordIds.length === 0 },
+      { label: '批量启用用户', key: 'enable', danger: false, disabled: multiModifyRecordIds.length === 0 },
+      { label: '批量修改部门', key: 'updateSystemDepartment', danger: false, disabled: multiModifyRecordIds.length === 0 },
+      { label: '批量修改岗位', key: 'updateSystemJobPosition', danger: false, disabled: multiModifyRecordIds.length === 0 },
+      { label: '批量修改角色', key: 'updateSystemRole', danger: false, disabled: multiModifyRecordIds.length === 0 },
+      { label: '批量修改密码', key: 'updatePassword', danger: false, disabled: multiModifyRecordIds.length === 0 }
     ],
     onClick: (key) => {
       if (multiModifyRecordIds.length > 0) {
