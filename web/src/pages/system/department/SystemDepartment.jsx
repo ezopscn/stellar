@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { TitleSuffix } from '@/common/Text.jsx';
 import { App } from 'antd';
-import { Card, Row, Col, Tree, Button, Alert, Form, Space } from 'antd';
+import { Card, Row, Col, Tree, Button, Alert, Form, Space, List, Avatar, Skeleton } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
@@ -130,6 +130,21 @@ const SystemDepartment = () => {
     }
   }, [systemDepartmentTreeData]);
 
+  const systemDepartmentUserList = [
+    {
+      title: 'Ant Design Title 1',
+    },
+    {
+      title: 'Ant Design Title 2',
+    },
+    {
+      title: 'Ant Design Title 3',
+    },
+    {
+      title: 'Ant Design Title 4',
+    },
+  ];
+
   return (
     <>
       <Helmet>
@@ -161,11 +176,36 @@ const SystemDepartment = () => {
             </Card>
           </Col>
 
-          <Col span={4} style={{ padding: '10px 0' }}>
-            <Card title="部门用户" />
+          <Col span={6} style={{ padding: '10px 0' }}>
+            <Card title="部门用户">
+              <List
+                className="admin-user-list"
+                itemLayout="horizontal"
+                dataSource={systemDepartmentUserList}
+                split={false}
+                renderItem={(item) => (
+                  <List.Item actions={[<a key="list-loadmore-edit">移除</a>, <a key="list-loadmore-more">变更</a>]}>
+                    <List.Item.Meta
+                      avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />}
+                      title={<a href="https://ant.design">吴彦祖（John）</a>}
+                      description="首席执行官（CEO）,研发总监"
+                    />
+                  </List.Item>
+                )}
+                pagination={{
+                  position: 'bottom',
+                  align: 'end',
+                  pageSize: 10,
+                  size: 'small',
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                  showTotal: (total, range) => `总共 ${total} 条数据`
+                }}
+              />
+            </Card>
           </Col>
 
-          <Col span={14} style={{ padding: '10px' }}>
+          <Col span={12} style={{ padding: '10px' }}>
             <Card title="部门详情">
               <Alert message="从菜单树列表任意选择一项后，即可进行编辑修改。" type="info" />
               <div className="admin-tree-edit-form">

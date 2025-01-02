@@ -18,12 +18,14 @@ const GenerateRecordFormItem = (item) => {
       treeData: item.data,
       showSearch: item.search,
       treeNodeFilterProp: 'label',
+      allowClear: false,
       multiple: item.multiple
     },
     select: {
       options: item.data,
       showSearch: item.search,
       optionFilterProp: 'label',
+      allowClear: false,
       mode: item.multiple ? 'multiple' : 'default'
     }
   };
