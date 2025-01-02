@@ -42,7 +42,7 @@ const Apis = {
     },
     Department: {
       List: BackendURL + '/system/department/list', // 部门列表
-      Detail: BackendURL + '/system/department/detail' // 部门详情
+      Detail: BackendURL + '/system/department/detail', // 部门详情
     }
   }
 };

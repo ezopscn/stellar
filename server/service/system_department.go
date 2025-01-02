@@ -13,6 +13,6 @@ func GetSystemDepartmentListService() (departments []model.SystemDepartment, err
 
 // 获取部门详情
 func GetSystemDepartmentDetailService(id string) (department model.SystemDepartment, err error) {
-	err = common.MySQLDB.Where("id = ?", id).First(&department).Error
+	err = common.MySQLDB.Where("id = ?", id).Preload("SystemUsers.SystemJobPositions").First(&department).Error
 	return
 }

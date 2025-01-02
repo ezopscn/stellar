@@ -84,13 +84,14 @@ const SystemDepartment = () => {
   };
 
   // 获取部门详情
-  const getSystemDepartmentDetail = async (selectedKeys) => {
+  const getSystemDepartmentDetailHandler = async (selectedKeys) => {
     if (!selectedKeys?.length) return;
 
     try {
       const res = await AxiosGet(Apis.System.Department.Detail, { id: selectedKeys[0] });
       if (res?.code === 200) {
         const { data } = res;
+        console.log(data);
         setUpdateSystemDepartment(data);
 
         // 设置表单值
@@ -118,32 +119,17 @@ const SystemDepartment = () => {
     }
   };
 
+  // 默认选中根部门
+  useEffect(() => {
+    if (systemDepartmentTreeData.length > 0) {
+      getSystemDepartmentDetailHandler(['1']);
+    }
+  }, [systemDepartmentTreeData]);
+
   // 初始化数据
   useEffect(() => {
     getSystemDepartmentDataHandler();
   }, []);
-
-  // 默认选中根部门
-  useEffect(() => {
-    if (systemDepartmentTreeData.length > 0) {
-      getSystemDepartmentDetail(['1']);
-    }
-  }, [systemDepartmentTreeData]);
-
-  const systemDepartmentUserList = [
-    {
-      title: 'Ant Design Title 1',
-    },
-    {
-      title: 'Ant Design Title 2',
-    },
-    {
-      title: 'Ant Design Title 3',
-    },
-    {
-      title: 'Ant Design Title 4',
-    },
-  ];
 
   return (
     <>
@@ -171,7 +157,9 @@ const SystemDepartment = () => {
                 expandedKeys={expandedSystemDepartmentKeys}
                 onExpand={setExpandedSystemDepartmentKeys}
                 treeData={systemDepartmentTreeData}
-                onSelect={getSystemDepartmentDetail}
+                onSelect={(selectedKeys) => {
+                  getSystemDepartmentDetailHandler(selectedKeys);
+                }}
               />
             </Card>
           </Col>
@@ -181,14 +169,14 @@ const SystemDepartment = () => {
               <List
                 className="admin-user-list"
                 itemLayout="horizontal"
-                dataSource={systemDepartmentUserList}
+                dataSource={updateSystemDepartment?.systemUsers}
                 split={false}
-                renderItem={(item) => (
+                renderItem={(item, index) => (
                   <List.Item actions={[<a key="list-loadmore-edit">移除</a>, <a key="list-loadmore-more">变更</a>]}>
                     <List.Item.Meta
-                      avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />}
-                      title={<a href="https://ant.design">吴彦祖（John）</a>}
-                      description="首席执行官（CEO）,研发总监"
+                      avatar={<Avatar src={item.avatar} />}
+                      title={`${item.cnName}（${item.enName}）`}
+                      description={item.systemJobPositions?.map(job => `${job.name}`).join(', ')}
                     />
                   </List.Item>
                 )}

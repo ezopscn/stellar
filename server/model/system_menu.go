@@ -9,7 +9,7 @@ type SystemMenu struct {
 	Sort        uint         `gorm:"column:sort;comment:排序" json:"sort"`
 	ParentId    uint         `gorm:"column:parentId;comment:父id" json:"parentId"`
 	Children    []SystemMenu `gorm:"-" json:"children"`
-	SystemRoles []SystemRole `gorm:"many2many:system_role_menu_relation" json:"SystemRoles,omitempty"`
+	SystemRoles []SystemRole `gorm:"many2many:system_role_menu_relation" json:"systemRoles,omitempty"`
 }
 
 // 表名设置
