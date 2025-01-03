@@ -185,6 +185,8 @@ const SystemDepartment = () => {
                   align: 'end',
                   pageSize: 10,
                   size: 'small',
+                  hideOnSinglePage: true,
+                  total: updateSystemDepartment?.systemUsers?.length,
                   showSizeChanger: true,
                   showQuickJumper: true,
                   showTotal: (total, range) => `总共 ${total} 条数据`
