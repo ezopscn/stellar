@@ -48,21 +48,9 @@ func SystemDepartmentAddHandler(ctx *gin.Context) {
 		return
 	}
 
-	// 校验父部门是否为空
-	if req.ParentId == nil {
-		response.FailedWithMessage("父部门不能为空")
-		return
-	}
-
-	// 不允许 ParentId 为 2，因为 2 是预留的未分配部门
-	if *req.ParentId == 2 {
-		response.FailedWithMessage("父部门不能为未分配部门")
-		return
-	}
-
-	// 校验名称是否合法
-	if req.Name == nil || *req.Name == "" || len(*req.Name) > 30 || len(*req.Name) < 3 {
-		response.FailedWithMessage("部门名称长度不合法")
+	// 校验参数
+	if err := req.Validate(); err != nil {
+		response.FailedWithMessage(err.Error())
 		return
 	}
 
@@ -76,4 +64,16 @@ func SystemDepartmentAddHandler(ctx *gin.Context) {
 		return
 	}
 	response.Success()
+}
+
+// 修改部门
+func SystemDepartmentUpdateHandler(ctx *gin.Context) {
+	// 获取请求参数
+	var req dto.SystemDepartmentUpdateRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		response.FailedWithMessage("请求参数错误")
+		return
+	}
+
+	// 校验参数合法性
 }

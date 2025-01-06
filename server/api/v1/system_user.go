@@ -2,7 +2,6 @@ package v1
 
 import (
 	"fmt"
-	"regexp"
 	"stellar/common"
 	"stellar/dto"
 	"stellar/initialize/data"
@@ -65,54 +64,12 @@ func SystemUserAddHandler(ctx *gin.Context) {
 	}
 
 	// 校验提交数据
-	errList := []string{}
-	if !utils.IsUsername(*req.Username) {
-		errList = append(errList, "用户名格式错误")
-	}
-	if !utils.IsPassword(*req.Password) {
-		errList = append(errList, "密码格式错误")
-	}
-	if !utils.IsCNName(*req.CNName) {
-		errList = append(errList, "中文名格式错误")
-	}
-	if !utils.IsENName(*req.ENName) {
-		errList = append(errList, "英文名格式错误")
-	}
-	if !utils.IsEmail(*req.Email) {
-		errList = append(errList, "邮箱格式错误")
-	}
-	if !utils.IsPhoneNumber(*req.Phone) {
-		errList = append(errList, "手机号格式错误")
-	}
-	if *req.HidePhone != 0 && *req.HidePhone != 1 {
-		errList = append(errList, "隐藏手机号格式错误，只能是 0 或 1")
-	}
-	if *req.Gender != 1 && *req.Gender != 2 && *req.Gender != 3 {
-		errList = append(errList, "性别格式错误，只能是 1 或 2 或 3")
-	}
-	if len(req.SystemDepartments) == 0 {
-		errList = append(errList, "部门不能为空")
-	}
-	if len(req.SystemJobPositions) == 0 {
-		errList = append(errList, "职位不能为空")
-	}
-	if req.SystemRole == nil || *req.SystemRole == 0 {
-		errList = append(errList, "角色不能为空")
-	}
-	if req.Description != nil {
-		if len(*req.Description) > 200 {
-			errList = append(errList, "描述长度不能超过 200 个字符")
-		}
-	} else {
-		req.Description = trans.String("")
-	}
-
+	errList := req.Validate()
 	// 如果错误列表不为空，则返回错误
 	if len(errList) > 0 {
 		response.FailedWithMessage(strings.Join(errList, ","))
 		return
 	}
-	fmt.Println(1)
 
 	// 用户模型
 	user := model.SystemUser{
@@ -221,48 +178,7 @@ func SystemUserMultiAddHandler(ctx *gin.Context) {
 			common.MySQLDB.Save(&taskDetail)
 
 			// 校验提交数据
-			errList := []string{}
-			if !utils.IsUsername(*v.Username) {
-				errList = append(errList, "用户名格式错误")
-			}
-			if !utils.IsPassword(*v.Password) {
-				errList = append(errList, "密码格式错误")
-			}
-			if !utils.IsCNName(*v.CNName) {
-				errList = append(errList, "中文名格式错误")
-			}
-			if !utils.IsENName(*v.ENName) {
-				errList = append(errList, "英文名格式错误")
-			}
-			if !utils.IsEmail(*v.Email) {
-				errList = append(errList, "邮箱格式错误")
-			}
-			if !utils.IsPhoneNumber(*v.Phone) {
-				errList = append(errList, "手机号格式错误")
-			}
-			if *v.HidePhone != "0" && *v.HidePhone != "1" {
-				errList = append(errList, "隐藏手机号格式错误，只能是 0 或 1")
-			}
-			if *v.Gender != "1" && *v.Gender != "2" && *v.Gender != "3" {
-				errList = append(errList, "性别格式错误，只能是 1 或 2 或 3")
-			}
-			if v.SystemDepartments == nil || *v.SystemDepartments == "" || !regexp.MustCompile(`^(\d+)(,\d+)*$`).MatchString(*v.SystemDepartments) {
-				errList = append(errList, "部门格式错误")
-			}
-			if v.SystemJobPositions == nil || *v.SystemJobPositions == "" || !regexp.MustCompile(`^(\d+)(,\d+)*$`).MatchString(*v.SystemJobPositions) {
-				errList = append(errList, "职位格式错误")
-			}
-			if !regexp.MustCompile(`^(\d+)$`).MatchString(*v.SystemRole) {
-				errList = append(errList, "角色格式错误")
-			}
-			if v.Description != nil {
-				if len(*v.Description) > 200 {
-					errList = append(errList, "描述长度不能超过 200 个字符")
-				}
-			} else {
-				v.Description = trans.String("")
-			}
-
+			errList := v.Validate()
 			// 如果错误列表不为空，则返回错误
 			if len(errList) > 0 {
 				// 更新状态和原因
