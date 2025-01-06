@@ -28,3 +28,25 @@ func ExtractStringResultFromContext(ctx *gin.Context, keyword string) (value str
 	}
 	return
 }
+
+// 通过 Context 生成 Creator
+func GenerateCreator(ctx *gin.Context) (creator string) {
+	username, err := ExtractStringResultFromContext(ctx, "username")
+	if err != nil {
+		return ""
+	}
+	cnName, err := ExtractStringResultFromContext(ctx, "cnName")
+	if err != nil {
+		return ""
+	}
+	enName, err := ExtractStringResultFromContext(ctx, "enName")
+	if err != nil {
+		return ""
+	}
+	userId, err := ExtractUintResultFromContext(ctx, "userId")
+	if err != nil {
+		return ""
+	}
+	creator = fmt.Sprintf("%s,%s,%s,%d", username, cnName, enName, userId)
+	return
+}

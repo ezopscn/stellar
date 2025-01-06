@@ -43,6 +43,9 @@ const Apis = {
     Department: {
       List: BackendURL + '/system/department/list', // 部门列表
       Detail: BackendURL + '/system/department/detail', // 部门详情
+      Add: BackendURL + '/system/department/add', // 添加部门
+      Update: BackendURL + '/system/department/update', // 修改部门
+      UpdateUserDepartment: BackendURL + '/system/department/update-user-department' // 用户部门变更
     }
   }
 };

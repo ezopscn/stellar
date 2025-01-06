@@ -50,6 +50,13 @@ func SystemUserListHandler(ctx *gin.Context) {
 
 // 添加用户接口
 func SystemUserAddHandler(ctx *gin.Context) {
+	// 生成创建者
+	creator := utils.GenerateCreator(ctx)
+	if creator == "" {
+		response.FailedWithMessage("生成创建者失败")
+		return
+	}
+
 	// 获取 post 参数
 	req := dto.SystemUserAddRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -143,13 +150,7 @@ func SystemUserAddHandler(ctx *gin.Context) {
 		}(),
 		SystemRoleId: uint(*req.SystemRole),
 		Description:  *req.Description,
-		Creator: func() string {
-			username, _ := utils.ExtractStringResultFromContext(ctx, "username")
-			cnName, _ := utils.ExtractStringResultFromContext(ctx, "cnName")
-			enName, _ := utils.ExtractStringResultFromContext(ctx, "enName")
-			userId, _ := utils.ExtractUintResultFromContext(ctx, "userId")
-			return fmt.Sprintf("%s,%s,%s,%d", username, cnName, enName, userId)
-		}(),
+		Creator:      creator,
 	}
 
 	// 创建用户
@@ -162,6 +163,13 @@ func SystemUserAddHandler(ctx *gin.Context) {
 
 // 批量添加用户接口
 func SystemUserMultiAddHandler(ctx *gin.Context) {
+	// 生成创建者
+	creator := utils.GenerateCreator(ctx)
+	if creator == "" {
+		response.FailedWithMessage("生成创建者失败")
+		return
+	}
+
 	// 获取 post 参数
 	req := []dto.SystemUserMultiAddRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -305,13 +313,7 @@ func SystemUserMultiAddHandler(ctx *gin.Context) {
 					}(),
 					SystemRoleId: utils.StringToUint(*v.SystemRole),
 					Description:  *v.Description,
-					Creator: func() string {
-						username, _ := utils.ExtractStringResultFromContext(ctx, "username")
-						cnName, _ := utils.ExtractStringResultFromContext(ctx, "cnName")
-						enName, _ := utils.ExtractStringResultFromContext(ctx, "enName")
-						userId, _ := utils.ExtractUintResultFromContext(ctx, "userId")
-						return fmt.Sprintf("%s,%s,%s,%d", username, cnName, enName, userId)
-					}(),
+					Creator:      creator,
 				}
 
 				// 创建用户

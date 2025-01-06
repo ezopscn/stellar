@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { TitleSuffix } from '@/common/Text.jsx';
 import { App } from 'antd';
-import { Card, Row, Col, Tree, Button, Alert, Form, Space, List, Avatar, Skeleton } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Tree, Button, Alert, Form, Space, List, Avatar, Modal, Popconfirm } from 'antd';
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
 import { GenerateTreeNode } from '@/utils/Tree.jsx';
 import { GenerateRecordFormItem } from '@/utils/Form.jsx';
 import { ConvertNameIdToLabelValueTree, ConvertNameIdToTitleKeyTree, GetExpandedAllTreeKeys, HasChildren } from '@/utils/Tree.jsx';
+import { AxiosPost } from '@/utils/Request.jsx';
 
 // 页面常量配置
 const PageConfig = {
@@ -24,7 +25,7 @@ const PageDescriptionComponent = () => (
     <ul>
       <li>部门名称没有唯一性限制，因为不同部门或者项目组下面可能存在相同的部门。</li>
       <li>当删除部门时，部门下面的还存在用户，那么该用户会被移动到未分配部门。</li>
-      <li>部门 ID 为 1 和 2 是系统保留的，其中 1 是公司组织架构主体，管理员可以修改它的名称，2 是系统需要特殊预留的未分配部门，不允许调整。</li>
+      <li>部门 ID 为 1 和 2 是系统保留的，其中 1 是公司组织架构主体，管理员可以修改它的名称，2 是系统需要特殊预留的未分配部门，不允许调整和创建子部门。</li>
     </ul>
   </>
 );
@@ -50,14 +51,59 @@ const getUpdateSystemDepartmentFields = (updateSystemDepartment, systemDepartmen
 
 const SystemDepartment = () => {
   const { message } = App.useApp();
-  const [updateSystemDepartmentForm] = Form.useForm();
-
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 基础数据
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
   // 左侧部门树数据
   const [systemDepartmentTreeData, setSystemDepartmentTreeData] = useState([]);
   // 展开的部门树节点
   const [expandedSystemDepartmentKeys, setExpandedSystemDepartmentKeys] = useState([]);
-  // 部门选择树数据
+  // 部门选择树数据（下拉选择）
   const [systemDepartmentSelectTreeData, setSystemDepartmentSelectTreeData] = useState([]);
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////// 
+  // 新增部门
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 新增部门弹窗
+  const [addSystemDepartmentModalVisible, setAddSystemDepartmentModalVisible] = useState(false);
+
+  // 新增部门表单
+  const [addSystemDepartmentForm] = Form.useForm();
+
+  // 新增部门字段
+  const addSystemDepartmentFields = [
+    { label: '父部门', name: 'parentId', type: 'treeSelect', search: true, tree: true, multiple: false, data: systemDepartmentSelectTreeData, rules: [{ required: true, message: '父部门不能为空' }] },
+    { label: '部门名称', name: 'name', type: 'input', rules: [{ required: true, message: '部门名称不能为空' }, { max: 30, message: '部门名称长度不能超过30个字符' }, { min: 3, message: '部门名称长度不能小于3个字符' }] }
+  ];
+
+  // 生成新增部门表单项
+  const generateAddSystemDepartmentFormItems = () => {
+    return addSystemDepartmentFields?.map((item) => GenerateRecordFormItem(item));
+  };
+
+  // 新增部门
+  const addSystemDepartmentHandler = async () => {
+    try {
+      const res = await AxiosPost(Apis.System.Department.Add, addSystemDepartmentForm.getFieldsValue());
+      if (res?.code === 200) {
+        message.success('新增部门成功');
+        setAddSystemDepartmentModalVisible(false);
+        getSystemDepartmentDataHandler();
+        addSystemDepartmentForm.resetFields();
+      } else {
+        message.error(res?.message || '新增部门失败');
+      }
+    } catch (error) {
+      console.error(error);
+      message.error('服务异常，新增部门失败');
+    }
+  };
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 编辑部门详情
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 编辑部门表单
+  const [updateSystemDepartmentForm] = Form.useForm();
   // 当前编辑的部门数据
   const [updateSystemDepartment, setUpdateSystemDepartment] = useState(null);
   // 删除部门按钮状态
@@ -91,7 +137,6 @@ const SystemDepartment = () => {
       const res = await AxiosGet(Apis.System.Department.Detail, { id: selectedKeys[0] });
       if (res?.code === 200) {
         const { data } = res;
-        console.log(data);
         setUpdateSystemDepartment(data);
 
         // 设置表单值
@@ -131,6 +176,49 @@ const SystemDepartment = () => {
     getSystemDepartmentDataHandler();
   }, []);
 
+
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 用户部门变更
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 用户部门变更弹窗
+  const [userSystemDepartmentChangeModalVisible, setUserSystemDepartmentChangeModalVisible] = useState(false);
+
+  // 用户部门变更表单
+  const [userSystemDepartmentChangeForm] = Form.useForm();
+
+  // 用户部门变更字段
+  const userSystemDepartmentChangeFields = [
+    { label: '用户', name: 'userId', type: 'input', disabled: true },
+    { label: '部门', name: 'departmentId', type: 'treeSelect', search: true, tree: true, multiple: true, data: systemDepartmentSelectTreeData, 
+      rules: [{ required: true, message: '部门不能为空' }] 
+    }
+  ];
+
+  // 生成用户部门变更表单项
+  const generateUserSystemDepartmentChangeFormItems = () => {
+    return userSystemDepartmentChangeFields?.map((item) => GenerateRecordFormItem(item));
+  };
+
+  // 用户部门变更
+  const userSystemDepartmentChangeHandler = async () => {
+    try {
+      const res = await AxiosPost(Apis.System.Department.UpdateUserDepartment, userSystemDepartmentChangeForm.getFieldsValue());
+      if (res?.code === 200) {
+        message.success('用户部门变更成功');
+        setUserSystemDepartmentChangeModalVisible(false);
+        userSystemDepartmentChangeForm.resetFields();
+        // 重新获取部门详情
+        getSystemDepartmentDetailHandler(updateSystemDepartment?.id);
+      } else {
+        message.error(res?.message || '用户部门变更失败');
+      }
+    } catch (error) {
+      console.error(error);
+      message.error('服务异常，用户部门变更失败');
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -149,7 +237,7 @@ const SystemDepartment = () => {
         <Row>
           <Col span={6} style={{ padding: '10px' }}>
             <Card title="部门列表">
-              <Button type="primary" block style={{ marginBottom: '15px' }} icon={<PlusOutlined />}>新增部门</Button>
+              <Button type="primary" block style={{ marginBottom: '15px' }} icon={<PlusOutlined />} onClick={() => setAddSystemDepartmentModalVisible(true)}>新增部门</Button>
               <Tree
                 defaultExpandAll={true}
                 defaultSelectedKeys={['1']}
@@ -172,7 +260,18 @@ const SystemDepartment = () => {
                 dataSource={updateSystemDepartment?.systemUsers}
                 split={false}
                 renderItem={(item, index) => (
-                  <List.Item actions={[<a key="list-loadmore-edit">移除</a>, <a key="list-loadmore-more">变更</a>]}>
+                  <List.Item actions={[
+                    <Popconfirm
+                      placement="topRight"
+                      title="确定要移除该用户吗？"
+                      okText="确定"
+                      cancelText="取消"
+                      okButtonProps={{ style: { backgroundColor: '#ff4d4f', borderColor: '#ff4d4f' } }}
+                      onConfirm={() => {}}
+                    >
+                      <a style={{color: "#ff4d4f"}}>移除</a>
+                    </Popconfirm>
+                  , <a onClick={() => setUserSystemDepartmentChangeModalVisible(true)}>变更</a>]}>
                     <List.Item.Meta
                       avatar={<Avatar src={item.avatar} />}
                       title={`${item.cnName}（${item.enName}）`}
@@ -183,13 +282,12 @@ const SystemDepartment = () => {
                 pagination={{
                   position: 'bottom',
                   align: 'end',
-                  pageSize: 10,
+                  pageSize: 1,
                   size: 'small',
                   hideOnSinglePage: true,
                   total: updateSystemDepartment?.systemUsers?.length,
                   showSizeChanger: true,
                   showQuickJumper: true,
-                  showTotal: (total, range) => `总共 ${total} 条数据`
                 }}
               />
             </Card>
@@ -226,6 +324,38 @@ const SystemDepartment = () => {
           </Col>
         </Row>
       </div>
+
+      {/* 添加部门 */}
+      <Modal
+        title="新增部门"
+        open={addSystemDepartmentModalVisible}
+        onCancel={() => {
+          setAddSystemDepartmentModalVisible(false);
+          addSystemDepartmentForm.resetFields();
+        }}
+        maskClosable={false}
+        onOk={addSystemDepartmentHandler}
+      >
+        <Form form={addSystemDepartmentForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="addSystemDepartmentForm" autoComplete="off">
+          {generateAddSystemDepartmentFormItems()}
+        </Form>
+      </Modal>
+
+      {/* 用户部门变更 */}
+      <Modal
+        title="用户部门变更"
+        open={userSystemDepartmentChangeModalVisible}
+        onCancel={() => {
+          setUserSystemDepartmentChangeModalVisible(false);
+          userSystemDepartmentChangeForm.resetFields();
+        }}
+        maskClosable={false}
+        onOk={userSystemDepartmentChangeHandler}
+      >
+        <Form form={userSystemDepartmentChangeForm} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} colon={false} name="userSystemDepartmentChangeForm" autoComplete="off">
+          {generateUserSystemDepartmentChangeFormItems()}
+        </Form>
+      </Modal>
     </>
   );
 };

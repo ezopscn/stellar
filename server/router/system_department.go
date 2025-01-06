@@ -15,5 +15,6 @@ func SystemDepartmentAuthRoutes(rg *gin.RouterGroup) gin.IRoutes {
 func SystemDepartmentAuthAndPermissionRoutes(rg *gin.RouterGroup) gin.IRoutes {
 	rg.GET("/list", v1.SystemDepartmentListHandler)
 	rg.GET("/detail", v1.SystemDepartmentDetailHandler)
+	rg.POST("/add", v1.SystemDepartmentAddHandler)
 	return rg
 }

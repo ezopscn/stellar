@@ -61,6 +61,7 @@ var systemDepartmentAuthApis = []model.SystemApi{}
 var systemDepartmentAuthAndPermissionApis = []model.SystemApi{
 	{Name: "部门列表", Path: "/system/department/list", Method: "GET", Description: "部门列表接口", NeedPermission: trans.Uint(1), CategoryId: 6, SystemRoles: []model.SystemRole{systemRoles[2]}},
 	{Name: "部门详情", Path: "/system/department/detail", Method: "GET", Description: "部门详情接口", NeedPermission: trans.Uint(1), CategoryId: 6},
+	{Name: "部门添加", Path: "/system/department/add", Method: "POST", Description: "部门添加接口", NeedPermission: trans.Uint(1), CategoryId: 6},
 }
 
 // 职位 API，无需鉴权
