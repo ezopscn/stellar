@@ -65,6 +65,10 @@ func SystemUserAddHandler(ctx *gin.Context) {
 
 	// 校验提交数据
 	errList := req.Validate()
+	// 用户描述需要单独处理一下
+	if req.Description == nil {
+		req.Description = trans.String("")
+	}
 	// 如果错误列表不为空，则返回错误
 	if len(errList) > 0 {
 		response.FailedWithMessage(strings.Join(errList, ","))
@@ -179,6 +183,10 @@ func SystemUserMultiAddHandler(ctx *gin.Context) {
 
 			// 校验提交数据
 			errList := v.Validate()
+			// 用户描述需要单独处理一下
+			if v.Description == nil {
+				v.Description = trans.String("")
+			}
 			// 如果错误列表不为空，则返回错误
 			if len(errList) > 0 {
 				// 更新状态和原因
