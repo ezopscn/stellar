@@ -86,5 +86,7 @@ var systemUsers = []model.SystemUser{
 // 用户初始化
 func InitUserData() {
 	common.MySQLDB.Exec("TRUNCATE TABLE system_user")
+	common.MySQLDB.Exec("TRUNCATE TABLE system_user_department_relation")
+	common.MySQLDB.Exec("TRUNCATE TABLE system_user_job_position_relation")
 	common.MySQLDB.Create(&systemUsers)
 }

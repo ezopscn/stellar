@@ -36,5 +36,7 @@ var systemRoles = []model.SystemRole{
 // 角色初始化
 func InitRoleData() {
 	common.MySQLDB.Exec("TRUNCATE TABLE system_role")
+	common.MySQLDB.Exec("TRUNCATE TABLE system_role_api_relation")
+	common.MySQLDB.Exec("TRUNCATE TABLE system_role_menu_relation")
 	common.MySQLDB.Create(&systemRoles)
 }

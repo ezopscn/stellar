@@ -3,13 +3,16 @@ import { Helmet } from 'react-helmet';
 import { TitleSuffix } from '@/common/Text.jsx';
 import { App } from 'antd';
 import { Card, Row, Col, Tree, Button, Alert, Form, Space, List, Avatar, Modal, Popconfirm } from 'antd';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { AxiosGet } from '@/utils/Request.jsx';
 import { Apis } from '@/common/APIConfig.jsx';
 import { GenerateTreeNode } from '@/utils/Tree.jsx';
 import { GenerateRecordFormItem } from '@/utils/Form.jsx';
 import { ConvertNameIdToLabelValueTree, ConvertNameIdToTitleKeyTree, GetExpandedAllTreeKeys, HasChildren } from '@/utils/Tree.jsx';
 import { AxiosPost } from '@/utils/Request.jsx';
+import { useSnapshot } from 'valtio';
+import { SystemRoleStates } from '@/store/StoreSystemRole.jsx';
+import { BackendURL } from '@/common/APIConfig.jsx';
 
 // 页面常量配置
 const PageConfig = {
@@ -51,6 +54,15 @@ const getUpdateSystemDepartmentFields = (updateSystemDepartment, systemDepartmen
 
 const SystemDepartment = () => {
   const { message } = App.useApp();
+  // 全局数据，用于父子组件之间数据传递
+  const { SystemRoleApis } = useSnapshot(SystemRoleStates);
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 按钮权限控制
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 新增按钮权限控制
+  const addSystemDepartmentButtonDisabled = !SystemRoleApis.list?.includes(Apis.System.Department.Add.replace(BackendURL, ''));
+
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   // 基础数据
   /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -237,7 +249,10 @@ const SystemDepartment = () => {
         <Row>
           <Col span={6} style={{ padding: '10px' }}>
             <Card title="部门列表">
-              <Button type="primary" block style={{ marginBottom: '15px' }} icon={<PlusOutlined />} onClick={() => setAddSystemDepartmentModalVisible(true)}>新增部门</Button>
+              <Button type="primary" block style={{ marginBottom: '15px' }} icon={<PlusOutlined />} 
+                onClick={() => setAddSystemDepartmentModalVisible(true)}
+                disabled={addSystemDepartmentButtonDisabled}
+              >新增部门</Button>
               <Tree
                 defaultExpandAll={true}
                 defaultSelectedKeys={['1']}

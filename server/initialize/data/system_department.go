@@ -31,6 +31,5 @@ func insertDepartmentsData(departments []model.SystemDepartment) {
 // 部门初始化
 func InitDepartmentData() {
 	common.MySQLDB.Exec("TRUNCATE TABLE system_department")
-	common.MySQLDB.Exec("TRUNCATE TABLE system_user_department_relation")
 	insertDepartmentsData(systemDepartments)
 }

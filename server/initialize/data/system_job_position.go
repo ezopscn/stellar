@@ -107,6 +107,5 @@ var systemJobPositions = []model.SystemJobPosition{
 // 职位初始化
 func InitJobPositionData() {
 	common.MySQLDB.Exec("TRUNCATE TABLE system_job_position")
-	common.MySQLDB.Exec("TRUNCATE TABLE system_user_job_position_relation")
 	common.MySQLDB.Create(&systemJobPositions)
 }

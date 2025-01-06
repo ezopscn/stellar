@@ -379,6 +379,5 @@ func insertMenusData(menus []model.SystemMenu) {
 // 菜单初始化
 func InitMenuData() {
 	common.MySQLDB.Exec("TRUNCATE TABLE system_menu")
-	common.MySQLDB.Exec("TRUNCATE TABLE system_role_menu_relation")
 	insertMenusData(systemMenus)
 }
